@@ -1,0 +1,99 @@
+from setuptools import setup
+from pybind11.setup_helpers import Pybind11Extension
+
+import os
+import sys
+
+__version__ = "0.3"
+
+
+define_macros = [('VERSION_INFO', __version__)]
+include_dirs = ['../include']
+extra_compile_args = ['-DNERVA_TIMER']
+extra_link_args = []
+
+# Configure Eigen
+EIGEN_INCLUDE_DIR = os.getenv('EIGEN_INCLUDE_DIR')
+
+if sys.platform.startswith("win"):
+    if not EIGEN_INCLUDE_DIR:
+        raise RuntimeError("Eigen library not found. Please set the EIGEN_INCLUDE_DIR environment variable to the path of your Eigen installation.")
+else:
+    EIGEN_INCLUDE_DIR = EIGEN_INCLUDE_DIR or '/usr/include/eigen3'
+
+if not os.path.exists(EIGEN_INCLUDE_DIR):
+    raise RuntimeError(f"Eigen library not found at specified path: {EIGEN_INCLUDE_DIR}")
+
+define_macros += [('EIGEN_USE_MKL_ALL', 1)]
+include_dirs += [EIGEN_INCLUDE_DIR]
+
+# Configure FMT
+FMT_INCLUDE_DIR = os.getenv('FMT_INCLUDE_DIR')
+if not FMT_INCLUDE_DIR:
+    raise RuntimeError("FMT library not found. Please set the FMT_INCLUDE_DIR environment variable to the path of your FMT installation.")
+
+# Configure OneAPI / MKL
+ONEAPI_ROOT = os.getenv('ONEAPI_ROOT')
+if not ONEAPI_ROOT:
+    raise RuntimeError('Could not detect the oneAPI library. Please set the ONEAPI_ROOT environment variable')
+
+MKL_ROOT = f'{ONEAPI_ROOT}/mkl/latest'
+MKL_INCLUDE_DIR = f'{MKL_ROOT}/include'
+MKL_LIB_DIR = f'{MKL_ROOT}/lib'
+
+include_dirs += [FMT_INCLUDE_DIR, MKL_INCLUDE_DIR]
+extra_compile_args += ['-DMKL_ILP64', '-DFMT_HEADER_ONLY']
+
+if sys.platform.startswith("win"):
+    extra_compile_args += ['/wd4244', '/wd4267', '/utf-8']
+    extra_link_args += [f'{MKL_LIB_DIR}/mkl_intel_ilp64.lib',
+                        f'{MKL_LIB_DIR}/mkl_intel_thread.lib',
+                        f'{MKL_LIB_DIR}/mkl_core.lib',
+                        f'{ONEAPI_ROOT}/compiler/latest/lib/libiomp5md.lib',
+                        f'/LIBPATH:{ONEAPI_ROOT}/compiler/latest/compiler/bin'
+                       ]
+else:
+    extra_compile_args += ['-march=native', '-m64', '-fopenmp']
+    extra_link_args += ['-Wl,--start-group',
+                        f'{MKL_LIB_DIR}/libmkl_intel_ilp64.a',
+                        f'{MKL_LIB_DIR}/libmkl_intel_thread.a',
+                        f'{MKL_LIB_DIR}/libmkl_core.a',
+                        '-Wl,--end-group',
+                        '-liomp5',
+                        '-lpthread',
+                        '-lm',
+                        '-ldl'
+                       ]
+
+# We need to use absolute paths, since the src folder is in the parent directory.
+current_dir = os.path.abspath(os.path.dirname(__file__))
+src_dir = os.path.abspath(os.path.join(current_dir, "../src"))
+
+ext_modules = [
+    Pybind11Extension(
+        "nervalibrowwise",
+        [
+            os.path.join(src_dir, "logger.cpp"),
+            os.path.join(src_dir, "python-bindings.cpp"),
+            os.path.join(src_dir, "utilities.cpp")
+        ],
+        define_macros=define_macros,
+        extra_compile_args=extra_compile_args,
+        extra_link_args=extra_link_args,
+        include_dirs=include_dirs,
+        cxx_std=20
+    ),
+]
+
+setup(
+    name="nerva",
+    version=__version__,
+    author="Wieger Wesselink",
+    author_email="j.w.wesselink@tue.nl",
+    description="C++ library for Neural Networks",
+    long_description="",
+    ext_modules=ext_modules,
+    zip_safe=False,
+    packages=['nerva']
+)
+

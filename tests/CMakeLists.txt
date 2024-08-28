@@ -1,0 +1,10 @@
+project(NERVA_TEST)
+
+file(GLOB SOURCES CONFIGURE_DEPENDS "*.cpp")
+foreach(SRC ${SOURCES})
+  get_filename_component(BASE "${SRC}" NAME_WE)
+  add_executable("${BASE}" "${SRC}")
+  add_test(NAME "nerva_${BASE}" COMMAND "${BASE}")
+  target_include_directories("${BASE}" PRIVATE ${Python_INCLUDE_DIRS})
+  target_link_libraries ("${BASE}" LINK_PUBLIC nervalib Eigen3::Eigen MKL::MKL Python3::Python pybind11::pybind11)
+endforeach(SRC)
