@@ -86,9 +86,9 @@ std::string pp(const MatrixA& A, const MatrixB& B, const MatrixC& C)
 
 // A = B * C
 template <int MatrixLayoutA = colwise, int MatrixLayoutB = colwise, int MatrixLayoutC = colwise>
-void test_ddd_product(long m, long k, long n)
+void test_ddd_product(long m, long k, long n, int repetitions)
 {
-  std::cout << "--- testing A = B * C (sdd_product) ---" << std::endl;
+  std::cout << "--- testing A = B * C (ddd_product) ---" << std::endl;
   std::cout << fmt::format("A = {:2d}x{:2d} dense  layout={}\n", m, n, layout_string(MatrixLayoutA));
   std::cout << fmt::format("B = {:2d}x{:2d} dense  layout={}\n", m, k, layout_string(MatrixLayoutB));
   std::cout << fmt::format("C = {:2d}x{:2d} dense  layout={}\n\n", k, n, layout_string(MatrixLayoutC));
@@ -109,16 +109,23 @@ void test_ddd_product(long m, long k, long n)
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, MatrixLayoutC> C(k, n);
   eigen::fill_matrix_random(C, 1.0, a, b, rng);
 
-  // dense product
   utilities::stopwatch watch;
-  A = B * C;
-  auto seconds = watch.seconds();
-  std::cout << fmt::format("{:8.5f}s ddd_product {}\n", seconds, pp(A, B, C));
+
+  // dense product
+  for (auto i = 0; i < repetitions; ++i)
+  {
+    watch.reset();
+    A = B * C;
+    auto seconds = watch.seconds();
+    std::cout << fmt::format("{:8.5f}s ddd_product {}\n", seconds, pp(A, B, C));
+  }
+
+  std::cout << std::endl;
 }
 
 // A = B * C
 template <int MatrixLayoutB = colwise, int MatrixLayoutC = colwise>
-void test_sdd_product(long m, long k, long n, const std::vector<float>& densities)
+void test_sdd_product(long m, long k, long n, const std::vector<float>& densities, int repetitions)
 {
   std::cout << "--- testing A = B * C (sdd_product) ---" << std::endl;
   std::cout << fmt::format("A = {:2d}x{:2d} sparse\n", m, n);
@@ -147,39 +154,53 @@ void test_sdd_product(long m, long k, long n, const std::vector<float>& densitie
 
     // dense product
     utilities::stopwatch watch;
-    A = B * C;
-    auto seconds = watch.seconds();
-    std::cout << fmt::format("{:8.5f}s ddd_product {}\n", seconds, pp(A, B, C));
+    for (auto i = 0; i < repetitions; ++i)
+    {
+      watch.reset();
+      A = B * C;
+      auto seconds = watch.seconds();
+      std::cout << fmt::format("{:8.5f}s ddd_product {}\n", seconds, pp(A, B, C));
+    }
 
     // sdd_product_batch
     for (long batch_size: {5, 10, 100})
     {
-      watch.reset();
-      mkl::sdd_product_batch(A1, B, C, batch_size);
-      seconds = watch.seconds();
-      std::cout << fmt::format("{:8.5f}s sdd_product(batchsize={}, {})\n", seconds, batch_size, pp(A1, B, C));
+      for (auto i = 0; i < repetitions; ++i)
+      {
+        watch.reset();
+        mkl::sdd_product_batch(A1, B, C, batch_size);
+        auto seconds = watch.seconds();
+        std::cout << fmt::format("{:8.5f}s sdd_product(batchsize={}, {})\n", seconds, batch_size, pp(A1, B, C));
+      }
     }
 
     if (density * m <= 2000)
     {
-      watch.reset();
-      mkl::sdd_product_forloop_eigen(A1, B, C);
-      seconds = watch.seconds();
-      std::cout << fmt::format("{:8.5f}s sdd_product_forloop_eigen({})\n", seconds, pp(A1, B, C));
+      for (auto i = 0; i < repetitions; ++i)
+      {
+        watch.reset();
+        mkl::sdd_product_forloop_eigen(A1, B, C);
+        auto seconds = watch.seconds();
+        std::cout << fmt::format("{:8.5f}s sdd_product_forloop_eigen({})\n", seconds, pp(A1, B, C));
+      }
 
-      watch.reset();
-      mkl::sdd_product_forloop_mkl(A1, B, C);
-      seconds = watch.seconds();
-      std::cout << fmt::format("{:8.5f}s sdd_product_forloop_mkl()\n", seconds, pp(A1, B, C));
+      for (auto i = 0; i < repetitions; ++i)
+      {
+        watch.reset();
+        mkl::sdd_product_forloop_mkl(A1, B, C);
+        auto seconds = watch.seconds();
+        std::cout << fmt::format("{:8.5f}s sdd_product_forloop_mkl()\n", seconds, pp(A1, B, C));
+      }
     }
 
     std::cout << std::endl;
   }
+  std::cout << std::endl;
 }
 
 // A = B * C
 template <int MatrixLayoutA = colwise, int MatrixLayoutC = colwise>
-void test_dsd_product(long m, long k, long n, const std::vector<float>& densities)
+void test_dsd_product(long m, long k, long n, const std::vector<float>& densities, int repetitions)
 {
   std::cout << "--- testing A = B * C (dsd_product) ---" << std::endl;
   std::cout << fmt::format("A = {:2d}x{:2d} dense  layout={}\n", m, k, layout_string(MatrixLayoutA));
@@ -206,20 +227,28 @@ void test_dsd_product(long m, long k, long n, const std::vector<float>& densitie
     eigen::fill_matrix_random(C, float(0), a, b, rng);
 
     utilities::stopwatch watch;
-    A = B * C;
-    auto seconds = watch.seconds();
-    std::cout << fmt::format("{:8.5f}s ddd_product({})\n", seconds, pp(A, B, C));
+    for (auto i = 0; i < repetitions; ++i)
+    {
+      watch.reset();
+      A = B * C;
+      auto seconds = watch.seconds();
+      std::cout << fmt::format("{:8.5f}s ddd_product({})\n", seconds, pp(A, B, C));
+    }
 
-    watch.reset();
-    mkl::dsd_product(A, B1, C);
-    seconds = watch.seconds();
-    std::cout << fmt::format("{:8.5f}s dsd_product({})\n\n", seconds, pp(A, B1, C));
+    for (auto i = 0; i < repetitions; ++i)
+    {
+      watch.reset();
+      mkl::dsd_product(A, B1, C);
+      auto seconds = watch.seconds();
+      std::cout << fmt::format("{:8.5f}s dsd_product({})\n\n", seconds, pp(A, B1, C));
+    }
   }
+  std::cout << std::endl;
 }
 
 // A = B^T * C
 template <int MatrixLayoutA = colwise, int MatrixLayoutC = colwise>
-void test_dsd_transpose_product(long m, long k, long n, const std::vector<float>& densities)
+void test_dsd_transpose_product(long m, long k, long n, const std::vector<float>& densities, int repetitions)
 {
   std::cout << "--- testing A = B^T * C (dsd_product) ---" << std::endl;
   std::cout << fmt::format("A = {:2d}x{:2d} dense  layout={}\n", m, k, layout_string(MatrixLayoutA));
@@ -246,16 +275,25 @@ void test_dsd_transpose_product(long m, long k, long n, const std::vector<float>
     eigen::fill_matrix_random(C, 0, a, b, rng);
 
     utilities::stopwatch watch;
-    A = B.transpose() * C;
-    auto seconds = watch.seconds();
-    std::cout << fmt::format("{:8.5f}s ddd_product({})\n", seconds, pp(A, B, C));
 
-    watch.reset();
-    bool B1_transposed = true;
-    mkl::dsd_product(A, B1, C, float(0), float(1), B1_transposed);
-    seconds = watch.seconds();
-    std::cout << fmt::format("{:8.5f}s dsd_product({})\n\n", seconds, pp(A, B1, C));
+    for (auto i = 0; i < repetitions; ++i)
+    {
+      watch.reset();
+      A = B.transpose() * C;
+      auto seconds = watch.seconds();
+      std::cout << fmt::format("{:8.5f}s ddd_product({})\n", seconds, pp(A, B, C));
+    }
+
+    for (auto i = 0; i < repetitions; ++i)
+    {
+      watch.reset();
+      bool B1_transposed = true;
+      mkl::dsd_product(A, B1, C, float(0), float(1), B1_transposed);
+      auto seconds = watch.seconds();
+      std::cout << fmt::format("{:8.5f}s dsd_product({})\n\n", seconds, pp(A, B1, C));
+    }
   }
+  std::cout << std::endl;
 }
 
 inline
@@ -291,6 +329,7 @@ class tool: public command_line_tool
     std::string algorithm;
     std::string layouts;
     int threads = 1;
+    int repetitions = 1;
     std::string densities_text = "1.0, 0.5, 0.1, 0.05, 0.01, 0.001";
 
     void add_options(lyra::cli& cli) override
@@ -301,6 +340,7 @@ class tool: public command_line_tool
       cli |= lyra::opt(n, "n")["--brows"]["-n"]("The number of rows of matrix B");
       cli |= lyra::opt(threads, "value")["--threads"]("The number of threads.");
       cli |= lyra::opt(densities_text, "value")["--densities"]("The densities that are tested.");
+      cli |= lyra::opt(repetitions, "value")["--repetitions"]("The number of repetitions for each test.");
     }
 
     std::string description() const override
@@ -318,31 +358,31 @@ class tool: public command_line_tool
       std::vector<float> densities = parse_comma_separated_floats(densities_text);
       if (algorithm == "sdd")
       {
-        test_sdd_product<colwise, colwise>(m, k, n, densities);
-        test_sdd_product<colwise, rowwise>(m, k, n, densities);
-        test_sdd_product<rowwise, colwise>(m, k, n, densities);
-        test_sdd_product<rowwise, rowwise>(m, k, n, densities);
+        test_sdd_product<colwise, colwise>(m, k, n, densities, repetitions);
+        test_sdd_product<colwise, rowwise>(m, k, n, densities, repetitions);
+        test_sdd_product<rowwise, colwise>(m, k, n, densities, repetitions);
+        test_sdd_product<rowwise, rowwise>(m, k, n, densities, repetitions);
       }
       else if (algorithm == "dsd")
       {
-        test_dsd_product<colwise, colwise>(m, k, n, densities);
-        test_dsd_product<rowwise, rowwise>(m, k, n, densities);
+        test_dsd_product<colwise, colwise>(m, k, n, densities, repetitions);
+        test_dsd_product<rowwise, rowwise>(m, k, n, densities, repetitions);
       }
       else if (algorithm == "dsdt")
       {
-        test_dsd_transpose_product<colwise, colwise>(m, k, n, densities);
-        test_dsd_transpose_product<rowwise, rowwise>(m, k, n, densities);
+        test_dsd_transpose_product<colwise, colwise>(m, k, n, densities, repetitions);
+        test_dsd_transpose_product<rowwise, rowwise>(m, k, n, densities, repetitions);
       }
       else if (algorithm == "ddd")
       {
-        test_ddd_product<colwise, colwise, colwise>(m, k, n);
-        test_ddd_product<colwise, colwise, rowwise>(m, k, n);
-        test_ddd_product<colwise, rowwise, colwise>(m, k, n);
-        test_ddd_product<colwise, rowwise, rowwise>(m, k, n);
-        test_ddd_product<rowwise, colwise, colwise>(m, k, n);
-        test_ddd_product<rowwise, colwise, rowwise>(m, k, n);
-        test_ddd_product<rowwise, rowwise, colwise>(m, k, n);
-        test_ddd_product<rowwise, rowwise, rowwise>(m, k, n);
+        test_ddd_product<colwise, colwise, colwise>(m, k, n, repetitions);
+        test_ddd_product<colwise, colwise, rowwise>(m, k, n, repetitions);
+        test_ddd_product<colwise, rowwise, colwise>(m, k, n, repetitions);
+        test_ddd_product<colwise, rowwise, rowwise>(m, k, n, repetitions);
+        test_ddd_product<rowwise, colwise, colwise>(m, k, n, repetitions);
+        test_ddd_product<rowwise, colwise, rowwise>(m, k, n, repetitions);
+        test_ddd_product<rowwise, rowwise, colwise>(m, k, n, repetitions);
+        test_ddd_product<rowwise, rowwise, rowwise>(m, k, n, repetitions);
       }
       return true;
     }
