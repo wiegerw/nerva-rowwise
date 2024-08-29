@@ -164,6 +164,8 @@ class stochastic_gradient_descent_algorithm
         rng(rng_)
     {}
 
+    virtual ~stochastic_gradient_descent_algorithm() = default;
+
     /// \brief Event function that is called at the start of training
     virtual void on_start_training()
     {}

@@ -4,7 +4,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-/// \file nerva/tools/mlp.cpp
+/// \file tools/mlp.cpp
 /// \brief add your file description here.
 
 #include "nerva/datasets/dataset.h"
@@ -83,7 +83,7 @@ auto parse_linear_layer_dropouts(const std::string& dropouts_text, std::size_t l
 }
 
 inline
-auto parse_init_weights(const std::string& text, std::size_t linear_layer_count) -> std::vector<std::string>
+auto parse_layer_weights(const std::string& text, std::size_t linear_layer_count) -> std::vector<std::string>
 {
   auto n = linear_layer_count;
 
@@ -209,7 +209,58 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
     }
 };
 
-class tool: public command_line_tool
+struct mlp_options: public sgd_options
+{
+  std::string cifar10;
+  std::string dataset;
+  std::size_t dataset_size = 2000;
+  bool normalize_data = false;
+  std::string learning_rate_scheduler = "constant(0.0001)";
+  std::string loss_function = "squared-error";
+  std::string architecture;
+  std::vector<std::size_t> sizes;
+  std::string weights_initialization;
+  std::string optimizer = "gradient-descent";
+  scalar overall_density = 1;
+  std::vector<double> densities;
+  std::size_t seed = std::random_device{}();
+  int precision = 4;
+  int threads = 1;
+
+  void info() const
+  {
+    std::cout << *this;
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const mlp_options& options)
+  {
+    out << static_cast<const sgd_options&>(options);
+    if (!options.cifar10.empty())
+    {
+      out << "cifar10 = " << options.cifar10 << std::endl;
+    }
+    if (!options.dataset.empty())
+    {
+      out << "dataset = " << options.dataset << std::endl;
+      out << "dataset size = " << options.dataset_size << std::endl;
+      out << "normalize data = " << std::boolalpha << options.normalize_data << std::endl;
+    }
+    out << "learning rate scheduler = " << options.learning_rate_scheduler << std::endl;
+    out << "loss function = " << options.loss_function << std::endl;
+    out << "architecture = " << options.architecture << std::endl;
+    out << "sizes = " << print_list(options.sizes) << std::endl;
+    out << "weights initialization = " << options.weights_initialization << std::endl;
+    out << "optimizer = " << options.optimizer << std::endl;
+    out << "overall density = " << options.overall_density << std::endl;
+    out << "densities = " << print_list(options.densities) << std::endl;
+    out << "seed = " << options.seed << std::endl;
+    out << "precision = " << options.precision << std::endl;
+    out << "threads = " << options.threads << std::endl;
+    return out;
+  }
+};
+
+class mlp_tool: public command_line_tool
 {
   protected:
     mlp_options options;
@@ -221,7 +272,7 @@ class tool: public command_line_tool
     std::string densities_text;
     std::string dropouts_text;
     std::string layer_specifications_text;
-    std::string init_weights_text = "None";
+    std::string layer_weights_text = "None";
     std::string computation = "eigen";
     double overall_density = 1;
     std::string preprocessed_dir;  // a directory containing a dataset for every epoch
@@ -241,7 +292,7 @@ class tool: public command_line_tool
       cli |= lyra::opt(options.seed, "value")["--seed"]("A seed value for the random generator.");
 
       // model parameters
-      cli |= lyra::opt(linear_layer_sizes_text, "value")["--sizes"]("A comma separated list of layer sizes");
+      cli |= lyra::opt(linear_layer_sizes_text, "value")["--layer-sizes"]("A comma separated list of the linear layer sizes");
       cli |= lyra::opt(densities_text, "value")["--densities"]("A comma separated list of sparse layer densities");
       cli |= lyra::opt(dropouts_text, "value")["--dropouts"]("A comma separated list of dropout rates");
       cli |= lyra::opt(overall_density, "value")["--overall-density"]("The overall density level of the sparse layers");
@@ -265,15 +316,16 @@ class tool: public command_line_tool
       cli |= lyra::opt(options.loss_function, "value")["--loss"]("The loss function (squared-error, cross-entropy, logistic-cross-entropy)");
 
       // weights
-      cli |= lyra::opt(init_weights_text, "value")["--init-weights"]("The weight initialization (default, he, uniform, xavier, normalized_xavier, uniform)");
+      cli |= lyra::opt(layer_weights_text, "value")["--layer-weights"]("The weight initialization of the layers (default, he, uniform, xavier, normalized_xavier, uniform)");
       cli |= lyra::opt(load_weights_file, "value")["--load-weights"]("Loads the weights and bias from a file in .npz format");
       cli |= lyra::opt(save_weights_file, "value")["--save-weights"]("Saves the weights and bias to a file in .npz format");
 
       // dataset
+      cli |= lyra::opt(options.cifar10, "value")["--cifar10"]("The location of the CIFAR10 dataset");
       cli |= lyra::opt(options.dataset, "value")["--dataset"]("The dataset (chessboard, spirals, square, sincos)");
+      cli |= lyra::opt(options.dataset_size, "value")["--dataset-size"]("The size of the dataset (default: 1000)");
       cli |= lyra::opt(load_dataset_file, "value")["--load-dataset"]("Loads the dataset from a file in .npz format");
       cli |= lyra::opt(save_dataset_file, "value")["--save-dataset"]("Saves the dataset to a file in .npz format");
-      cli |= lyra::opt(options.dataset_size, "value")["--size"]("The size of the dataset (default: 1000)");
       cli |= lyra::opt(options.normalize_data)["--normalize"]("Normalize the data");
       cli |= lyra::opt(preprocessed_dir, "value")["--preprocessed"]("A directory containing the files epoch<nnn>.npz");
 
@@ -325,18 +377,28 @@ class tool: public command_line_tool
 
       std::mt19937 rng{static_cast<unsigned int>(options.seed)};
 
-      if (!options.dataset.empty())
+      if (!options.cifar10.empty())
+      {
+        NERVA_LOG(log::verbose) << "Loading datset CIFAR10 from folder " << options.cifar10 << '\n';
+        cifar10reader_colwise reader;
+        reader.read(options.cifar10);
+        reader.normalize_data();
+        std::tie(dataset.Xtrain, dataset.Ttrain, dataset.Xtest, dataset.Ttest) = reader.data();
+        dataset.transpose();
+      }
+      else if (!options.dataset.empty())
       {
         NERVA_LOG(log::verbose) << "Loading dataset " << options.dataset << '\n';
         dataset = datasets::make_dataset(options.dataset, options.dataset_size, rng);
-        if (!save_dataset_file.empty())
-        {
-          dataset.save(save_dataset_file);
-        }
       }
       else if (!load_dataset_file.empty())
       {
         dataset.load(load_dataset_file);
+      }
+
+      if (!save_dataset_file.empty())
+      {
+        dataset.save(save_dataset_file);
       }
 
       auto layer_specifications = parse_layers(layer_specifications_text);
@@ -344,7 +406,7 @@ class tool: public command_line_tool
       auto linear_layer_count = linear_layer_sizes.size() - 1;
       auto linear_layer_densities = parse_linear_layer_densities(densities_text, overall_density, linear_layer_sizes);
       auto linear_layer_dropouts = parse_linear_layer_dropouts(dropouts_text, linear_layer_count);
-      auto linear_layer_weights = parse_init_weights(init_weights_text, linear_layer_count);
+      auto linear_layer_weights = parse_layer_weights(layer_weights_text, linear_layer_count);
       auto optimizers = parse_optimizers(options.optimizer, layer_specifications.size());
 
       // construct the multilayer perceptron M
@@ -403,5 +465,5 @@ class tool: public command_line_tool
 auto main(int argc, const char* argv[]) -> int
 {
   pybind11::scoped_interpreter guard{};
-  return tool().execute(argc, argv);
+  return mlp_tool().execute(argc, argv);
 }

@@ -33,26 +33,6 @@ struct sgd_options
   void info() const;
 };
 
-struct mlp_options: public sgd_options
-{
-  std::string dataset;
-  std::size_t dataset_size = 2000;
-  bool normalize_data = false;
-  std::string learning_rate_scheduler = "constant(0.0001)";
-  std::string loss_function = "squared-error";
-  std::string architecture;
-  std::vector<std::size_t> sizes;
-  std::string weights_initialization;
-  std::string optimizer = "gradient-descent";
-  scalar overall_density = 1;
-  std::vector<double> densities;
-  std::size_t seed = std::random_device{}();
-  int precision = 4;
-  int threads = 1;
-
-  void info() const;
-};
-
 inline
 std::ostream& operator<<(std::ostream& out, const sgd_options& options)
 {
@@ -71,37 +51,7 @@ std::ostream& operator<<(std::ostream& out, const sgd_options& options)
 }
 
 inline
-std::ostream& operator<<(std::ostream& out, const mlp_options& options)
-{
-  out << static_cast<const sgd_options&>(options);
-  if (!options.dataset.empty())
-  {
-    out << "dataset = " << options.dataset << std::endl;
-    out << "dataset size = " << options.dataset_size << std::endl;
-    out << "normalize data = " << std::boolalpha << options.normalize_data << std::endl;
-  }
-  out << "learning rate scheduler = " << options.learning_rate_scheduler << std::endl;
-  out << "loss function = " << options.loss_function << std::endl;
-  out << "architecture = " << options.architecture << std::endl;
-  out << "sizes = " << print_list(options.sizes) << std::endl;
-  out << "weights initialization = " << options.weights_initialization << std::endl;
-  out << "optimizer = " << options.optimizer << std::endl;
-  out << "overall density = " << options.overall_density << std::endl;
-  out << "densities = " << print_list(options.densities) << std::endl;
-  out << "seed = " << options.seed << std::endl;
-  out << "precision = " << options.precision << std::endl;
-  out << "threads = " << options.threads << std::endl;
-  return out;
-}
-
-inline
 void sgd_options::info() const
-{
-  std::cout << *this;
-}
-
-inline
-void mlp_options::info() const
 {
   std::cout << *this;
 }
