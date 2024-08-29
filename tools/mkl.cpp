@@ -40,6 +40,24 @@ std::string layout_string(int layout)
 }
 
 inline
+float parse_float(const std::string& text)
+{
+  // Use stold instead of stof to avoid out_of_range errors
+  return static_cast<float>(std::stold(text, nullptr));
+}
+
+inline
+std::vector<float> parse_comma_separated_floats(const std::string& text)
+{
+  std::vector<float> result;
+  for (const std::string& word: utilities::regex_split(text, ","))
+  {
+    result.push_back(parse_float(word));
+  }
+  return result;
+}
+
+inline
 std::string layout_char(int layout)
 {
   return layout == colwise ? "C" : "R";
@@ -64,6 +82,38 @@ std::string pp(const MatrixA& A, const MatrixB& B, const MatrixC& C)
   std::ostringstream out;
   out << matrix_parameters("A", A) << ", " << matrix_parameters("B", B) << ", " << matrix_parameters("C", C);
   return out.str();
+}
+
+// A = B * C
+template <int MatrixLayoutA = colwise, int MatrixLayoutB = colwise, int MatrixLayoutC = colwise>
+void test_ddd_product(long m, long k, long n)
+{
+  std::cout << "--- testing A = B * C (sdd_product) ---" << std::endl;
+  std::cout << fmt::format("A = {:2d}x{:2d} dense  layout={}\n", m, n, layout_string(MatrixLayoutA));
+  std::cout << fmt::format("B = {:2d}x{:2d} dense  layout={}\n", m, k, layout_string(MatrixLayoutB));
+  std::cout << fmt::format("C = {:2d}x{:2d} dense  layout={}\n\n", k, n, layout_string(MatrixLayoutC));
+
+  auto seed = std::random_device{}();
+  std::mt19937 rng{seed};
+
+  float a = -10;
+  float b = 10;
+
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, MatrixLayoutA> A(m, n);
+  eigen::fill_matrix_random(A, 1.0, a, b, rng);
+  mkl::sparse_matrix_csr<float> A1 = mkl::to_csr<float>(A);
+
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, MatrixLayoutB> B(m, k);
+  eigen::fill_matrix_random(B, 1.0, a, b, rng);
+
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, MatrixLayoutC> C(k, n);
+  eigen::fill_matrix_random(C, 1.0, a, b, rng);
+
+  // dense product
+  utilities::stopwatch watch;
+  A = B * C;
+  auto seconds = watch.seconds();
+  std::cout << fmt::format("{:8.5f}s ddd_product {}\n", seconds, pp(A, B, C));
 }
 
 // A = B * C
@@ -241,7 +291,7 @@ class tool: public command_line_tool
     std::string algorithm;
     std::string layouts;
     int threads = 1;
-    // bool gpu = false;
+    std::string densities_text = "1.0, 0.5, 0.1, 0.05, 0.01, 0.001";
 
     void add_options(lyra::cli& cli) override
     {
@@ -250,7 +300,7 @@ class tool: public command_line_tool
       cli |= lyra::opt(k, "k")["--acols"]["-k"]("The number of columns of matrix A");
       cli |= lyra::opt(n, "n")["--brows"]["-n"]("The number of rows of matrix B");
       cli |= lyra::opt(threads, "value")["--threads"]("The number of threads.");
-      // cli |= lyra::opt(gpu)["--gpu"]("Use the GPU ");
+      cli |= lyra::opt(densities_text, "value")["--densities"]("The densities that are tested.");
     }
 
     std::string description() const override
@@ -260,12 +310,12 @@ class tool: public command_line_tool
 
     bool run() override
     {
-      if (threads >= 1 && threads <= 8)
+      if (threads >= 1 && threads <= 16)
       {
         omp_set_num_threads(threads);
       }
 
-      std::vector<float> densities = {1.0, 0.5, 0.1, 0.05, 0.01, 0.001};
+      std::vector<float> densities = parse_comma_separated_floats(densities_text);
       if (algorithm == "sdd")
       {
         test_sdd_product<colwise, colwise>(m, k, n, densities);
@@ -276,16 +326,23 @@ class tool: public command_line_tool
       else if (algorithm == "dsd")
       {
         test_dsd_product<colwise, colwise>(m, k, n, densities);
-//        test_dsd_product<colwise, rowwise>(m, k, n, densities);
-//        test_dsd_product<rowwise, colwise>(m, k, n, densities);
         test_dsd_product<rowwise, rowwise>(m, k, n, densities);
       }
       else if (algorithm == "dsdt")
       {
         test_dsd_transpose_product<colwise, colwise>(m, k, n, densities);
-//        test_dsd_transpose_product<colwise, rowwise>(m, k, n, densities);
-//        test_dsd_transpose_product<rowwise, colwise>(m, k, n, densities);
         test_dsd_transpose_product<rowwise, rowwise>(m, k, n, densities);
+      }
+      else if (algorithm == "ddd")
+      {
+        test_ddd_product<colwise, colwise, colwise>(m, k, n);
+        test_ddd_product<colwise, colwise, rowwise>(m, k, n);
+        test_ddd_product<colwise, rowwise, colwise>(m, k, n);
+        test_ddd_product<colwise, rowwise, rowwise>(m, k, n);
+        test_ddd_product<rowwise, colwise, colwise>(m, k, n);
+        test_ddd_product<rowwise, colwise, rowwise>(m, k, n);
+        test_ddd_product<rowwise, rowwise, colwise>(m, k, n);
+        test_ddd_product<rowwise, rowwise, rowwise>(m, k, n);
       }
       return true;
     }
