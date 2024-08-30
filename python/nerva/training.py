@@ -19,6 +19,7 @@ def to_one_hot(x: torch.LongTensor, num_classes: int):
     one_hot.scatter_(1, x.unsqueeze(1), 1)
     return one_hot
 
+
 def print_epoch(epoch, lr, loss, train_accuracy, test_accuracy, elapsed):
     print(f'epoch {epoch:3}  '
           f'lr: {lr:.8f}  '

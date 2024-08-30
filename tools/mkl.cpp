@@ -189,7 +189,7 @@ void test_sdd_product(long m, long k, long n, const std::vector<float>& densitie
         watch.reset();
         mkl::sdd_product_forloop_mkl(A1, B, C);
         auto seconds = watch.seconds();
-        std::cout << fmt::format("{:8.5f}s sdd_product_forloop_mkl()\n", seconds, pp(A1, B, C));
+        std::cout << fmt::format("{:8.5f}s sdd_product_forloop_mkl({})\n", seconds, pp(A1, B, C));
       }
     }
 
