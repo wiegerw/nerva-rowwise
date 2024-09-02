@@ -8,39 +8,39 @@
 #include <numeric>
 #include <random>
 
-// Include headers for SIMD intrinsics
-#ifdef __SSE__
-#include <xmmintrin.h>
-#endif
-
-// Function to enable FTZ and DAZ on Intel/AMD CPUs
-inline
-void enable_flush_to_zero()
-{
-  // Check if the architecture supports SSE
-#ifdef __SSE__
-  // Set FTZ and DAZ modes in the MXCSR register
-  _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-  _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
-  std::cout << "Flush-to-Zero and Denormals-Are-Zero enabled on Intel/AMD CPU." << std::endl;
-#else
-  // If not x86/x86_64 with SSE, do nothing
-  std::cout << "This platform does not support SSE. No changes made." << std::endl;
-#endif
-}
-
-// Function to disable FTZ and DAZ (restore default behavior)
-inline
-void disable_flush_to_zero()
-{
-#ifdef __SSE__
-  _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_OFF);
-  _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_OFF);
-  std::cout << "Flush-to-Zero and Denormals-Are-Zero disabled on Intel/AMD CPU." << std::endl;
-#else
-  std::cout << "This platform does not support SSE. No changes made." << std::endl;
-#endif
-}
+// // Include headers for SIMD intrinsics
+// #ifdef __SSE__
+// #include <xmmintrin.h>
+// #endif
+//
+// // Function to enable FTZ and DAZ on Intel/AMD CPUs
+// inline
+// void enable_flush_to_zero()
+// {
+//   // Check if the architecture supports SSE
+// #ifdef __SSE__
+//   // Set FTZ and DAZ modes in the MXCSR register
+//   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+//   _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+//   std::cout << "Flush-to-Zero and Denormals-Are-Zero enabled on Intel/AMD CPU." << std::endl;
+// #else
+//   // If not x86/x86_64 with SSE, do nothing
+//   std::cout << "This platform does not support SSE. No changes made." << std::endl;
+// #endif
+// }
+//
+// // Function to disable FTZ and DAZ (restore default behavior)
+// inline
+// void disable_flush_to_zero()
+// {
+// #ifdef __SSE__
+//   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_OFF);
+//   _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_OFF);
+//   std::cout << "Flush-to-Zero and Denormals-Are-Zero disabled on Intel/AMD CPU." << std::endl;
+// #else
+//   std::cout << "This platform does not support SSE. No changes made." << std::endl;
+// #endif
+// }
 
 void matrix_product()
 {
@@ -159,7 +159,7 @@ int main()
   multiplication2();
   matrix_product();
 
-  enable_flush_to_zero();
+  // enable_flush_to_zero();
 
   multiplication1();
   multiplication2();
