@@ -18,7 +18,7 @@ Compilation has been tested successfully with g++-11, g++-12, g++-13, clang-18, 
 ## Dependencies
 Nerva uses the following third-party libraries.
 
-* doctest (https://github.com/onqtam/doctest, already included in the repository)
+* doctest (https://github.com/onqtam/doctest)
 * FMT (https://github.com/fmtlib/fmt)
 * Lyra (https://github.com/bfgroup/Lyra)
 * Eigen (https://eigen.tuxfamily.org/)
@@ -102,18 +102,20 @@ The following build systems are supported
 * B2 (https://www.bfgroup.xyz/b2/)
 
 Using CMake, the Nerva c++ library can be built in a standard way. For example compiling
-the Nerva library on Ubuntu can be done like this:
+and installing the Nerva library on Ubuntu can be done like this:
 ```
 mkdir build
 cd build
 cmake .. \
+    -DCMAKE_INSTALL_PREFIX=../install \
     -DCMAKE_BUILD_TYPE=RELEASE \
     -DMKL_DIR:PATH=$ONEAPI_ROOT/mkl/latest/lib/cmake/mkl
 make -j8
+make install
 ```
 Note that the `ONEAPI_ROOT` environment variable must be set. The OneAPI library
 has MKL included, but it is still necessary to specify `MKL_DIR` manually.
-If you are using CMake, the dependencies for Eigen, FMT, Lyra and pybind11 are
+If you are using CMake, the dependencies for doctest, Eigen, FMT, Lyra and pybind11 are
 resolved automatically using `FetchContent` commands.
 
 The Nerva tests can be run using the command
@@ -125,7 +127,7 @@ On Windows the C++ build has been tested using
 ```
 cmake .. ^
     -G "NMake Makefiles" ^
-    -DCMAKE_INSTALL_PREFIX=C:\repos\nerva-rowwise ^
+    -DCMAKE_INSTALL_PREFIX=..\install ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
 nmake
