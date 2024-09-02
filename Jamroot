@@ -40,7 +40,7 @@ project nerva
        <include>$(LYRA_INCLUDE_DIR)
        <include>$(PYBIND11_INCLUDE_DIR)
        <include>/usr/include/python3.12  # TODO: find a better way for this
-       <cxxflags>-std=c++20
+       <cxxflags>-std=c++17
 
        <define>EIGEN_USE_MKL_ALL
        <define>NERVA_TIMER
