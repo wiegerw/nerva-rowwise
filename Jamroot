@@ -3,8 +3,12 @@ import os ;
 
 using python : ;
 
+# Configure doctest
+local DOCTEST_INCLUDE_DIR = [ os.environ DOCTEST_INCLUDE_DIR ] ;
+
 # Configure MKL
 local ONEAPI_ROOT = [ os.environ ONEAPI_ROOT ] ;
+local ONEAPI_INCLUDE_DIR = $(ONEAPI_ROOT)/latest/include ;
 local MKL_ROOT = $(ONEAPI_ROOT)/mkl/latest ;
 local MKL_INCLUDE_DIR = $(MKL_ROOT)/include ;
 local MKL_LIB_DIR = $(MKL_ROOT)/lib ;
@@ -22,10 +26,14 @@ local LYRA_INCLUDE_DIR = [ os.environ LYRA_INCLUDE_DIR ] ;
 # Configure pybind11
 local PYBIND11_INCLUDE_DIR = [ os.environ PYBIND11_INCLUDE_DIR ] ;
 
+# Configure SYCL
+
+ECHO "DOCTEST_INCLUDE_DIR = $(DOCTEST_INCLUDE_DIR)" ;
 ECHO "EIGEN_INCLUDE_DIR = $(EIGEN_INCLUDE_DIR)" ;
 ECHO "FMT_INCLUDE_DIR = $(FMT_INCLUDE_DIR)" ;
 ECHO "LYRA_INCLUDE_DIR = $(LYRA_INCLUDE_DIR)" ;
 ECHO "PYBIND11_INCLUDE_DIR = $(PYBIND11_INCLUDE_DIR)" ;
+ECHO "ONEAPI_ROOT = $(ONEAPI_ROOT)" ;
 ECHO "MKL_ROOT = $(MKL_ROOT)" ;
 
 # Define a feature for the number type
@@ -35,10 +43,13 @@ feature.compose <scalar>double : <define>NERVA_USE_DOUBLE ;
 project nerva
    : requirements
        <include>include
+       <include>$(DOCTEST_INCLUDE_DIR)
        <include>$(EIGEN_INCLUDE_DIR)
        <include>$(FMT_INCLUDE_DIR)
        <include>$(LYRA_INCLUDE_DIR)
        <include>$(PYBIND11_INCLUDE_DIR)
+       <include>$(ONEAPI_INCLUDE_DIR)
+       <include>$(ONEAPI_INCLUDE_DIR)/sycl
        <include>/usr/include/python3.12  # TODO: find a better way for this
        <cxxflags>-std=c++17
 
@@ -97,6 +108,7 @@ project nerva
        <toolset>clang-icpx:<linkflags>-fsycl
        <toolset>clang-icpx:<linkflags>-fsycl-targets=spir64_x86_64
        <toolset>clang-icpx:<linkflags>-lsycl
+       <toolset>clang-icpx:<linkflags>-liomp5
        #<toolset>intel:<cxxflags>-fopenmp-targets=<arch>
    ;
 
