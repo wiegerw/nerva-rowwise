@@ -1,0 +1,277 @@
+= nerva-rowwise C++
+:copyright: Copyright 2024 Wieger Wesselink
+:author: Wieger Wesselink
+:email: j.w.wesselink@tue.nl
+:doctype: book
+:toc: left
+:toc2:
+:toc-title: pass:[<h3>Contents</h3>]
+:css-signature: demo
+:stem: latexmath
+:icons: font
+:description: Documentation for the nerva-rowwise repository.
+:library: nerva-rowwise
+:imagesdir: images
+Wieger Wesselink <j.w.wesselink@tue.nl>
+ifdef::env-github[]
+:note-caption: :information_source:
+:tip-caption: :bulb:
+endif::[]
+
+== Installation
+.The following build systems are supported
+- CMake 3.16+
+- B2 (https://www.bfgroup.xyz/b2/)
+
+Using CMake, the Nerva c++ library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable `ONEAPI_ROOT` should point to the OneAPI installation directory, and the variable `MKL_DIR` to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using `FetchContent` commands. The build and install can for example be done like this on Linux:
+
+[source]
+----
+mkdir build
+cd build
+cmake .. \
+    -DCMAKE_INSTALL_PREFIX=../install \
+    -DCMAKE_BUILD_TYPE=RELEASE \
+    -DMKL_DIR:PATH=$ONEAPI_ROOT/mkl/latest/lib/cmake/mkl
+make -j8
+make install
+----
+TIP: Setting the `MKL_DIR` variable is not necessary if the OneAPI `setvars.sh` script is run beforehand.
+
+IMPORTANT: For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
+https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044
+and https://gitlab.com/libeigen/eigen/-/issues/2586 for more details.
+To resolve this issue, a hack has been applied: by defining the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H`,
+the inclusion of the offending header file is prevented.
+
+On Windows, a command like this can be used:
+[source]
+----
+cmake .. ^
+    -G "NMake Makefiles" ^
+    -DCMAKE_INSTALL_PREFIX=..\install ^
+    -DCMAKE_BUILD_TYPE=Release ^
+    -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
+nmake
+nmake install
+----
+The unit tests can be run using the command
+
+[source]
+----
+ctest -R nerva
+----
+
+TIP: The number of threads that are used at runtime by the MKL library can be controlled using the environment variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`, see also https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html.
+
+== Command line tools
+There are two command line tools in the `tools` directory. The tool `mkl` can be used to do benchmarking of computing sparse and dense matrix products using the MKL library, and the tool `mlp` can be used to do training experiments with multilayer perceptrons.
+
+=== mkl tool
+An example of running the `mkl` tool is
+
+[source]
+----
+./mkl --arows=1000 --acols=1000 --brows=1000 --threads=12 --algorithm=sdd --repetitions=10 --densities="0.5,0.2,0.1,0.05"
+----
+This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
+
+=== mlp tool
+An example invocation of the `mlp` tool is
+
+[source]
+----
+../install/bin/mlp \
+    --layers="ReLU;ReLU;Linear" \
+    --layer-sizes="3072,1024,1024,10" \
+    --layer-weights=Xavier \
+    --optimizers="Nesterov(0.9)" \
+    --loss=SoftmaxCrossEntropy \
+    --learning-rate="Constant(0.01)" \
+    --epochs=100 \
+    --batch-size=100 \
+    --threads=12 \
+    --overall-density=0.05 \
+    --cifar10=../data/cifar-10-batches-bin \
+    --seed=123
+----
+This will train a CIFAR-10 model using a MLP consisting of three layers with activation functions ReLU, ReLU and none. Note that the CIFAR-10 binary version needs to be downloaded from https://www.cs.toronto.edu/~kriz/cifar.html.
+
+=== Command Line Options Overview
+The `mlp` tool has the following command line options.
+Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].
+
+==== General Options
+* `-?`, `-h`, `--help`
+Display help information.
+* `--verbose`, `-v`
+Show verbose output.
+* `--debug`, `-d`
+Show debug output.
+
+==== Random Generator
+* `--seed <value>`
+A seed value for the random generator.
+
+==== Layer Configuration
+* `--layers <value>`
+A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);Linear` is used to specify a neural network with three layers with an ReLU, AllReLU and no activation function. The following layers are supported:
+
+|===
+|Specification |Description
+
+|`Linear`
+|Linear layer without activation
+
+|`ReLU`
+|Linear layer with ReLU activation
+
+|`Sigmoid`
+|Linear layer with sigmoid activation
+
+|`Softmax`
+|Linear layer with softmax activation
+
+|`LogSoftmax`
+|Linear layer with log-softmax activation
+
+|`HyperbolicTangent`
+|Linear layer with hyperbolic tangent activation
+
+|`AllReLU`(stem:[\alpha])
+|Linear layer with All ReLU activation
+
+|`SReLU`(stem:[\alpha])
+|Linear layer with SReLU activation
+
+|`TReLU`(stem:[\epsilon])
+|Linear layer with trimmed ReLU activation
+
+|`BatchNorm`
+|Batch normalization layer
+|===
+
+* `--layer-sizes <value>`
+A comma-separated list of sizes of the linear layers in the multilayer perceptron. For example, `--layer-sizes=3072,1024,512,10` specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.
+* `--densities <value>`
+A comma-separated list of linear layer densities. By default all linear layers are dense (i.e. have density 1.0).
+* `--dropouts <value>`
+A comma-separated list of dropout rates of linear layers. By default, all linear layers have no dropout (i.e. dropout rate 0.0).
+* `--overall-density <value>`
+The overall density of the linear layers. This value should be in the interval stem:[[0,1]], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers are assigned a higher density than large layers.
+
+==== Training Configuration
+* `--epochs <value>`
+The number of epochs of the training (default: 100).
+* `--batch-size <value>`
+The batch size of the training.
+* `--no-shuffle`
+Do not shuffle the dataset during training.
+* `--no-statistics`
+Do not display intermediate statistics during training.
+* `--optimizers <value>`
+A semicolon-separated list of optimizers used for linear and batch normalization layers. The following optimizers are supported:
+|===
+|Specification |Description
+
+|`GradientDescent`
+|Gradient descent optimization
+
+|`Momentum`(stem:[\mu])
+|Momentum optimization with momentum parameter stem:[\mu]
+
+|`Nesterov`(stem:[\mu])
+|Nesterov optimization with momentum parameter stem:[\mu]
+|===
+
+* `--learning-rate <value>`
+A semicolon-separated list of learning rate schedulers of linear and batch normalization layers. If only one learning rate scheduler is specified, it is applied to all layers. The following learning rate schedulers are supported:
+|===
+|Specification |Description
+
+|`Constant(lr)`
+|Constant learning rate `lr`
+
+|`TimeBased(lr, decay)`
+|Learning rate with decay
+
+|`StepBased(lr, drop_rate, change_rate)`
+|Step based learning rate
+
+|`MultistepLR(lr, milestones, gamma)`
+|Piecewise linear learning rate. `milestones` contains the epoch numbers in which the learning rate is adjusted.
+
+|`Exponential(lr, change_rate)`
+|Exponentially decreasing learning rate
+|===
+See also https://en.wikipedia.org/wiki/Learning_rate.
+
+* `--loss <value>`
+The loss function used for training the multilayer perceptron. The following loss functions are supported:
+|===
+|Specification |Description
+
+|`SquaredError`
+|Squared error loss.
+
+|`CrossEntropy`
+|Cross entropy loss (N.B. prone to numerical problems!)
+
+|`LogisticCrossEntropy`
+|Logistic cross entropy loss.
+
+|`SoftmaxCrossEntropy`
+|Softmax cross entropy loss. Matches `CrossEntropy` of PyTorch. Suitable for classification experiments.
+
+|`NegativeLogLikelihood`
+|Negative log likelihood loss.
+|===
+
+* `--layer-weights <value>`
+The weight initialization of the layers (options: `default`, `he`, `uniform`, `xavier`, `normalized_xavier`, `uniform`).
+* `--load-weights <value>`
+Load weights and biases from a file in `.npz` format.
+* `--save-weights <value>`
+Save weights and biases to a file in `.npz` format.
+
+==== Dataset Options
+* `--cifar10 <value>`
+The location of the CIFAR-10 dataset.
+* `--dataset <value>`
+The dataset to use (`chessboard`, `spirals`, `square`, `sincos`).
+* `--dataset-size <value>`
+The size of the dataset (default: 1000).
+* `--load-dataset <value>`
+Load the dataset from a file in `.npz` format.
+* `--save-dataset <value>`
+Save the dataset to a file in `.npz` format.
+* `--normalize`
+Normalize the data.
+* `--preprocessed <value>`
+A directory containing preprocessed files `epoch<nnn>.npz`.
+
+==== Miscellaneous options
+* `--precision <value>`
+The precision used for printing matrices.
+* `--info`
+Print detailed information about the multilayer perceptron.
+* `--timer`
+Print timer messages.
+
+==== Pruning and Growing Strategies
+* `--prune <strategy>`
+The pruning strategy: `Magnitude(<drop_fraction>)`, `SET(<drop_fraction>)`, or `Threshold(<value>)`.
+* `--grow <strategy>`
+The growing strategy (default: `Random`).
+* `--grow-weights <value>`
+The weight function used for growing (`x=Xavier`, `X=XavierNormalized`, etc.).
+
+==== Computation Options
+* `--computation <value>`
+The computation mode (`eigen`, `mkl`, `blas`).
+* `--clip <value>`
+A threshold value used to set elements to zero.
+* `--threads <value>`
+The number of threads used by Eigen.
+* `--gradient-step <value>`
+If positive, perform gradient checks with the given step size.
