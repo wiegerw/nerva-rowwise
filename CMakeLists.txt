@@ -84,13 +84,9 @@ add_library(nervalib STATIC src/logger.cpp src/utilities.cpp)
 target_link_libraries(nervalib PUBLIC MKL::MKL Eigen3::Eigen Python3::Python)
 
 # Note that this only installs the pybind11 module, but not the corresponding Python files.
-# See the README file for instructions on how to install the complete `nerva` module.
-#
-# The Intel icpx compiler gives a linker error: `error loading plugin: libonnxruntime.1.12.22.721.so`,
-# I don't know how to resolve this.
+# See the documentation for instructions on how to install the complete `nerva` module using `pip`.
 pybind11_add_module(nervalibrowwise src/python-bindings.cpp src/logger.cpp src/utilities.cpp)
 target_link_libraries(nervalibrowwise LINK_PUBLIC MKL::MKL Eigen3::Eigen Python3::Python pybind11::pybind11)
-target_link_directories(nervalibrowwise PRIVATE $ENV{ONEAPI_ROOT}/latest/lib)
 set(PYTHON_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages" CACHE PATH "Python package install directory")
 install(TARGETS nervalibrowwise LIBRARY DESTINATION ${PYTHON_INSTALL_DIR})
 
