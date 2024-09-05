@@ -18,6 +18,8 @@ ifdef::env-github[]
 :tip-caption: :bulb:
 endif::[]
 
+IMPORTANT: The documentation of this project is in the initial phase, so a lot is still missing.
+
 == Installation
 .The following build systems are supported
 - CMake 3.16+
@@ -67,37 +69,73 @@ TIP: The number of threads that are used at runtime by the MKL library can be co
 == Command line tools
 There are two command line tools in the `tools` directory. The tool `mkl` can be used to do benchmarking of computing sparse and dense matrix products using the MKL library, and the tool `mlp` can be used to do training experiments with multilayer perceptrons.
 
-=== mkl tool
+=== The tool mkl
 An example of running the `mkl` tool is
-
 [source]
 ----
-./mkl --arows=1000 --acols=1000 --brows=1000 --threads=12 --algorithm=sdd --repetitions=10 --densities="0.5,0.2,0.1,0.05"
+include::../examples/doc_mkl.sh[tag=doc]
 ----
 This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
 
-=== mlp tool
+The output may look like this
+[source]
+----
+--- testing A = B * C (sdd_product) ---
+A = 1000x1000 sparse
+B = 1000x1000 dense  layout=column-major
+C = 1000x1000 dense  layout=column-major
+
+density(A) = 0.5
+ 0.01147s ddd_product A=column-major, B=column-major, C=column-major
+ 0.00793s ddd_product A=column-major, B=column-major, C=column-major
+ 0.00854s ddd_product A=column-major, B=column-major, C=column-major
+ 0.04049s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01998s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01178s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01114s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01099s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00666s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00375s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00734s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00332s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.20097s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.19891s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+----
+Note that the very first invocation of an MKL function can be slow.
+
+=== The tool mlp
 An example invocation of the `mlp` tool is
 
 [source]
 ----
-../install/bin/mlp \
-    --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072,1024,1024,10" \
-    --layer-weights=Xavier \
-    --optimizers="Nesterov(0.9)" \
-    --loss=SoftmaxCrossEntropy \
-    --learning-rate="Constant(0.01)" \
-    --epochs=100 \
-    --batch-size=100 \
-    --threads=12 \
-    --overall-density=0.05 \
-    --cifar10=../data/cifar-10-batches-bin \
-    --seed=123
+include::../examples/doc_mpl.sh[tag=doc]
 ----
-This will train a CIFAR-10 model using a MLP consisting of three layers with activation functions ReLU, ReLU and none. Note that the CIFAR-10 binary version needs to be downloaded from https://www.cs.toronto.edu/~kriz/cifar.html.
+This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from https://www.cs.toronto.edu/~kriz/cifar.html.
 
-=== Command Line Options Overview
+The output may look like this:
+[source]
+----
+=== Nerva c++ model ===
+Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
+Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
+Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
+loss = SoftmaxCrossEntropyLoss()
+scheduler = ConstantScheduler(lr=0.01)
+layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
+
+epoch   0 lr: 0.01000000  loss: 2.30284437  train accuracy: 0.07904000  test accuracy: 0.08060000 time: 0.00000000s
+epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test accuracy: 0.21320000 time: 2.74594253s
+epoch   2 lr: 0.01000000  loss: 1.91454245  train accuracy: 0.29976000  test accuracy: 0.29940000 time: 2.76982510s
+epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test accuracy: 0.35820000 time: 2.69554319s
+epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test accuracy: 0.40000000 time: 2.68532307s
+epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s
+----
+
+=== The mlp command line options
 The `mlp` tool has the following command line options.
 Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].
 
@@ -152,13 +190,14 @@ A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);L
 |===
 
 * `--layer-sizes <value>`
-A comma-separated list of sizes of the linear layers in the multilayer perceptron. For example, `--layer-sizes=3072,1024,512,10` specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.
+A comma-separated list of the sizes of linear layers of the multilayer perceptron. For example, `--layer-sizes=3072,1024,512,10` specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.
 * `--densities <value>`
-A comma-separated list of linear layer densities. By default all linear layers are dense (i.e. have density 1.0).
+A comma-separated list of linear layer densities. By default, all linear layers are dense (i.e. have density 1.0). If only one value is
+ specified, it will be used for all linear layers.
 * `--dropouts <value>`
 A comma-separated list of dropout rates of linear layers. By default, all linear layers have no dropout (i.e. dropout rate 0.0).
 * `--overall-density <value>`
-The overall density of the linear layers. This value should be in the interval stem:[[0,1]], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers are assigned a higher density than large layers.
+The overall density of the linear layers. This value should be in the interval stem:[[0,1]], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.
 
 ==== Training Configuration
 * `--epochs <value>`
@@ -193,13 +232,14 @@ A semicolon-separated list of learning rate schedulers of linear and batch norma
 |Constant learning rate `lr`
 
 |`TimeBased(lr, decay)`
-|Learning rate with decay
+|Adaptive learning rate with decay
 
 |`StepBased(lr, drop_rate, change_rate)`
-|Step based learning rate
+|Step based learning rate where the learning rate is regularly dropped
+to a lower value
 
 |`MultistepLR(lr, milestones, gamma)`
-|Piecewise linear learning rate. `milestones` contains the epoch numbers in which the learning rate is adjusted.
+|Step based learning rate, where `milestones` contains the epoch numbers in which the learning rate is dropped.
 
 |`Exponential(lr, change_rate)`
 |Exponentially decreasing learning rate
@@ -228,27 +268,68 @@ The loss function used for training the multilayer perceptron. The following los
 |===
 
 * `--layer-weights <value>`
-The weight initialization of the layers (options: `default`, `he`, `uniform`, `xavier`, `normalized_xavier`, `uniform`).
+The generator that is used for initializing the weights of the linear layers. The following weight generators are supported:
+|===
+|Specification |Description
+
+|`Xavier`
+|Xavier weights
+
+|`XavierNormalized`
+|Normalized Xavier weights
+
+|`He`
+|Kaiming He weights
+
+|`Uniform`
+|Uniform weights
+
+|`Zero`
+|All weights are zero (N.B. This usually doesn't work)
+|===
+
 * `--load-weights <value>`
-Load weights and biases from a file in `.npz` format.
+Load weights and biases from a dictionary in NumPy `.npz` format.
+The weight matrices should be stored with keys `W1,W2,...` and the bias vectors with keys `b1,b2,...`.
+See also
+link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
+
 * `--save-weights <value>`
-Save weights and biases to a file in `.npz` format.
+Save weights and biases to a dictionary in NumPy `.npz` format.
+The weight matrices are stored with keys `W1,W2,...` and the bias vectors with keys `b1,b2,...`.
+See also
+link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
 
 ==== Dataset Options
 * `--cifar10 <value>`
-The location of the CIFAR-10 dataset.
+Specify the location of the binary version of the
+link:https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] dataset. This is a directory with subdirectory `cifar-10-batches-bin`.
 * `--dataset <value>`
-The dataset to use (`chessboard`, `spirals`, `square`, `sincos`).
+Specify a synthetic dataset to use. The following datasets are supported:
+|===
+|Specification |Description |Features |Classes
+
+|`checkerboard`
+|A checkerboard pattern, see also link:https://kaifishr.github.io/2021/01/14/micro-mlp.html#checkerboard[checkerboard].
+|2
+|2
+
+|`mini`
+|A dataset with random values.
+|3
+|2
+|===
+
 * `--dataset-size <value>`
-The size of the dataset (default: 1000).
+The size of the synthetic dataset (default: 1000).
 * `--load-dataset <value>`
-Load the dataset from a file in `.npz` format.
+Load the dataset from a file in NumPy `.npz` format. See `--load-weights` for information about the format.
 * `--save-dataset <value>`
-Save the dataset to a file in `.npz` format.
+Save the dataset to a file in NumPy `.npz` format. See `--save-weights` for information about the format.
 * `--normalize`
-Normalize the data.
+Normalize the dataset.
 * `--preprocessed <value>`
-A directory containing preprocessed files `epoch<nnn>.npz`.
+A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to store preprocessed datasets. A script link:../python/tools/create_cifar10_datasets.py[create_cifar10_datasets.py] is available for creating augmented CIFAR-10 datasets.
 
 ==== Miscellaneous options
 * `--precision <value>`
@@ -260,18 +341,54 @@ Print timer messages.
 
 ==== Pruning and Growing Strategies
 * `--prune <strategy>`
-The pruning strategy: `Magnitude(<drop_fraction>)`, `SET(<drop_fraction>)`, or `Threshold(<value>)`.
+The strategy used for pruning sparse weight matrices. The following strategies are supported:
+|===
+|Specification |Description
+
+|`Magnitude(<drop_fraction>)`
+|Magnitude based pruning. A fraction of the weights with the smallest absolute value is dropped.
+
+|`SET(<drop_fraction>)`
+|SET pruning (TODO).
+
+|`Threshold(<value>)`
+|Weights below the given threshold are pruned.
+|===
+
 * `--grow <strategy>`
-The growing strategy (default: `Random`).
+The strategy used for growing in sparse weight matrices. The following strategies are supported:
+|===
+|Specification |Description
+
+|`Random`
+|Weights are added at random positions (outside the support of the sparse matrix).
+|===
+
 * `--grow-weights <value>`
-The weight function used for growing (`x=Xavier`, `X=XavierNormalized`, etc.).
+The weight generation function used for growing weights. See `--layer-weights` for supported values.
 
 ==== Computation Options
 * `--computation <value>`
-The computation mode (`eigen`, `mkl`, `blas`).
+The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:
+|===
+|Specification |Description
+
+|`eigen`
+|All computations are done using the Eigen library. Note that by setting the flag `EIGEN_USE_MKL_ALL` Eigen will attempt to use MKL library calls.
+
+|`mkl`
+|Some computations are implemented using MKL functions.
+
+|`blas`
+|Some computations are implemented using BLAS functions.
+
+|`sycl`
+|Some computations are implemented using SYCL functions.
+|===
+
 * `--clip <value>`
-A threshold value used to set elements to zero.
+A threshold value used to set small elements of weight matrices to zero.
 * `--threads <value>`
-The number of threads used by Eigen.
+The number of threads used by the MKL and OMP libraries.
 * `--gradient-step <value>`
-If positive, perform gradient checks with the given step size.
+If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
