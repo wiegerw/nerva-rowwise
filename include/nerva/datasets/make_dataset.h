@@ -16,7 +16,7 @@
 namespace nerva::datasets {
 
 template<typename RandomNumberGenerator>
-std::pair<eigen::matrix, eigen::matrix> make_dataset_chessboard(long n, RandomNumberGenerator rng)
+std::pair<eigen::matrix, eigen::matrix> make_dataset_checkerboard(long n, RandomNumberGenerator rng)
 {
   eigen::matrix X(2, n);
   eigen::matrix T(2, n);
@@ -75,10 +75,10 @@ dataset make_dataset(const std::string& name, std::size_t n, RandomNumberGenerat
   auto n_train = n;
   auto n_test = n / 5;
 
-  if (name == "chessboard")
+  if (name == "checkerboard")
   {
-    std::tie(result.Xtrain, result.Ttrain) = make_dataset_chessboard(n_train, rng);
-    std::tie(result.Xtest, result.Ttest) = make_dataset_chessboard(n_test, rng);
+    std::tie(result.Xtrain, result.Ttrain) = make_dataset_checkerboard(n_train, rng);
+    std::tie(result.Xtest, result.Ttest) = make_dataset_checkerboard(n_test, rng);
   }
   else if (name == "mini")
   {

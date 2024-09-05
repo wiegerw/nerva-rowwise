@@ -466,7 +466,7 @@ TEST_CASE("test_batch_normalization2")
   }
 }
 
-TEST_CASE("test_chessboard")
+TEST_CASE("test_checkerboard")
 {
   multilayer_perceptron M;
   std::vector<std::size_t> linear_layer_sizes = {2, 2, 2, 2};
@@ -485,9 +485,9 @@ TEST_CASE("test_chessboard")
                 batch_size
   );
 
-  auto [X, T] = datasets::make_dataset_chessboard(N, nerva_rng);
+  auto [X, T] = datasets::make_dataset_checkerboard(N, nerva_rng);
 
-  print_mlp("test_chessboard", M);
+  print_mlp("test_checkerboard", M);
   std::vector<std::string> loss_functions = {"SquaredError", "LogisticCrossEntropy", "SoftmaxCrossEntropy"};
   for (const std::string& loss_function_text: loss_functions)
   {

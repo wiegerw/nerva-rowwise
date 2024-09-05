@@ -322,7 +322,7 @@ class mlp_tool: public command_line_tool
 
       // dataset
       cli |= lyra::opt(options.cifar10, "value")["--cifar10"]("The location of the CIFAR10 dataset");
-      cli |= lyra::opt(options.dataset, "value")["--dataset"]("The dataset (chessboard, spirals, square, sincos)");
+      cli |= lyra::opt(options.dataset, "value")["--dataset"]("The dataset (checkerboard, mini)");
       cli |= lyra::opt(options.dataset_size, "value")["--dataset-size"]("The size of the dataset (default: 1000)");
       cli |= lyra::opt(load_dataset_file, "value")["--load-dataset"]("Loads the dataset from a file in .npz format");
       cli |= lyra::opt(save_dataset_file, "value")["--save-dataset"]("Saves the dataset to a file in .npz format");
