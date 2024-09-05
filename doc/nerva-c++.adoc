@@ -12,6 +12,7 @@
 :description: Documentation for the nerva-rowwise repository.
 :library: nerva-rowwise
 :imagesdir: images
+:bibliography: bibliography.bib
 Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
@@ -392,3 +393,8 @@ A threshold value used to set small elements of weight matrices to zero.
 The number of threads used by the MKL and OMP libraries.
 * `--gradient-step <value>`
 If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
+
+== References
+This is a citation to cite:[wesselink2024nervatrulysparseimplementation].
+
+bibliography::[]
