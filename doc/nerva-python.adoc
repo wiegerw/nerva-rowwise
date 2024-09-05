@@ -1,4 +1,4 @@
-= Nerva-rowwise C++ manual
+= Nerva-rowwise Python manual
 :copyright: Copyright 2024 Wieger Wesselink
 :author: Wieger Wesselink
 :email: j.w.wesselink@tue.nl
@@ -21,91 +21,70 @@ endif::[]
 IMPORTANT: The documentation of this project is in the initial phase, so a lot is still missing.
 
 == Installation
-.The following build systems are supported
-- CMake 3.16+
-- B2 (https://www.bfgroup.xyz/b2/)
 
-Using CMake, the Nerva c++ library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable `ONEAPI_ROOT` should point to the OneAPI installation directory, and the variable `MKL_DIR` to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using `FetchContent` commands. The build and install can for example be done like this on Linux:
+This section explains how to install the `nerva` python module on Ubuntu and on Windows.
 
-[source]
-----
-mkdir build
-cd build
-cmake .. \
-    -DCMAKE_INSTALL_PREFIX=../install \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DMKL_DIR:PATH=$ONEAPI_ROOT/mkl/latest/lib/cmake/mkl
-make -j8
-make install
-----
-TIP: Setting the `MKL_DIR` variable is not necessary if the OneAPI `setvars.sh` script is run beforehand.
+=== Ubuntu + gcc
+The Ubuntu build has been tested with Linux Mint 22, which is built on top of Ubuntu 24.04.
 
-IMPORTANT: For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
-https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044
-and https://gitlab.com/libeigen/eigen/-/issues/2586 for more details.
-To resolve this issue, a hack has been applied: by defining the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H`,
-the inclusion of the offending header file is prevented.
-
-On Windows, a command like this can be used:
-[source]
-----
-cmake .. ^
-    -G "NMake Makefiles" ^
-    -DCMAKE_INSTALL_PREFIX=..\install ^
-    -DCMAKE_BUILD_TYPE=Release ^
-    -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
-nmake
-nmake install
-----
-The unit tests can be run using the command
+The following packages need to be installed:
 
 [source]
 ----
-ctest -R nerva
+pybind11-dev
+build-essential   # meta-packages that are necessary for compiling software
+python3-pip       # for installing python packages using pip
+python3-pybind11
 ----
 
-TIP: The number of threads that are used at runtime by the MKL library can be controlled using the environment variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`, see also https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html.
+Also, some environment variables must be set for the dependencies. An example is
+given below
+
+[source]
+----
+export ONEAPI_ROOT=/home/user/intel/oneapi
+export EIGEN_INCLUDE_DIR=/home/user/repos/libeigen/eigen
+export FMT_INCLUDE_DIR=/home/user/repos/fmtlib/fmt/include
+export LYRA_INCLUDE_DIR=/home/user/repos/bfgroup/Lyra/include
+export PYBIND11_INCLUDE_DIR=/home/user/repos/pybind11/pybind11/include
+----
+Setting `EIGEN_INCLUDE_DIR` is optional. If it is omitted, the default value
+`/usr/include/eigen3` is used. Eigen can be installed from the GitLab repository,
+but it is also possible to use the system package `libeigen3-dev`.
+It is recommended to install the most recent version of the OneAPI library.
+
+The `nerva` module can then be installed using
+
+[source]
+----
+cd python
+pip3 install .
+----
+
+=== Windows
+To get optimal performance, it may be needed to add compiler flags like `/arch:AVX2` manually to the `extra_compile_args` list in the file link:../python/setup.py[]. Unfortunately on Windows there seems to be no standard way to automatically select the correct flags.
+
+Just like on Ubuntu, environment variables must be set for the dependencies.
+An example is given below.
+
+[source]
+----
+set ONEAPI_ROOT="C:\Program Files (x86)\Intel\OneAPI"
+set EIGEN_INCLUDE_DIR=C:\repos\libeigen\eigen
+set FMT_INCLUDE_DIR=C:\repos\fmtlib\fmt\include
+set LYRA_INCLUDE_DIR=C:\repos\bfgroup\Lyra\include
+set PYBIND11_INCLUDE_DIR=C:\repos\pybind11\pybind11\include
+----
+
+The `nerva` package can then be installed using
+
+[source]
+----
+pip install .
+----
 
 == Command line tools
-There are two command line tools in the `tools` directory. The tool `mkl` can be used to do benchmarking of computing sparse and dense matrix products using the MKL library, and the tool `mlp` can be used to do training experiments with multilayer perceptrons.
-
-=== The tool mkl
-An example of running the `mkl` tool is
-[source]
-----
-include::../examples/doc_mkl.sh[tag=doc]
-----
-This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
-
-The output may look like this
-[source]
-----
---- testing A = B * C (sdd_product) ---
-A = 1000x1000 sparse
-B = 1000x1000 dense  layout=column-major
-C = 1000x1000 dense  layout=column-major
-
-density(A) = 0.5
- 0.01147s ddd_product A=column-major, B=column-major, C=column-major
- 0.00793s ddd_product A=column-major, B=column-major, C=column-major
- 0.00854s ddd_product A=column-major, B=column-major, C=column-major
- 0.04049s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01998s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01178s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01114s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.01099s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00666s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00375s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00734s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00332s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.20097s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19891s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
-----
-Note that the very first invocation of an MKL function can be slow.
+The tool `mlp.py` can be used to do training experiments with multilayer perceptrons.
 
 === The tool mlp
 An example invocation of the `mlp` tool is

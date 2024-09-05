@@ -24,7 +24,7 @@ jobs:
         run: mkdir -p output_directory
 
       - name: Convert AsciiDoc to HTML
-        run: asciidoctor -D ./output_directory ./doc/nerva-c++.adoc
+        run: asciidoctor -D ./output_directory ./doc/*.adoc
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
