@@ -18,13 +18,15 @@ jobs:
           ruby-version: '3.0'  # Specify your Ruby version
 
       - name: Install Asciidoctor
-        run: gem install asciidoctor
+        run: |
+          gem install asciidoctor
+          gem install asciidoctor-bibtex
 
       - name: Create output directory
         run: mkdir -p output_directory
 
       - name: Convert AsciiDoc to HTML
-        run: asciidoctor -D ./output_directory ./doc/*.adoc
+        run: asciidoctor -r asciidoctor-bibtex -D ./output_directory ./doc/*.adoc
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
