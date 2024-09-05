@@ -19,24 +19,16 @@
 
 using namespace nerva;
 
-enum orientation
+enum matrix_layout
 {
-  colwise = 0,
-  rowwise = 1
-};
-
-enum class layouts
-{
-  colwise_colwise,
-  colwise_rowwise,
-  rowwise_colwise,
-  rowwise_rowwise
+  column_major = 0,
+  row_major = 1
 };
 
 inline
 std::string layout_string(int layout)
 {
-  return layout == colwise ? "colwise" : "rowwise";
+  return layout == column_major ? "column-major" : "row-major";
 }
 
 inline
@@ -60,7 +52,7 @@ std::vector<float> parse_comma_separated_floats(const std::string& text)
 inline
 std::string layout_char(int layout)
 {
-  return layout == colwise ? "C" : "R";
+  return layout == column_major ? "C" : "R";
 }
 
 template <typename Scalar>
@@ -85,7 +77,7 @@ std::string pp(const MatrixA& A, const MatrixB& B, const MatrixC& C)
 }
 
 // A = B * C
-template <int MatrixLayoutA = colwise, int MatrixLayoutB = colwise, int MatrixLayoutC = colwise>
+template <int MatrixLayoutA = column_major, int MatrixLayoutB = column_major, int MatrixLayoutC = column_major>
 void test_ddd_product(long m, long k, long n, int repetitions)
 {
   std::cout << "--- testing A = B * C (ddd_product) ---" << std::endl;
@@ -124,7 +116,7 @@ void test_ddd_product(long m, long k, long n, int repetitions)
 }
 
 // A = B * C
-template <int MatrixLayoutB = colwise, int MatrixLayoutC = colwise>
+template <int MatrixLayoutB = column_major, int MatrixLayoutC = column_major>
 void test_sdd_product(long m, long k, long n, const std::vector<float>& densities, int repetitions)
 {
   std::cout << "--- testing A = B * C (sdd_product) ---" << std::endl;
@@ -142,7 +134,7 @@ void test_sdd_product(long m, long k, long n, const std::vector<float>& densitie
     float a = -10;
     float b = 10;
 
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, colwise> A(m, n);
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, column_major> A(m, n);
     eigen::fill_matrix_random(A, density, a, b, rng);
     mkl::sparse_matrix_csr<float> A1 = mkl::to_csr<float>(A);
 
@@ -199,7 +191,7 @@ void test_sdd_product(long m, long k, long n, const std::vector<float>& densitie
 }
 
 // A = B * C
-template <int MatrixLayoutA = colwise, int MatrixLayoutC = colwise>
+template <int MatrixLayoutA = column_major, int MatrixLayoutC = column_major>
 void test_dsd_product(long m, long k, long n, const std::vector<float>& densities, int repetitions)
 {
   std::cout << "--- testing A = B * C (dsd_product) ---" << std::endl;
@@ -219,7 +211,7 @@ void test_dsd_product(long m, long k, long n, const std::vector<float>& densitie
 
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, MatrixLayoutA> A(m, n);
 
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, colwise> B(m, k);
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, column_major> B(m, k);
     eigen::fill_matrix_random(B, density, a, b, rng);
     mkl::sparse_matrix_csr<float> B1 = mkl::to_csr<float>(B);
 
@@ -247,7 +239,7 @@ void test_dsd_product(long m, long k, long n, const std::vector<float>& densitie
 }
 
 // A = B^T * C
-template <int MatrixLayoutA = colwise, int MatrixLayoutC = colwise>
+template <int MatrixLayoutA = column_major, int MatrixLayoutC = column_major>
 void test_dsd_transpose_product(long m, long k, long n, const std::vector<float>& densities, int repetitions)
 {
   std::cout << "--- testing A = B^T * C (dsd_product) ---" << std::endl;
@@ -267,7 +259,7 @@ void test_dsd_transpose_product(long m, long k, long n, const std::vector<float>
 
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, MatrixLayoutA> A(m, n);
 
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, colwise> B(k, m);
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, column_major> B(k, m);
     eigen::fill_matrix_random(B, density, a, b, rng);
     mkl::sparse_matrix_csr<float> B1 = mkl::to_csr<float>(B);
 
@@ -296,28 +288,6 @@ void test_dsd_transpose_product(long m, long k, long n, const std::vector<float>
   std::cout << std::endl;
 }
 
-inline
-layouts parse_layouts(const std::string& text)
-{
-  if (text == "cc")
-  {
-    return layouts::colwise_colwise;
-  }
-  else if (text == "cr")
-  {
-    return layouts::colwise_rowwise;
-  }
-  else if (text == "rc")
-  {
-    return layouts::rowwise_colwise;
-  }
-  else if (text == "rr")
-  {
-    return layouts::rowwise_rowwise;
-  }
-  throw std::runtime_error(fmt::format("unsupported layout {}", text));
-}
-
 class tool: public command_line_tool
 {
   protected:
@@ -327,7 +297,6 @@ class tool: public command_line_tool
     float alpha = 1.0;
     float beta = 0.0;
     std::string algorithm;
-    std::string layouts;
     int threads = 1;
     int repetitions = 1;
     std::string densities_text = "1.0, 0.5, 0.1, 0.05, 0.01, 0.001";
@@ -358,31 +327,31 @@ class tool: public command_line_tool
       std::vector<float> densities = parse_comma_separated_floats(densities_text);
       if (algorithm == "sdd")
       {
-        test_sdd_product<colwise, colwise>(m, k, n, densities, repetitions);
-        test_sdd_product<colwise, rowwise>(m, k, n, densities, repetitions);
-        test_sdd_product<rowwise, colwise>(m, k, n, densities, repetitions);
-        test_sdd_product<rowwise, rowwise>(m, k, n, densities, repetitions);
+        test_sdd_product<column_major, column_major>(m, k, n, densities, repetitions);
+        test_sdd_product<column_major, row_major>(m, k, n, densities, repetitions);
+        test_sdd_product<row_major, column_major>(m, k, n, densities, repetitions);
+        test_sdd_product<row_major, row_major>(m, k, n, densities, repetitions);
       }
       else if (algorithm == "dsd")
       {
-        test_dsd_product<colwise, colwise>(m, k, n, densities, repetitions);
-        test_dsd_product<rowwise, rowwise>(m, k, n, densities, repetitions);
+        test_dsd_product<column_major, column_major>(m, k, n, densities, repetitions);
+        test_dsd_product<row_major, row_major>(m, k, n, densities, repetitions);
       }
       else if (algorithm == "dsdt")
       {
-        test_dsd_transpose_product<colwise, colwise>(m, k, n, densities, repetitions);
-        test_dsd_transpose_product<rowwise, rowwise>(m, k, n, densities, repetitions);
+        test_dsd_transpose_product<column_major, column_major>(m, k, n, densities, repetitions);
+        test_dsd_transpose_product<row_major, row_major>(m, k, n, densities, repetitions);
       }
       else if (algorithm == "ddd")
       {
-        test_ddd_product<colwise, colwise, colwise>(m, k, n, repetitions);
-        test_ddd_product<colwise, colwise, rowwise>(m, k, n, repetitions);
-        test_ddd_product<colwise, rowwise, colwise>(m, k, n, repetitions);
-        test_ddd_product<colwise, rowwise, rowwise>(m, k, n, repetitions);
-        test_ddd_product<rowwise, colwise, colwise>(m, k, n, repetitions);
-        test_ddd_product<rowwise, colwise, rowwise>(m, k, n, repetitions);
-        test_ddd_product<rowwise, rowwise, colwise>(m, k, n, repetitions);
-        test_ddd_product<rowwise, rowwise, rowwise>(m, k, n, repetitions);
+        test_ddd_product<column_major, column_major, column_major>(m, k, n, repetitions);
+        test_ddd_product<column_major, column_major, row_major>(m, k, n, repetitions);
+        test_ddd_product<column_major, row_major, column_major>(m, k, n, repetitions);
+        test_ddd_product<column_major, row_major, row_major>(m, k, n, repetitions);
+        test_ddd_product<row_major, column_major, column_major>(m, k, n, repetitions);
+        test_ddd_product<row_major, column_major, row_major>(m, k, n, repetitions);
+        test_ddd_product<row_major, row_major, column_major>(m, k, n, repetitions);
+        test_ddd_product<row_major, row_major, row_major>(m, k, n, repetitions);
       }
       return true;
     }
