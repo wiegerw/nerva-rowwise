@@ -23,16 +23,16 @@ jobs:
 
       - name: Compile LaTeX
         run: |
-          pdflatex nerva-libraries-implementation.tex
-          bibtex nerva-libraries-implementation
-          pdflatex nerva-libraries-implementation.tex
-          pdflatex nerva-libraries-implementation.tex
+          pdflatex doc/nerva-libraries-implementation.tex
+          bibtex doc/nerva-libraries-implementation
+          pdflatex doc/nerva-libraries-implementation.tex
+          pdflatex doc/nerva-libraries-implementation.tex
 
       - name: Upload PDF
         uses: actions/upload-artifact@v3
         with:
           name: pdf
-          path: nerva-libraries-implementation.pdf
+          path: doc/nerva-libraries-implementation.pdf
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
