@@ -1,0 +1,42 @@
+name: Build LaTeX PDF
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive texlive-latex-extra texlive-fonts-recommended texlive-xetex
+
+      - name: Compile LaTeX
+        run: |
+          pdflatex nerva-libraries-implementation.tex
+          bibtex nerva-libraries-implementation
+          pdflatex nerva-libraries-implementation.tex
+          pdflatex nerva-libraries-implementation.tex
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdf
+          path: nerva-libraries-implementation.pdf
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ # or the directory where the PDF is located
+

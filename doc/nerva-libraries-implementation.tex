@@ -1,0 +1,1363 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+ \usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage[svgnames]{xcolor}
+\usepackage{textcomp}
+\usepackage{manyfoot}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{mathtools} % cases
+\usepackage{array} % newcolumntype
+\usepackage{tikz}
+\usepackage{listing}
+\usepackage{float}
+\usepackage{hyperref}
+
+\newfloat{lstfloat}{htbp}{lop}
+\floatname{lstfloat}{Listing}
+\def\lstfloatautorefname{Listing} % needed for hyperref/auroref
+
+% for TikZ pictures
+\usepackage{listofitems} % for \readlist to create arrays
+\usetikzlibrary{arrows.meta} % for arrow size
+\usetikzlibrary{positioning}
+\usepackage[outline]{contour} % glow around text
+\contourlength{1.4pt}
+\tikzset{>=latex} % for LaTeX arrow head
+
+\usepackage{xcolor}
+\colorlet{outputcolor}{white!80!black}
+\colorlet{hiddencolor}{white!20!black}
+\colorlet{inputcolor}{white!80!black}
+\colorlet{linecolor}{black!40!black}
+%\definecolor{darkgreen}{RGB}{0,100,0}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{property}[theorem]{Property}
+\newtheorem{definition}{Definition}
+
+\tikzset{
+  >=latex, % for default LaTeX arrow head
+  node/.style={thick,circle,draw=hiddencolor,minimum size=22,inner sep=0.5,outer sep=0.6},
+  node in/.style={node,green!20!black,draw=inputcolor!30!black,fill=inputcolor!25},
+  node hidden/.style={node,blue!20!black,draw=hiddencolor!30!black,fill=hiddencolor!20},
+  node out/.style={node,red!20!black,draw=outputcolor!30!black,fill=outputcolor!20},
+  connect/.style={thick,linecolor}, %,line cap=round
+  connect arrow/.style={-{Latex[length=4,width=3.5]},thick,linecolor,shorten <=0.5,shorten >=1},
+  node 1/.style={node in}, % node styles, numbered for easy mapping with \nstyle
+  node 2/.style={node hidden},
+  node 3/.style={node out}
+}
+\def\nstyle{int(\lay<\Nnodlen?min(2,\lay):3)} % map layer number onto 1, 2, or 3
+
+% for tables with feedforward + backpropagation equations
+\newcolumntype{W}[1]{>{$\displaystyle}w{l}{#1}<{$}}
+\newcolumntype{L}{>{\displaystyle}l}
+
+\newcommand{\const}[1]{\ensuremath{\mathrm{#1}}} % constants
+\newcommand{\func}[1]{\ensuremath{\textsf{#1}}} % functions
+\newcommand{\set}[1]{\ensuremath{\{ #1 \} }} % sets
+
+% derivatives
+\newcommand{\Gradient}{\textsf{D}}
+\newcommand{\Derivative}[2]{\ensuremath{\frac{\partial #1}{\partial #2}}}
+\newcommand{\Partial}[1]{\frac{\partial}{\partial #1}}
+
+% real numbers
+\newcommand{\Reals}{\mathbb{R}}
+
+\begin{document}
+
+\title{\centering Batch Matrix-form Equations and Implementation \\ of Multilayer Perceptrons}
+
+\title{Nerva Libraries Implementation}
+\author{Wieger Wesselink}
+\date{\today}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+This document contains algorithm specifications and implementation details of the Nerva Libraries \url{https://github.com/wiegerw/nerva}.
+
+\section{Mathematical background} \label{section:mathematical-background}
+In this section we provide notational conventions, we provide definitions for the gradient and the Jacobian, and a comprehensive table with matrix operations that are necessary for the execution of multilayer perceptrons.
+
+In the rest of this document we use the following notation. Vectors are denoted using lowercase symbols $x, y, z$, and matrices using uppercase symbols $X, Y, Z$. The columns of a matrix $X \in \Reals^{m \times n}$ are denoted as $x^1, \ldots, x^n$, while the rows are denoted as $x_1, \ldots, x_m$. Occasionally, the subscript notation $x_i$ is also used to denote the $i^\text{th}$ element of the vector $x$, but this will be clear from context.
+To distinguish between row and column vectors, we denote their domains as $\Reals^{1 \times n}$ and $\Reals^{m \times 1}$, respectively. We use the dot symbol $\cdot$ for matrix multiplication, and not for the dot product. This notation is used primarily to enhance the readability of expressions.
+
+In the context of neural networks, we typically use $x, X$ for inputs, $y, Y$ for outputs, $z, Z$ for intermediate values, and $t, T$ for targets. The number of inputs of a layer is denoted by $\const{D}$ and the number of outputs by $\const{K}$. The number of examples in a mini-batch is denoted by $\const{N}$.
+We follow the convention of the major neural network frameworks where data is stored using a row layout. This means that by default $x$, $y$, and $z$ are considered row vectors, and each row of an input matrix $X$ represents an example of a dataset. For example, if $X \in \Reals^{\const{N} \times \const{D}}$, then $x_i \in \Reals^{1 \times \const{D}}$ represents the $i$-th example.
+
+\begin{definition}[Gradient]
+Let $f: \Reals^{m \times n} \rightarrow \Reals$ be a function with input $X$ that has elements $x_{ij}$, with $m, n \in \mathbb{\const{N}}^{+}$. Then the gradient $\nabla_X f$ is defined as
+\begin{equation}
+\nabla_X f(X) =
+\begin{bmatrix}
+ \dfrac{\partial f(X)}{\partial x_{11}} & \cdots & \dfrac {\partial f(X)}{\partial x_{1n}}
+   \\
+   \vdots & \ddots & \vdots \\
+   \dfrac {\partial f(X)}{\partial x_{m1}} & \cdots & \dfrac {\partial f(X)}{\partial x_{mn}}
+\end{bmatrix}.
+\end{equation}
+\end{definition}
+\begin{definition}[Gradient of the loss function] \label{def:gradient}
+We consider neural networks with output $Y \in \Reals^{\const{N} \times \const{K}}$ and target $T \in \Reals^{\const{N} \times \const{K}}$. We assume that there is a fixed loss function $\mathcal{L}: \Reals^{\const{N} \times \const{K}} \times \Reals^{\const{N} \times \const{K}} \rightarrow \Reals$, such that $\mathcal{L}(Y, T)$ is the loss corresponding to the output $Y$, given the target $T$. We use the following shorthand notation for the gradient of the loss:
+\begin{equation}
+\Gradient Y = \nabla_Y \mathcal{L}(Y, T).
+\end{equation}
+If $Y$ depends on a parameter $Z$, i.e. $Y = Y(Z)$, then we define
+\begin{equation}
+\Gradient Z = \nabla_Z \mathcal{L}(Y(Z), T).  
+\end{equation}
+\end{definition}
+
+\begin{definition}[Jacobian]
+Let $f: \Reals^n \rightarrow \Reals^m$ be a function with input $x \in \Reals^n$. Then the Jacobian $\frac{\partial f}{\partial x}$ is defined as\footnote{We use the convention that the Jacobian does not depend on whether $x$ and $f(x)$ are row vectors or column vectors. This is consistent with SymPy, but other conventions are also in use.}
+\begin{equation}
+\frac{\partial f}{\partial x}(x) =
+\begin{bmatrix}
+ \dfrac{\partial f_{1}(x)}{\partial x_{1}} & \cdots & \dfrac {\partial f_{1}(x)}{\partial x_{n}}
+   \\
+   \vdots & \ddots & \vdots \\
+   \dfrac {\partial f_{m}(x)}{\partial x_{1}} & \cdots & \dfrac {\partial f_{m}(x)}{\partial x_{n}}
+\end{bmatrix}.
+\end{equation}
+\end{definition}
+
+The execution of MLPs depends on a small number of matrix operations. In Table \ref{table:matrix-operations} we provide a mathematical notation, a code representation, and a definition for the most important operations. These operations are used in the implementation of activation functions, loss functions, and the feedforward and backpropagation equations of neural network layers. Basic operations like matrix assignment, matrix indexing, and matrix dimensions are omitted, to keep the resulting code familiar to users of the respective Python frameworks. There is some redundancy in the table, to allow for more efficient, or numerically stable implementations.
+We refrain from using broadcasting notation, as commonly found in frameworks like NumPy, where arrays of different dimensions can be added, and use the standard notation of matrix calculus instead.
+This approach with explicit dimensions is needed to validate the correctness using SymPy.
+For example, to calculate the sum of elements in a column vector $x \in \Reals^{n \times 1}$, we express it as the dot product $1_n^\top \cdot x$, with $1_n = (1, \ldots, 1)^\top$  a column vector of ones.
+
+\clearpage
+\section{Matrix operations} \label{section:matrix_operations}
+\begin{table}[H]
+\centering
+\caption{An overview of matrix operations that are needed for the implementation of the class of MLPs described in this paper. We assume that $X,Y \in \Reals^{m \times n}$ and $Z \in \Reals^{n \times k}$, where $k, m, n \in \mathbb{N}^{+}$. Wherever possible, we use $m$
+to denote the number of rows and $n$ to denote the number of columns of a matrix or vector.
+The function $\sigma$ is the sigmoid function as defined in section \ref{section:activation-functions}.
+}
+\label{table:matrix-operations}
+{
+\small
+\begin{align*}
+\toprule
+    \textsc{operation} &\quad \textsc{code} & \textsc{definition}
+    \\
+    \midrule
+    0_{m} &\quad \texttt{zeros(m)} & \text{$m \times 1$ column vector with elements equal to 0}
+    \\
+    0_{mn} &\quad \texttt{zeros(m, n)} & \text{$m \times n$ matrix with elements equal to 0}
+    \\
+    1_{m} &\quad \texttt{ones(m)} & \text{$m \times 1$ column vector with elements equal to 1}
+    \\
+    1_{mn} &\quad \texttt{ones(m, n)} & \text{$m \times n$ matrix with elements equal to 1} 
+    \\
+    \mathbb{I}_n &\quad \texttt{identity(n)} & \text{$n \times n$ identity matrix} 
+    \\
+    X^\top &\quad \texttt{X.T} & \text{transposition}
+    \\
+    cX &\quad \texttt{c * X} & \text{scalar multiplication, $c \in \Reals$}
+    \\
+    X + Y &\quad \texttt{X + Y} & \text{addition}
+    \\
+    X - Y &\quad \texttt{X - Y} & \text{subtraction}
+    \\
+    X \cdot Z &\quad \texttt{X @ Z} \text{ or } \texttt{X * Z} 
+    & \text{matrix multiplication, also denoted as $XZ$}
+    \\
+    x^\top y \text{ or } x y^\top &\quad \texttt{dot(x,y)} & \text{dot product, } x,y \in \Reals^{m \times 1} \text{ or } x,y \in \Reals^{1 \times n}
+    \\
+    X \odot Y &\quad \texttt{hadamard(X,Y)} & \text{element-wise product of $X$ and $Y$}
+    \\
+    \func{diag}(X) &\quad \texttt{diag(X)} & \text{column vector that contains the diagonal of $X$} 
+    \\
+    \func{Diag}(x) &\quad \texttt{Diag(x)} &\quad \text{diagonal matrix with $x$ as diagonal, } x \in \Reals^{1 \times n} \text{ or } x \in \Reals^{m \times 1} 
+    \\
+    1_m^\top \cdot X \cdot 1_n &\quad \texttt{elements\_sum(X)} & \text{sum of the elements of $X$}
+    \\
+    x \cdot 1_n^\top &\quad \texttt{column\_repeat(x, n)} & \text{$n$ copies of column vector $x \in \Reals^{m \times 1}$} 
+    \\
+    1_m \cdot x &\quad \texttt{row\_repeat(x, m)} & \text{$m$ copies of row vector $x \in \Reals^{1 \times n}$}
+    \\
+    1_m^\top \cdot X &\quad \texttt{columns\_sum(X)} & \text{$1 \times n$ row vector with sums of the columns of $X$}
+    \\
+    X \cdot 1_n &\quad \texttt{rows\_sum(X)} & \text{$m \times 1$ column vector with sums of the rows of $X$} 
+    \\
+    \max(X)_\text{col} &\quad \texttt{columns\_max(X)} & \text{$1 \times n$ row vector with maximum values of the columns of $X$}
+    \\
+    \max(X)_\text{row} &\quad \texttt{rows\_max(X)} & \text{$m \times 1$ column vector with maximum values of the rows of $X$}
+    \\
+    (1_m^\top \cdot X) / n &\quad \texttt{columns\_mean(X)} & \text{$1 \times n$ row vector with mean values of the columns of $X$}
+    \\
+    (X \cdot 1_n) / m &\quad \texttt{rows\_mean(X)} & \text{$m \times 1$ column vector with mean values of the rows of $X$}
+    \\
+    f(X) &\quad \texttt{apply(f, X)} & \text{element-wise application of $f: \Reals \rightarrow \Reals$ to $X$} 
+    \\
+    e^X &\quad \texttt{exp(X)} & \text{element-wise application of $f: x \rightarrow e^x$ to $X$} 
+    \\
+    \log(X) &\quad \texttt{log(X)} & \text{element-wise application of the natural logarithm $f: x \rightarrow \ln(x)$ to $X$}
+    \\
+    1 / X &\quad \texttt{reciprocal(X)} & \text{element-wise application of $f: x \rightarrow 1/x$ to $X$}
+    \\
+    \sqrt{X} &\quad \texttt{sqrt(X)} & \text{element-wise application of $f: x \rightarrow \sqrt{x}$ to $X$}
+    \\ X^{-1/2} &\quad \texttt{inv\_sqrt}(X) & \text{element-wise application of $f: x \rightarrow x^{-1/2}$ to $X$} 
+    \\
+    \log(\sigma(X)) &\quad \texttt{log\_sigmoid}(X) & \text{element-wise application of $f: x \rightarrow \log(\sigma(x))$ to $X$},
+    \\
+    \bottomrule
+\end{align*}
+}
+\end{table}
+
+\clearpage
+In Table \ref{table:matrix-operations-implementation} we provide implementations in several frameworks of the fundamental matrix-form operations for multilayer perceptrons.
+\begin{table*}[htb]
+\scriptsize
+\centering
+\begin{tabular}{ p{2.2cm}|p{2.6cm}p{2.6cm}p{2.6cm}p{3.6cm} }
+ \toprule
+ Operation & NumPy + JAX & PyTorch & TensorFlow & Eigen\\
+ \midrule
+\textsf{zeros(m,n)}            & \textsf{zeros((m,n))}           & \textsf{zeros(m,n)}              & \textsf{zeros([m,n])}                & \textsf{Zero(m,n)}                      \\
+\textsf{ones(m,n)}             & \textsf{ones((m,n))}            & \textsf{ones(m,n)}               & \textsf{ones([m,n])}                 & \textsf{Ones(m,n)}                      \\
+\textsf{identity(n)}           & \textsf{eye(n)}                 & \textsf{eye(n)}                  & \textsf{eye(n)}                      & \textsf{Identity(n,n)}                  \\
+\textsf{X.T}                   & \textsf{X.T}                    & \textsf{X.T}                     & \textsf{X.T}                         & \textsf{X.transpose()}                   \\
+\textsf{c * X}                 & \textsf{c * X}                  & \textsf{c * X}                   & \textsf{c * X}                       & \textsf{c * X}                           \\
+\textsf{X + Y}                 & \textsf{X + Y}                  & \textsf{X + Y}                   & \textsf{X + Y}                       & \textsf{X + Y}                           \\
+\textsf{X - Y}                 & \textsf{X - Y}                  & \textsf{X - Y}                   & \textsf{X - Y}                       & \textsf{X - Y}                           \\
+\textsf{X * Z}                 & \textsf{X @ Z}                  & \textsf{X @ Z}                   & \textsf{X @ Z}                       & \textsf{X * Z}                           \\
+\textsf{hadamard(X,Y)}         & \textsf{X * Y}                  & \textsf{X * Y}                   & \textsf{multiply(X,Y)}               & \textsf{X.array() * Y.array()}           \\
+\textsf{diag(X)}               & \textsf{diag(X)}                & \textsf{diag(X)}                 & \textsf{diag\_part(X)}               & \textsf{X.diagonal()}                    \\
+\textsf{Diag(x)}               & \textsf{diag(x)}                & \textsf{diag(x.flatten())}       & \textsf{diag(reshape(x,[-1]))}       & \textsf{x.asDiagonal()}                  \\
+\textsf{elements\_sum(X)}      & \textsf{sum(X)}                 & \textsf{sum(X)}                  & \textsf{reduce\_sum(X)}              & \textsf{X.sum()}                         \\
+\textsf{column\_repeat(x,n)}   & \textsf{tile(x,(1,n))}          & \textsf{x.repeat(1,n)}           & \textsf{tile(x,[1,n])}               & \textsf{x.replicate(1,n)}               \\
+\textsf{row\_repeat(x,m)}      & \textsf{tile(x,(m,1))}          & \textsf{x.repeat(m,1)}           & \textsf{tile(x,[m,1])}               & \textsf{x.replicate(m,1)}               \\
+\textsf{columns\_sum(X)}       & \textsf{sum(X,axis=0)}          & \textsf{sum(X,dim=0)}            & \textsf{reduce\_sum(X,axis=0)}       & \textsf{X.colwise().sum()}               \\
+\textsf{rows\_sum(X)}          & \textsf{sum(X,axis=1)}          & \textsf{sum(X,dim=1)}            & \textsf{reduce\_sum(X,axis=1)}       & \textsf{X.rowwise().sum()}               \\
+\textsf{columns\_max(X)}       & \textsf{max(X,axis=0)}          & \textsf{max(X,dim=0).values}     & \textsf{reduce\_max(X,axis=0)}       & \textsf{X.colwise().maxCoeff()}          \\
+\textsf{rows\_max(X)}          & \textsf{max(X,axis=1)}          & \textsf{max(X,dim=1).values}     & \textsf{reduce\_max(X,axis=1)}       & \textsf{X.rowwise().maxCoeff()}          \\
+\textsf{columns\_mean(X)}      & \textsf{mean(X,axis=0)}         & \textsf{mean(X,dim=0)}           & \textsf{reduce\_mean(X,axis=0)}      & \textsf{X.colwise().mean()}              \\
+\textsf{rows\_mean(X)}         & \textsf{mean(X,axis=1)}         & \textsf{mean(X,dim=1)}           & \textsf{reduce\_mean(X,axis=1)}      & \textsf{X.rowwise().mean()}              \\
+\textsf{apply(f,X)}            & \textsf{f(X)}                   & \textsf{f(X)}                    & \textsf{f(X)}                        & \textsf{X.unaryExpr(f)}                  \\
+\textsf{exp(X)}                & \textsf{exp(X)}                 & \textsf{exp(X)}                  & \textsf{exp(X)}                      & \textsf{X.array().exp()}                 \\
+\textsf{log(X)}                & \textsf{log(X)}                 & \textsf{log(X)}                  & \textsf{log(X)}                      & \textsf{X.array().log()}                 \\
+\textsf{reciprocal(X)}         & \textsf{1 / X}                  & \textsf{1 / X}                   & \textsf{inverse(X)}                  & \textsf{X.array().inverse()}             \\
+\textsf{sqrt(X)}               & \textsf{sqrt(X)}                & \textsf{sqrt(X)}                 & \textsf{sqrt(X)}                     & \textsf{X.array().sqrt()}                \\
+\textsf{inv\_sqrt(X)} & \textsf{reciprocal(sqrt(X+e))}  & \textsf{reciprocal(sqrt(X+e))}   & \textsf{reciprocal(sqrt(X+e))}       & \textsf{reciprocal(sqrt(X.array()+e))}   \\
+\textsf{log\_sigmoid(X)}       & \textsf{-logaddexp(0,-X)}       & \textsf{-softplus(-X)}           & \textsf{-softplus(-X)}               & \textsf{-log1p(exp(-X.array()))}         \\
+ \bottomrule
+\end{tabular}
+\caption{Implementation of matrix operations in NumPy, JAX, PyTorch, TensorFlow and Eigen.
+We assume that \texttt{e} is a given small positive constant that is used to avoid division by zero. Note that some of the operations are located in Python submodules.
+}
+\label{table:matrix-operations-implementation}
+\end{table*}
+
+\section{Layer equations} \label{section:layers}
+A major contribution of this paper is the following overview of the feedforward and backpropagation equations of layers \textbf{in matrix-form}. For each of the equations, the corresponding Python implementation is given. For several equations a derivation is included, while the correctness of the equations and derivations has been validated using SymPy. All layers are implemented in our Nerva Python packages, and a validation of all equations and derivations can be found in the \texttt{tests} directory of the \texttt{nerva-sympy} package. We consider input batches $X$ in row layout, i.e. each row represents a single example. We use the following notations:
+\begin{enumerate}
+    \item[--] $X \in \Reals^{\const{N} \times \const{D}}$ is the input batch, where $\const{N}$ is the number of examples and $\const{D}$ is the input dimension.
+    \item[--] $Y \in \Reals^{\const{N} \times \const{K}}$ is the output batch, where $\const{K}$ is the output dimension.
+    \item[--] $W \in \Reals^{\const{K} \times \const{D}}$ is the weight matrix, which maps the input features to the output features.
+    \item[--] $b \in \Reals^{1 \times \const{K}}$ is the bias vector.
+    \item[--] $Z \in \Reals^{\const{N} \times \const{K}}$ is a matrix with intermediate values.
+    \item[--] $\beta, \gamma, \Sigma \in \Reals^{1 \times \const{K}}$ are the parameters of batch normalization.
+    \item [--] $a_l, t_l, a_r, t_r \in \Reals$ are the coefficients of an SReLU activation function.
+    \item[--] $R \in \Reals^{\const{K} \times \const{D}}$ is a dropout matrix.
+\end{enumerate}
+Each of these matrices has a gradient with the same dimensions, denoted using the same symbol preceded by $\Gradient{}$, e.g. $\Gradient{X}$ is the gradient corresponding to $X$. The implementation uses the same names. The input \texttt{X}, and layer parameters like \texttt{W}, \texttt{b} and their gradients \texttt{DX}, \texttt{DW}, \texttt{Db} are stored in the attributes of a layer. The only exception is the output \texttt{Y} and its gradient \texttt{DY}, which are stored in the \texttt{X} and \texttt{DX} attributes of the next layer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{linear layer}
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+Y &= X W^\top + 1_\const{N} \cdot b
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient W &= \Gradient Y^\top \cdot X
+\\
+\Gradient b &= 1_\const{N}^\top \cdot \Gradient Y
+\\
+\Gradient X &= \Gradient Y \cdot W
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+Y = X * W.T + row_repeat(b, N)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DW = DY.T * X
+Db = columns_sum(DY)
+DX = DY * W
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{activation layer}
+Let $\func{act}: \Reals \rightarrow \Reals$ be an activation function, for example \func{relu}.
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+Z &= X W^\top + 1_\const{N} \cdot b \\
+Y &= \func{act}(Z)
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient Z &= \Gradient Y \odot \func{act}'(Z)
+\\
+\Gradient W &= \Gradient Z^\top \cdot X
+\\
+\Gradient b &= 1_\const{N}^\top \cdot \Gradient Z
+\\
+\Gradient X &= \Gradient Z \cdot W
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+Z = X * W.T + row_repeat(b, N)
+Y = act(Z)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DZ = hadamard(DY, act.gradient(Z))
+DW = DZ.T * X
+Db = columns_sum(DZ)
+DX = DZ * W
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{srelu-layer}
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+Z &= X W^\top + 1_N \cdot b
+\\
+Y &= \func{srelu}(Z)
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient Z &= \Gradient Y \odot \func{srelu}'(Z)
+\\
+\Gradient W &= \Gradient Z^\top \cdot X
+\\
+\Gradient b &= 1_N^\top \cdot \Gradient Z
+\\
+\Gradient X &= \Gradient Z \cdot W
+\\
+\Gradient a_l &= 1_N^\top \cdot (\Gradient Y \odot A^l) \cdot 1_K
+\\
+\Gradient a_r &= 1_N^\top \cdot (\Gradient Y \odot A^r) \cdot 1_K
+\\
+\Gradient t_l &= 1_N^\top \cdot (\Gradient Y \odot T^l) \cdot 1_K
+\\
+\Gradient t_r &= 1_N^\top \cdot (\Gradient Y \odot T^r) \cdot 1_K
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+Z = X * W.T + repeat_row(b, N)
+Y = apply(act, Z)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DZ = hadamard(DY, apply(act_prime, Z))
+DW = DZ.T * X
+Db = sum_columns(DZ)
+DX = DZ * W
+Al = apply(al, Z)
+Ar = apply(ar, Z)
+Tl = apply(tl, Z)
+Tr = apply(tr, Z)
+Dal = sum_elements(hadamard(DY, Al))
+Dar = sum_elements(hadamard(DY, Ar))
+Dtl = sum_elements(hadamard(DY, Tl))
+Dtr = sum_elements(hadamard(DY, Tr))
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+where
+\[
+    \begin{array}{lll}
+      A^l_{ij} &=&
+          \begin{cases*}
+              Z_{ij} - t_l & if $Z_{ij} \leq t_l$ \\
+              0 & otherwise
+          \end{cases*}
+      \\[0.5cm]
+      A^r_{ij} &=&
+          \begin{cases*}
+              0 & if $Z_{ij} \leq t_l \lor Z_{ij} < t_r$ \\
+              Z_{ij} - t_r & otherwise
+          \end{cases*}
+      \\[0.5cm]
+      T^l_{ij} &=&
+          \begin{cases*}
+              1 - a_l & if $Z_{ij} \leq t_l$ \\
+              0 & otherwise
+          \end{cases*}
+      \\[0.5cm]
+      T^r_{ij} &=&
+          \begin{cases*}
+              1 - a_r & if $Z_{ij} \geq t_r$ \\
+              0 & otherwise
+          \end{cases*}
+    \end{array}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{softmax layer}
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+Z &= X W^\top + 1_\const{N} \cdot b
+\\
+Y &= \func{softmax}(Z)
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient Z &= Y \odot (\Gradient Y - \func{diag}(\Gradient Y \cdot Y^\top) \cdot 1_\const{K}^\top)
+\\
+\Gradient W &= \Gradient Z^\top \cdot X
+\\
+\Gradient b &= 1_\const{N}^\top \cdot \Gradient Z
+\\
+\Gradient X &= \Gradient Z \cdot W
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+Z = X * W.T + row_repeat(b, N)
+Y = softmax(Z)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DZ = hadamard(Y, 
+         DY - column_repeat(diag(DY * Y.T), K))
+DW = DZ.T * X
+Db = columns_sum(DZ)
+DX = DZ * W
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{log-softmax layer}
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+Z &= X W^\top + 1_\const{N} \cdot b
+\\
+Y &= \func{logsoftmax}(Z)
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient Z &= \Gradient Y - \func{softmax}(Z) \odot (\Gradient Y \cdot 1_\const{K} \cdot 1_\const{K}^\top )
+\\
+\Gradient W &= \Gradient Z^\top \cdot X
+\\
+\Gradient b &= 1_\const{N}^\top \cdot \Gradient Z
+\\
+\Gradient X &= \Gradient Z \cdot W
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+Z = X * W.T + row_repeat(b, N)
+Y = log_softmax(Z)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DZ = DY - hadamard(softmax(Z), 
+                   column_repeat(rows_sum(DY), K))
+DW = DZ.T * X
+Db = columns_sum(DZ)
+DX = DZ * W
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{batch normalization layer} \label{section:batch-normalization}
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+R &= X - \frac{1_\const{N} \cdot 1_\const{N}^\top}{\const{N}} \cdot X
+\\
+\Sigma &= \frac{1}{\const{N}} \cdot \func{diag}(R^\top R)^\top
+\\
+Z &= (1_\const{N} \cdot \Sigma^{-\frac{1}{2}}) \odot R
+\\
+Y &= (1_\const{N} \cdot \gamma) \odot Z + 1_\const{N} \cdot \beta
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient Z &= (1_\const{N} \cdot \gamma) \odot \Gradient Y
+\\
+\Gradient \beta &= 1_\const{N}^\top \cdot \Gradient Y
+\\
+\Gradient \gamma &= 1_\const{N}^\top \cdot (Z \odot \Gradient Y)
+\\
+\Gradient X
+     &= \left(\frac{1}{\const{N}} \cdot 1_\const{N} \cdot \Sigma^{-\frac{1}{2}}\right) ~\odot \\
+     &  \left(
+              (\const{N} \cdot \mathbb{I}_\const{N} - 1_\const{N} \cdot 1_\const{N}^\top) \cdot \Gradient Z
+              -
+              Z \odot (1_\const{N} \cdot \func{diag}(Z^\top \cdot \Gradient Z)^\top)
+       \right)
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+R = X - row_repeat(columns_mean(X), N)
+Sigma = diag(R.T * R).T / N
+inv_sqrt_Sigma = inv_sqrt(Sigma)
+Z = hadamard(row_repeat(
+             inv_sqrt_Sigma, N), R)
+Y = hadamard(row_repeat(gamma, N), Z) + 
+             row_repeat(beta, N)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DZ = hadamard(row_repeat(gamma, N), DY)
+Dbeta = columns_sum(DY)
+Dgamma = columns_sum(hadamard(Z, DY))
+DX = hadamard(row_repeat(inv_sqrt_Sigma / N, N), 
+        (N * identity(N) - ones(N, N)) * DZ - 
+        hadamard(Z, row_repeat(diag(Z.T * DZ).T, N)))
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{linear dropout layer}
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+Y &= X (W^\top \odot R) + 1_\const{N} \cdot b
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient W &= (\Gradient Y^\top \cdot X) \odot R^\top
+\\
+\Gradient b &= 1_\const{N}^\top \cdot \Gradient Y
+\\
+\Gradient X &= \Gradient Y (W \odot R^\top)
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+Y = X * hadamard(W.T, R) + row_repeat(b, N)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DW = hadamard(DY.T * X, R.T)
+Db = columns_sum(DY)
+DX = DY * hadamard(W, R.T)
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{activation dropout layer}
+\[
+\begin{array}{@{} *{2}{L} @{}}
+\textsc{feedforward equations} & \textsc{backpropagation equations} \\
+\addlinespace[1ex]
+\begin{aligned}[t]
+Z &= X (W^\top \odot R) + 1_\const{N} \cdot b
+\\
+Y &= \func{act}(Z)
+\end{aligned}
+&
+\begin{aligned}[t]
+\Gradient Z &= \Gradient Y \odot \func{act}'(Z)
+\\
+\Gradient W &= (\Gradient Z^\top \cdot X) \odot R^\top
+\\
+\Gradient b &= 1_\const{N}^\top \cdot \Gradient Z
+\\
+\Gradient X &= \Gradient Z (W \odot R^\top)
+\end{aligned}
+\\
+\addlinespace[2ex]
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+Z = X * hadamard(W.T, R) + row_repeat(b, N)
+Y = act(Z)
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}[t]{0.5\textwidth}
+\small\begin{verbatim}
+DZ = hadamard(DY, act.gradient(Z))
+DW = hadamard(DZ.T * X, R.T)
+Db = columns_sum(DZ)
+DX = DZ * hadamard(W, R.T)
+\end{verbatim}
+\end{minipage} \\
+\end{array}
+\]
+
+
+\subsection{Derivations}
+In this section we give some derivations of the backpropagation equations. We give some applications of the product rule and chain rule for vector functions, and show how some properties on the rows and columns of a matrix can be generalized into matrix-form.
+\vspace{0.3cm}
+
+\begin{lemma}[Product Rule for vector functions] \label{lemma:product-rule}
+The product rule for scalar functions $u$ and $v$ is given by
+\[
+(u \cdot v)^{\prime} = u^{\prime} \cdot v + u \cdot v^{\prime}.
+\]
+It can be generalized to vector functions, but the result is sensitive to the orientation of the operands. Below we give four concrete applications of the product rule for vector functions.
+Let $x \in \Reals^{p}$, $A \in \Reals^{m \times n}$, and $h(x) = f(x) g(x)$ for $m, n, p \in \mathbb{N}^{+}$.
+\begin{table}[h]
+\begin{alignat}{2}
+&
+\text{ Let } f(x) \in \Reals^{n \times 1},
+\text{ and let } g(x) \in \Reals, 
+\text{ then }
+\Derivative{h}{x} = \Derivative{f}{x} g + f \Derivative{g}{x}.
+\label{eq:product-rule1}
+\\ \addlinespace[1ex]
+&
+\text{ Let } f(x) \in \Reals^{1 \times n},
+\text{ and let } g(x) \in \Reals,
+\text{ then }
+\Derivative{h}{x} = \Derivative{f}{x} g + f^\top \Derivative{g}{x}.
+\label{eq:product-rule2}
+\\
+&
+\text{ Let } f(x) = A,
+\text{ and let } g(x) \in \Reals^{n \times 1},
+\text{ then }
+\Derivative{h}{x} = A \Derivative{g}{x}.
+\label{eq:product-rule3}
+\\
+&
+\text{ Let } f(x) \in \Reals^{1 \times m},
+\text{ and let } g(x) = A,
+\text{ then }
+\Derivative{h}{x} = A^\top \Derivative{f}{x}.
+\label{eq:product-rule4}
+\end{alignat}
+\label{table:product-rule}
+\end{table}
+\end{lemma}
+
+\begin{lemma}[Chain rule for vector functions] \label{lemma:chain-rule}
+    Let $f: \Reals^n \rightarrow \Reals^m$, let 
+    $g: \Reals^m \rightarrow \Reals^p$,
+    and let $h(x) = g(y)$ with $y = f(x)$. Then we have
+    \begin{equation} \label{eq:chain-rule}
+       \frac{\partial h}{\partial x} = 
+       \frac{\partial g}{\partial y} \cdot
+       \frac{\partial f}{\partial x}
+    \end{equation}
+    Note that this equations holds irrespective of whether $f(x)$ is a row or a column vector.
+\end{lemma}
+\vspace{0.3cm}
+
+\begin{property}[Matrix properties]
+Let $X, Y, Z \in \Reals^{m \times n}$. We denote the $i^\text{th}$ row of matrix $A$ as $a_i$ and the $j^\text{th}$ column of matrix $A$ as $a^j$. The element at position $(i,j)$ of $A$ is denoted as $a_{ij}$. Below we give a number of properties on the rows and columns of matrices, and the generalization of these properties into matrix-form.
+
+\begin{alignat}{2}
+&\text{If }
+  z^j = x^j \cdot (x^j)^\top \cdot y^j \quad (1 \leq j \leq n),
+&&\text{ then }
+  Z = X \odot (1_m \cdot \func{diag}(X^\top \cdot Y)^\top).
+\label{eq:matrix-property1}
+\\  
+&\text{If }
+  z^j = 1_m \cdot (x^j)^\top \cdot y^j \quad (1 \leq j \leq n),
+&&\text{ then }
+  Z = 1_m \cdot \func{diag}(X^\top Y)^\top.
+\label{eq:matrix-property2}
+\\  
+&\text{If }
+  z^j = x^j \cdot 1_m^\top \cdot y^j \quad (1 \leq j \leq n),
+&&\text{ then }
+  Z = X \odot (1_m \cdot 1_m^\top \cdot Y)
+\label{eq:matrix-property3}
+\\  
+&\text{If }
+  z_i = x_i \cdot y_i^\top \cdot y_i \quad (1 \leq i \leq m),
+&&\text{ then }
+  Z = (\func{diag}(X \cdot Y^\top) \cdot 1_n^\top) \odot Y
+\label{eq:matrix-property5}
+\\  
+&\text{If }
+  z_i = x_i \cdot y_i^\top \cdot 1_n^\top \quad (1 \leq i \leq m),
+&&\text{ then }
+  Z = \func{diag}(X \cdot Y^\top) \cdot 1_n^\top
+\label{eq:matrix-property6}
+\\  
+&\text{If }
+  z_i = x_i \cdot 1_n \cdot y_i \quad (1 \leq i \leq m),
+&&\text{ then }
+  Z = (X \cdot 1_n \cdot 1_n^\top) \odot Y
+\label{eq:matrix-property7}
+\end{alignat}
+\end{property}
+
+\noindent
+All properties have been validated with SymPy. Naturally there is a lot of symmetry between the row and column properties. By means of example we will prove equation \eqref{eq:matrix-property5}. From $z_i = x_i \cdot y_i^\top \cdot y_i$ we derive that $z_{ij} = (x_i \cdot y_i^\top) y_{ij}$ for $1 \leq j \leq n$. Hence we can write $Z = R \odot Y$, where $R$ is defined using $r_{ij} = (x_i \cdot y_i^\top)$. We observe that $\func{diag}(X \cdot Y^\top) = (x_1 \cdot y_1^\top, \ldots, x_m \cdot y_m^\top)^\top$. From the definition of $R$ we can see that it consists of $n$ copies of the column vector $\func{diag}(X \cdot Y^\top)$. Hence we have $R = \func{diag}(X \cdot Y^\top) \cdot 1_n^\top$.
+
+\subsubsection*{linear layer}
+We have $Y = X \cdot W^\top + 1_\const{N} \cdot b$. Let $x_i, y_i, b_i$ be the $i^\text{th}$ row of $X$, $Y$, $1_\const{N} \cdot b$ for $1 \leq i \leq \const{N}$, hence $y_i = x_i W^\top + b_i$, where $b_i = b$. Furthermore, let $w_j$ be the $j^\text{th}$ row of $W$, and let $e_i$ be the $i^\text{th}$ row of the unit matrix $\mathbb{I}_\const{N}$. Let $\mathcal{L}(Y) = \sum_{i=1}^\const{N} \mathcal{L}(y_i)$ be the corresponding loss. We calculate
+\begin{align}
+\begin{split}
+  \Derivative{\mathcal{L}}{x_i} 
+  &\overset{(\ref{eq:chain-rule})}{=} \sum_{k=1}^\const{N} \Derivative{\mathcal{L}}{y_k} \Derivative{y_k}{x_i}
+  = \Derivative{\mathcal{L}}{y_i} \Derivative{y_i}{x_i}
+  \overset{(\ref{eq:product-rule4})}{=} \Derivative{\mathcal{L}}{y_i} \cdot W,
+  \text{ hence } \Gradient{x_i} = \Gradient{y_i} \cdot W
+  \\
+  \Derivative{\mathcal{L}}{b} 
+  &\overset{(\ref{eq:chain-rule})}{=} \sum_{k=1}^\const{N} \Derivative{\mathcal{L}}{y_k} \Derivative{y_k}{b}
+  \overset{(\ref{eq:product-rule4})}{=} \sum_{k=1}^\const{N} \Derivative{\mathcal{L}}{y_k} \cdot \mathbb{I}_K
+  = \sum_{k=1}^\const{N} \Derivative{\mathcal{L}}{y_k}, 
+  \text{ hence } \Gradient{b} = 1_\const{N}^\top \cdot \Gradient{Y}
+  \\
+  \text{We have } y_k &= x_k W^\top + b \text{ and } \Derivative{y_k}{w_{ij}} = x_{kj} e_i, \text{ hence}
+  \\
+  \Derivative{\mathcal{L}}{w_{ij}} 
+  &= \sum_{k=1}^\const{N} \Derivative{\mathcal{L}}{y_k} \Derivative{y_k}{w_{ij}}
+  = \sum_{k=1}^\const{N} \Derivative{\mathcal{L}}{y_k} x_{kj} e_i
+  = \sum_{k=1}^\const{N} \sum_{l=1}^\const{K}
+    \Derivative{\mathcal{L}}{y_{kl}} 
+    x_{kj} (e_i)_l
+  \\  
+  &= \sum_{k=1}^\const{N} (e_i)_l
+    \sum_{l=1}^\const{K}
+    \Derivative{\mathcal{L}}{y_{kl}} x_{kj}
+  = \sum_{k=1}^\const{N} (e_i)_l
+    (\Gradient{Y}^\top \cdot X)_{lj}
+  = (\Gradient{Y}^\top \cdot X)_{ij}
+\end{split}  
+\end{align}
+This can be generalized to matrix equations: $\Gradient{X} = \Gradient{Y} \cdot W$, $\Gradient{b} = 1_\const{N}^\top \cdot \Gradient{Y}$, and $\Gradient{W} = \Gradient Y^\top \cdot X$.
+
+\subsubsection*{log-softmax layer}
+We have $Y = \func{log-softmax}(Z)$.
+Let $y_i, z_i$ be the $i^\text{th}$ row of $Y$, $Z$ for $1 \leq i \leq \const{N}$, hence $y_i = \func{log-softmax}(z_i)$.
+We calculate
+\begin{align*}
+  \Derivative{\mathcal{L}}{z_i} 
+  & \overset{(\ref{eq:chain-rule})}{=} 
+    \Derivative{\mathcal{L}}{y_i} \Partial{z_i} \func{log-softmax}(z_i)
+  \overset{(\ref{eq:log-softmax-derivation})}{=}
+  \Derivative{\mathcal{L}}{y_i}
+    \left( 
+       \mathbb{I}_K - 1_\const{K} \cdot \func{softmax}(z_i)
+    \right)
+  \\
+  & \Longleftrightarrow~~ \Gradient{z_i} = \Gradient{y_i} \cdot 
+      \left( 
+       \mathbb{I}_K - 1_\const{K} \cdot \func{softmax}(z_i)
+    \right)
+  = \Gradient y_i - \Gradient y_i \cdot 1_\const{K} \cdot \func{softmax}(z_i).  
+\end{align*}
+This can be generalized to matrices using property \ref{eq:matrix-property7}:
+\begin{align}
+\Gradient Z &= \Gradient Y - \func{softmax}(Z) \odot
+(\Gradient Y \cdot 1_\const{K} \cdot 1_\const{K}^\top)
+\end{align}
+
+\subsubsection*{batch normalization layer}
+We will derive the equation for $\Gradient X$, which is the most complicated one.
+Following the approach of \cite{yeh-batch-norm}, we first derive the equations for a single column. Let $x^j, r^j, z^j \in \Reals^{\const{N} \times 1}$ be the $j^\text{th}$ column of $X$, $R$ and $Z$, and let $\sigma \in \Reals$ be the $j^\text{th}$ element of $\Sigma$, with $1 \leq j \leq \const{D}$. Then we obtain the following equations:
+\begin{align}
+r^j &= x^j - \frac{1_\const{N} \cdot 1_\const{N}^\top}{\const{N}} \cdot x^j = (\mathbb{I}_{\const{N}} - \frac{1_\const{N} \cdot 1_\const{N}^\top}{\const{N}}) \cdot x^j
+\\
+\sigma &= \frac{(r^j)^\top r^j}{\const{N}} 
+\\
+z^j &= r^j \cdot \sigma^{-\frac{1}{2}}
+\end{align}
+We calculate
+\begin{align}
+  \Derivative{z^j}{r^j}
+  & \overset{(\ref{eq:product-rule1})}{=}
+  \Derivative{r^j}{r^j} \cdot \sigma^{-\frac{1}{2}}
+  + r^j \cdot \Derivative{\sigma^{-\frac{1}{2}}}{r^j}
+  \overset{(\ref{eq:chain-rule})}{=} 
+  \sigma^{-\frac{1}{2}} - r^j \cdot 
+  \frac{\sigma^{-\frac{3}{2}}}{2} \cdot \Derivative{\sigma}{r^j}
+  =
+  \sigma^{-\frac{1}{2}} - r^j \cdot 
+  \frac{\sigma^{-\frac{3}{2}}}{2} \cdot \left( \frac{2 (r^j)^\top}{\const{N}} \right)
+  \\
+  &= 
+  \frac{\sigma^{-\frac{1}{2}}}{\const{N}}
+  \left(
+    \const{N} \cdot \mathbb{I}_\const{N} - \sigma^{-1} r^j (r^j)^\top
+  \right)
+  =
+  \frac{\sigma^{-\frac{1}{2}}}{\const{N}}
+  \cdot 
+  \left( 
+    \const{N} \cdot \mathbb{I}_{\const{N}} - z^j (z^j)^\top  
+  \right).
+\end{align}
+Using the chain rule we find
+\begin{align}
+  \frac{\partial \mathcal{L}}{\partial r^j} 
+  & \overset{(\ref{eq:chain-rule})}{=}
+  \frac{\partial \mathcal{L}}{\partial z^j}
+  \frac{\partial z^j}{\partial r^j},
+  \text{ hence }
+  \Gradient{r^j} = 
+  \frac{\sigma^{-\frac{1}{2}}}{\const{N}}
+  \left( 
+    \const{N} \cdot \mathbb{I}_{\const{N}} - z^j (z^j)^\top  
+  \right)
+  \cdot
+  \Gradient{z^j}
+  \\
+  \frac{\partial \mathcal{L}}{\partial x^j} 
+  & \overset{(\ref{eq:chain-rule})}{=}
+  \frac{\partial \mathcal{L}}{\partial r^j}
+  \frac{\partial r^j}{\partial x^j},
+  \text{ hence }
+  \Gradient x^j 
+  = 
+  (\mathbb{I}_{\const{N}} - \frac{1_\const{N} \cdot 1_\const{N}^\top}{\const{N}})
+  \cdot
+  \Gradient r^j,
+\end{align}
+where one needs to take into account that for a column vector $x$ we have $\Gradient x = (\Derivative{\mathcal{L}}{x})^\top$.
+Hence
+\begin{align*}
+    \Gradient x^j 
+    &=
+    \frac{\sigma^{-\frac{1}{2}}}{\const{N}}
+    \cdot
+    (\mathbb{I}_{\const{N}} - \frac{1_\const{N} \cdot 1_\const{N}^\top}{\const{N}})
+    \cdot 
+    \left( 
+       \const{N} \cdot \mathbb{I}_{\const{N}} - z^j \cdot (z^j)^\top 
+    \right)
+    \cdot
+    \Gradient z^j
+    \\
+    &=
+    \frac{\sigma^{-\frac{1}{2}}}{\const{N}}
+    \cdot
+    (
+      \const{N} \cdot \mathbb{I}_{\const{N}}
+      - z^j \cdot (z^j)^\top
+      - 1_\const{N} \cdot 1_\const{N}^\top
+      + \frac{1_\const{N} \cdot 1_\const{N}^\top \cdot z^j \cdot (z^j)^\top}{\const{N}}
+    )  
+    \cdot
+    \Gradient z^j
+    \\     
+      & \ \ \ \  \{ \; \text{In batch normalization the column sum $1_\const{N}^\top \cdot z^j$ evaluates to zero. } \}
+    \\ 
+    &=
+    \frac{\sigma^{-\frac{1}{2}}}{\const{N}}
+    \cdot
+    (
+      (\const{N} \cdot \mathbb{I}_{\const{N}} - 1_\const{N} \cdot 1_\const{N}^\top) \cdot \Gradient z^j
+      - z^j \cdot (z^j)^\top \cdot \Gradient z^j
+    )  
+\end{align*}
+Using property \eqref{eq:matrix-property1} we generalize this into matrix-form:
+\begin{align} \label{eq:batch-normalization-backpropagation}
+\Gradient X
+     &= (\frac{1}{\const{N}} \cdot 1_\const{N} \cdot \Sigma^{-\frac{1}{2}}) ~\odot 
+      \left(
+              (\const{N} \cdot \mathbb{I}_\const{N} - 1_\const{N} \cdot 1_\const{N}^\top) \cdot \Gradient Z
+              -
+              Z \odot (1_\const{N} \cdot \func{diag}(Z^\top \cdot \Gradient Z)^\top)
+       \right).
+\end{align}
+For the remaining equations, let 
+$y_i, z_i, \beta_i, \gamma_i$ be the $i^\text{th}$ row of $Y$, $Z$, $1_\const{N} \cdot \beta$, and $1_\const{N} \cdot \gamma$ for $1 \leq i \leq \const{N}$, where $\beta_i = \beta$, and $\gamma_i = \gamma$. Hence $y_i = \gamma_i \odot z_i + \beta_i$. From this it follows
+\begin{align*}
+    & \Derivative{\mathcal{L}}{\beta_i} = \Derivative{\mathcal{L}}{y_i}
+    \\
+    & \Derivative{\mathcal{L}}{\gamma_i} = \Derivative{\mathcal{L}}{y_i} \odot z_i,
+\end{align*}
+which we can generalize into matrix-form:
+$\Gradient \beta = 1_\const{N}^\top \cdot \Gradient Y$ and
+$\Gradient \gamma = 1_\const{N}^\top \cdot (\Gradient Y \odot Z)$.
+
+\clearpage
+\section{Activation functions} \label{section:activation-functions}
+In this section we give an overview of some commonly used univariate activation functions. These activation functions are typically applied element-wise to the output matrix $Y$ of a neural network.
+\[
+\begin{array}{L @{\hspace{10pt}} L @{\hspace{20pt}} L}
+  \textsc{name} & \textsc{function} & \textsc{derivative}
+  \\
+
+  \begin{minipage}[t]{0.3\textwidth}
+    \text{ReLU} \\ \text{\cite{Fuk75}} 
+  \end{minipage}
+  &
+  \func{relu}(x) = \max(0, x)
+  &
+  \func{relu}'(x) = 
+ \begin{cases*}
+    0 & if $x < 0$ \\
+    1 & otherwise
+  \end{cases*}
+  \\
+  \addlinespace[1ex]
+
+  \begin{minipage}[t]{0.3\textwidth}
+    \text{Leaky ReLU} \\ \text{\cite{Maas2013RectifierNI}}
+  \end{minipage}
+  &
+  \func{leaky-relu}(x) = \max(\alpha x, x)
+  &
+\func{leaky-relu}'(x) = 
+ \begin{cases*}
+    \alpha & if $x < \alpha x$ \\
+    1 & otherwise
+  \end{cases*}
+  \\
+  \addlinespace[1ex]
+
+  \text{All-ReLU (\cite{DBLP:journals/corr/abs-2102-01732})}
+  &
+  \func{all-relu}(x) =
+  \begin{cases*}
+    \alpha x & if $x < 0$ \\
+    x & otherwise
+  \end{cases*}
+  &
+  \func{all-relu}'(x) = 
+  \begin{cases*}
+    \alpha & if $x < 0$ \\
+    1 & otherwise
+  \end{cases*}
+  \\
+  \addlinespace[1ex]
+
+  \text{SReLU (\cite{conf/aaai/JinXFWXY16})}
+  &
+  \func{srelu}(x) =
+  \begin{cases*}
+    t_l + a_l(x - t_l)  & if $x \leq t_l$ \\
+    x & if $t_l < x < t_r$ \\
+    t_r + a_r(x - t_r) & if $x \geq t_r$
+  \end{cases*}
+  &
+  \func{srelu}'(x) = 
+  \begin{cases*}
+    a_l  & if $x \leq t_l$ \\
+    1 & if $t_l < x < t_r$ \\
+    a_r & if $x \geq t_r$
+  \end{cases*}
+  \\
+  \addlinespace[1ex]
+
+  \text{Hyperbolic tangent}
+  &
+  \func{tanh}(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}
+  &
+  \func{tanh}'(x) = 1 - \func{tanh}(x)^2
+  \\
+  \addlinespace[1ex]
+
+  \begin{minipage}[t]{0.3\textwidth}
+    \text{Sigmoid / logistic function} \\ \text{\cite{hinton12}}
+  \end{minipage}
+  &
+  \sigma(x) = \frac{1}{1 + e^{-x}}
+  &
+  \sigma'(x) = \sigma(x) (1 - \sigma(x))
+\end{array}
+\]
+\vspace{0.5em}
+
+\noindent
+Note that Leaky ReLU and All-ReLU depend on a parameter $\alpha \in \Reals$ and
+SReLU  depends on four parameters $a_l, t_l, a_r, t_r \in \Reals$.
+N.B. The three cases of the SReLU function overlap if $t_l \geq t_r$. We use the convention that in such a case the first possible alternative must be chosen.
+For All-ReLU and SReLU layers the sign of the parameter $\alpha$ should be alternated. In a network with layers $1, 2, 3, \ldots$ the All-ReLU function should be applied to the layers $2, 3, 4, \ldots$ with parameters $-\alpha, \alpha, -\alpha, \ldots$.
+
+\vspace{0.5cm}
+\noindent
+The SReLU parameters $a_l, t_l, a_r, t_r$ are learnable parameters, i.e. they should be updated periodically based on the values of their gradients with respect to the loss function. As initial values we take $a_l, t_l, a_r, t_r = 0, 0, 0, 1$. This corresponds to the ReLU function.
+
+\subsection{Softmax functions}
+In this section we give an overview of softmax functions and their derivatives, both for single inputs and for batches. These equations are present in the activation function of softmax layers and in some of the loss functions in section \ref{section:loss-functions}. We use the same notation as before, where $x \in \Reals^{1 \times \const{D}}$ is a single input with dimension $\const{D}$, and $X \in \Reals^{\const{N} \times \const{D}}$ is an input batch, where $\const{N}$ is the number of samples in the batch.
+We denote the rows of $X$ as $x_1, \ldots, x_\const{N}$.\\
+
+
+\noindent
+Below an overview of softmax functions and their derivatives is given. Equations in matrix-form are only given if they are needed later on. Note that the function $\func{log-softmax}$ is defined using
+\[
+\func{log-softmax}(x) = \log(\func{softmax}(x)).
+\]
+\[
+\begin{array}{@{} *{2}{L} @{}}
+  \textsc{vector functions} & \textsc{matrix functions}
+  \\
+  
+  \addlinespace[1ex]
+  \func{softmax}(x) = \frac{e^x}{e^x \cdot 1_\const{D}}
+  &
+  \func{softmax}(X) = e^X \odot \left( \frac{1}{e^X \cdot 1_\const{D}}  \cdot 1_\const{D}^\top \right)
+  \\
+  \addlinespace[1ex]
+
+  \func{stable-softmax}(x) = \frac{e^z}{e^z \cdot 1_\const{D}}
+  &
+  \func{stable-softmax}(X) = e^Z \odot \left( \frac{1}{e^Z \cdot 1_\const{D}}  \cdot 1_\const{D}^\top \right)
+  \\
+  \addlinespace[1ex]
+  
+  \func{log-softmax}(x) = x - \log(e^x \cdot 1_\const{D}) \cdot 1_\const{D}^\top
+  &
+  \func{log-softmax}(X) = X - \log(e^X \cdot 1_\const{D}) \cdot 1_\const{D}^\top
+  \\
+  \addlinespace[2ex]
+
+  \func{stable-log-softmax}(x) = z - \log(e^z \cdot 1_\const{D}) \cdot 1_\const{D}^\top
+  &
+  \func{stable-log-softmax}(X) = Z - \log(e^Z \cdot 1_\const{D}) \cdot 1_\const{D}^\top,
+\end{array}
+\]
+
+\ \\
+where
+
+\[
+    \begin{cases*}
+    z = x - \max(x) \cdot 1_\const{D}^\top 
+    \\
+    Z = X - \max(X)_\text{row} \cdot 1_\const{D}^\top.
+    \end{cases*}
+\]
+
+
+\ \\
+\noindent
+The derivatives of the softmax functions are given by
+\begin{align}
+  \frac{\partial}{\partial x} \func{softmax}(x) &= 
+  \frac{\partial}{\partial x} \func{stable-softmax}(x) =
+  \func{Diag}(\func{softmax}(x)) - \func{softmax}(x)^\top \cdot \func{softmax}(x),
+  \\
+  \frac{\partial}{\partial x} \func{log-softmax}(x) &= 
+  \frac{\partial}{\partial x} \func{stable-log-softmax}(x) =
+  \mathbb{I}_D - 1_\const{D} \cdot \func{softmax}(x)
+\end{align}
+
+\subsection{Derivations}
+
+\subsubsection*{log-softmax}
+Let $y(x) = \func{softmax}(x)$, then we have
+\begin{align} \label{eq:log-softmax-derivation}
+\begin{split}
+    \Partial{x} \log \left( \func{softmax}(x) \right)
+    & \overset{(\ref{eq:chain-rule})}{=}
+    \Partial{y} \log(y) \Partial{x} \func{softmax}(x)
+    \\
+    & \overset{(\ref{eq:softmax-derivation})}{=}
+    \func{Diag}(\frac{1}{y}) \cdot 
+        \left( \func{Diag}(y) -y^\top y \right)
+    \\
+    &= \mathbb{I}_D - \func{Diag}(y) y^\top y
+    \\
+    &= \mathbb{I}_D - 1_\const{D} \cdot y
+    \\
+    &= \mathbb{I}_D - 1_\const{D} \cdot \func{softmax}(x).
+\end{split}    
+\end{align}
+
+\section{Loss functions} \label{section:loss-functions}
+In this section we give an overview of some loss functions and their gradients, both for single inputs and for batches. We use the following notations:
+\begin{enumerate}
+    \item $y \in \Reals^{1 \times \const{K}}$ is a single output, where $\const{K}$ is the output dimension.
+    \item $t \in \Reals^{1 \times \const{K}}$ is a target for a single output $y$.
+    \item $Z \in \Reals^{\const{N} \times \const{K}}$ is an output batch, where $\const{N}$ is the number of examples in the batch.
+    \item $T \in \Reals^{\const{N} \times \const{K}}$ contains the targets for an output batch $Y$.
+\end{enumerate}
+
+
+
+
+
+\subsubsection*{squared error loss}
+\begin{align}
+\begin{split}
+  \mathcal{L}_\text{SE}(y, t) &= (y - t) (y - t)^\top
+  \\
+  \nabla_y \mathcal{L}_\text{SE}(y, t) &= 2(y - t)
+  \\
+  \mathcal{L}_\text{SE}(Y, T) &= 1_\const{N}^\top \cdot ((Y - T) \odot (Y - T)) \cdot 1_\const{K}
+  \\
+  \nabla_Y \mathcal{L}_\text{SE}(Y, T) &= 2(Y - T)
+\end{split}  
+\end{align}
+The mean squared error loss is a scaled version of the squared error loss.
+\begin{align*}
+  \mathcal{L}_\text{MSE}(Y, T) &= \frac{\mathcal{L}_\text{SE}(Y, T)} {\const{K} \cdot \const{N}}
+\end{align*}
+
+\subsubsection*{cross-entropy loss}
+\begin{align}
+\begin{split}
+  \mathcal{L}_\text{CE}(y, t) &= - t \cdot \log(y)^\top
+  \\
+  \nabla_y \mathcal{L}_\text{CE}(y, t) &= - t \odot \frac{1}{y}
+  \\
+  \mathcal{L}_\text{CE}(Y, T) &= - 1_\const{N}^\top \cdot (T \odot \log(Y)) \cdot 1_\const{K}
+  \\
+  \nabla_Y \mathcal{L}_\text{CE}(Y, T) &= -T \odot \frac{1}{Y}
+\end{split} 
+\end{align}
+
+\subsubsection*{softmax cross-entropy loss}
+\begin{align}
+\begin{split}
+  \mathcal{L}_\text{SCE}(y, t) &= - t \cdot \func{log-softmax}(y)^\top
+  \\
+  \nabla_y \mathcal{L}_\text{SCE}(y, t) &= t \cdot 1_\const{K} \cdot \func{softmax}(y) - t
+  \\
+  \mathcal{L}_\text{SCE}(Y, T) &= - 1_\const{N}^\top \cdot (T \odot \func{log-softmax}(Y)) \cdot 1_\const{K}
+  \\
+  \nabla_Y \mathcal{L}_\text{SCE}(Y, T) &= \func{softmax}(Y) \odot (T \cdot 1_\const{K} \cdot 1_\const{K}^\top) - T
+\end{split}
+\end{align}
+Note that if $t$ is a one-hot encoded target (e.g. in case of a classification problem),
+it is a vector consisting of one value 1 and all others values 0. In other words
+we have $t \cdot 1_\const{K} = 1$, hence in this case the gradients can be simplified to
+\begin{align*}
+  \nabla_y \mathcal{L}_\text{SCE}(y, t) &= \func{softmax}(y) - t \\
+  \nabla_Y \mathcal{L}_\text{SCE}(Y, T) &= \func{softmax}(Y) - T
+\end{align*}
+% N.B. In PyTorch the softmax cross-entropy loss is named \texttt{CrossEntropyLoss}.
+
+\subsubsection*{logistic cross-entropy loss}
+\begin{align}
+  \begin{split}
+  \label{eq:logistic-cross-entropy-loss}
+  \mathcal{L}_\text{LCE}(y, t) &= - t \cdot \log(\sigma(y))^\top
+  \\
+  \nabla_y \mathcal{L}_\text{LCE}(y, t) &= t \odot \sigma(y) - t
+  \\
+  \mathcal{L}_\text{LCE}(Y, T) &= - 1_\const{N}^\top \cdot (T \odot (\log(\sigma(Y))) \cdot 1_\const{K}
+  \\
+  \nabla_Y \mathcal{L}_\text{LCE}(Y, T) &= T \odot \sigma(Y) - T
+  \end{split}
+\end{align}
+
+\subsubsection*{negative log-likelihood loss}
+\begin{align}
+\begin{split}
+  \mathcal{L}_\text{NLL}(y, t) &= - \log(y \cdot t^\top)
+  \\
+  \nabla_y \mathcal{L}_\text{NLL}(y, t) &= - \frac{1}{y \cdot t^\top} \cdot t
+  \\
+  \mathcal{L}_\text{NLL}(Y, T) &= - 1_\const{N}^\top \cdot (\log((Y \odot T) \cdot 1_\const{K})) \cdot 1_\const{K}
+  \\
+  \nabla_Y \mathcal{L}_\text{NLL}(Y, T) &= -\left( \frac{1}{(Y \odot T) \cdot 1_\const{K}} \cdot 1_\const{K}^\top \right) \odot T
+\end{split}
+\end{align}
+
+\subsection{Derivations}
+
+\subsubsection*{cross-entropy loss}
+\begin{align}
+\begin{split}
+\nabla_y \mathcal{L}_\text{CE}(y, t)
+&= - \Partial{y} (t \cdot \log(y)^\top)
+\overset{(\ref{eq:product-rule3})}{=} - t \cdot \func{Diag}(\frac{1}{y})
+= - t \odot \frac{1}{y} \\
+\end{split}
+\end{align}
+
+\subsubsection*{softmax cross-entropy loss}
+\begin{align}
+\label{eq:softmax-cross-entropy-derivation}
+\begin{split}
+\nabla_y \mathcal{L}_\text{SCE}(y, t) 
+&= - \Partial{y} (t \cdot \func{log-softmax}(y)^\top)
+\overset{(\ref{eq:product-rule3})}{=} - t \cdot \Partial{y} \func{log-softmax}(y) 
+\\
+& \overset{(\ref{eq:log-softmax-derivation})}{=} -t \cdot \left(\mathbb{I}_K - 1_\const{K} \cdot \func{softmax}(y) \right)
+= t \cdot 1_\const{K} \cdot \func{softmax}(y) - t
+\end{split}
+\end{align}
+If the target $t$ is a one-hot encoded vector, we have $t \cdot 1_\const{K} = 1$. In that case the gradient simplifies to
+\[
+  \nabla_y \mathcal{L}_\text{SCE-one-hot}(y, t) = \func{softmax(y)} - t.
+\]
+Using property \eqref{eq:matrix-property7} we can generalize equation \eqref{eq:softmax-cross-entropy-derivation} to
+\begin{align*}
+\nabla_Y \mathcal{L}_\text{SCE}(Y, T)
+&= \func{softmax(Y)} \odot (T \cdot 1_\const{K} \cdot 1_\const{K}^\top) - T.
+\end{align*}
+
+\subsubsection*{logistic cross-entropy loss}
+\begin{align*}
+\nabla_y \mathcal{L}_\text{LCE}(y, t) 
+&= \Partial{y}(-t \cdot \log(\sigma(y))^\top)
+\overset{(\ref{eq:product-rule3})}{=} -t \cdot \Partial{y}\log(\sigma(y))
+\\
+&= - t \cdot \func{Diag}(1_\const{K}^\top - \sigma(y))
+= t \odot \sigma(y) - t,
+\end{align*}
+where we used the well known fact that in the univariate case $\frac{d}{dt} \log(\sigma(t)) = 1 - \log(\sigma(t))$.
+
+\section{Weight initialization} \label{section:weight-initialization}
+The initial values of the weights in linear layers must be carefully chosen, as they may have a large impact on the performance of a neural network \cite{DBLP:journals/air/NarkhedeBS22}.
+Typically, these values are randomly generated on the basis of specific probability distributions. In this section, we give a few commonly used distributions.
+
+\[
+\begin{array}{@{} *{3}{L} @{}}
+  \textsc{name} & \textsc{distribution}
+  \\
+  \addlinespace[1ex]
+
+  \text{Uniform} & U(a,b)
+  \\
+  \addlinespace[1ex]
+
+  \text{Xavier \cite{pmlr-v9-glorot10a}} & U(- \frac{1}{\sqrt{\const{D}}}, \frac{1}{\sqrt{\const{D}}}) \\
+  \addlinespace[1ex]
+
+  \text{Normalized Xavier \cite{pmlr-v9-glorot10a}} & U(- \frac{\sqrt{6}}{\sqrt{\const{D}+\const{K}}}, \frac{\sqrt{6}}{\sqrt{\const{D}+\const{K}}}), \\
+  \addlinespace[1ex]
+
+  \text{He \cite{he2015delving}} & \mathcal{N}(0, \sqrt{\frac{2}{\const{D}}}),
+
+\end{array}
+\]
+where $\const{D}$ is the number of inputs and $\const{K}$ the number of outputs of the layer to which the weight matrix belongs. Furthermore, $U(a,b)$ is the uniform distribution in a given interval $[a, b]$, and $\mathcal{N}(\mu,\sigma)$ is the normal distribution with mean $\mu$ and standard deviation $\sigma$.
+
+
+Unlike weights, the initial values of bias vectors are typically set to a small constant or zero rather than drawn from probability distributions. However, the Xavier weight distribution can also be used.
+
+
+
+
+
+\section{Optimization} \label{section:optimization}
+In the optimization step, the parameters $\theta$ of a layer are updated based on the value of their gradient $\Gradient \theta$ with respect to a given loss function. The goal of this step is to decrease the value of the loss. In this section, we give three common choices for optimization methods: gradient descent, momentum, and Nesterov. All take a learning rate parameter $\eta$ as input, which is used to control the size of the optimization step. Our equations are equivalent to the ones in Keras \cite{chollet2015keras}, but presented in matrix form. 
+We use a prime symbol to denote updated values.
+\[
+\begin{array}{L @{\hspace{20pt}} L @{\hspace{20pt}} L}
+\textsc{Gradient descent} & \textsc{Momentum} & \textsc{Nesterov} \\
+\addlinespace[1ex]
+\theta' = \theta - \eta \cdot \Gradient \theta
+&
+\begin{aligned}[t]
+  \Delta'_\theta &= \mu \cdot \Delta_\theta - \eta \cdot \Gradient \theta \\
+  \theta' &= \theta + \Delta'_\theta
+\end{aligned}
+&
+\begin{aligned}[t]
+  \Delta'_\theta &= \mu \cdot \Delta_\theta - \eta \cdot \Gradient \theta \\
+  \theta' &= \theta + \mu \cdot \Delta'_\theta - \eta \cdot \Gradient \theta
+\end{aligned}
+\end{array}
+\]
+Both momentum and Nesterov depend on a parameter $0 < \mu < 1$. Furthermore, they store an additional parameter $\Delta_\theta$ with the same dimensions as $\theta$. This parameter is updated in each optimization call and initially contains only zeros.
+
+\section{Learning Rate Schedulers} \label{section:learning-rate-schedulers}
+We define a learning rate scheduler as a function $\eta: \mathbb{N} \rightarrow \Reals$ that returns the learning rate at optimization step $i$. We assume that $\eta_0$ is a given initial learning rate.
+\[
+\begin{array}{lll} %{@{} *{3}{L} @{}}
+\textsc{Formula} & \textsc{Description} 
+\\
+  \eta_{i}= \eta_0 
+  & \text{ A constant scheduler with initial value $\eta_0$. }
+\\
+  \eta_{i+1} = \displaystyle \frac {\eta_{i}}{1+d \cdot i} 
+  & \text{ A time-based scheduler with decay parameter $d$. } 
+\\
+% \addlinespace[1ex] 
+\\
+  \eta_{i} = \displaystyle \eta_{0} \cdot d^{ \left \lfloor {\frac {1+i}{r}} \right \rfloor } 
+  & \text{A step-based scheduler with change rate $d$ and drop rate $r$. } 
+\\
+\addlinespace[1ex]
+  \eta_{i} = \eta_{0} e^{-d \cdot i} 
+  & \text{An exponential scheduler with decay parameter $d$.}
+\\   
+\addlinespace[1ex]
+  \eta_{i} = \displaystyle \eta_{0} \Gamma^{\sum_{j=1}^k \lfloor \frac{i}{m_j} \rfloor}
+  & \text{A multi-step scheduler with decay parameter $\Gamma$ and milestones $\set{m_1, \ldots m_k}$.}
+\end{array}
+\]
+
+\clearpage
+\bibliographystyle{alpha}
+\bibliography{nerva}
+
+\end{document}
