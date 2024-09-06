@@ -23,11 +23,13 @@ jobs:
 
       - name: Compile LaTeX
         run: |
+          mkdir output_directory
           cd doc
           pdflatex nerva-libraries-implementation.tex
           bibtex nerva-libraries-implementation
           pdflatex nerva-libraries-implementation.tex
           pdflatex nerva-libraries-implementation.tex
+          cp nerva-libraries-implementation.pdf ../output_directory/
 
       - name: Upload PDF
         uses: actions/upload-artifact@v3
@@ -39,5 +41,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./doc
+          publish_dir: ./output_directory
 
