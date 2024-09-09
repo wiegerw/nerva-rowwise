@@ -1,6 +1,7 @@
-name: Deploy AsciiDoc to GitHub Pages
+name: Deploy AsciiDoc documentation to GitHub
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -15,7 +16,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'  # Specify your Ruby version
+          ruby-version: '3.0'
 
       - name: Install Asciidoctor
         run: |

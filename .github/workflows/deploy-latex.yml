@@ -1,6 +1,7 @@
-name: Build LaTeX PDF
+name: Deploy LaTeX documentation to GitHub
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
