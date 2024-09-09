@@ -24,16 +24,17 @@ jobs:
 
       - name: Compile LaTeX
         run: |
-          mkdir -p pdf_directory
+          mkdir -p output_directory
           cd doc
           pdflatex nerva-libraries-implementation.tex
           bibtex nerva-libraries-implementation
           pdflatex nerva-libraries-implementation.tex
           pdflatex nerva-libraries-implementation.tex
-          cp nerva-libraries-implementation.pdf ../pdf_directory
+          cp nerva-libraries-implementation.pdf ../output_directory
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./pdf_directory
+          publish_dir: ./output_directory
+          destination_dir: pdf

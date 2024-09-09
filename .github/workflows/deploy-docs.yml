@@ -25,11 +25,12 @@ jobs:
 
       - name: Compile Asciidoc
         run: |
-          mkdir -p asciidoc_directory
-          asciidoctor -r asciidoctor-bibtex -D ./asciidoc_directory ./doc/*.adoc
+          mkdir -p output_directory
+          asciidoctor -r asciidoctor-bibtex -D ./output_directory ./doc/*.adoc
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./asciidoc_directory
+          publish_dir: ./output_directory
+          destination_dir: doc
