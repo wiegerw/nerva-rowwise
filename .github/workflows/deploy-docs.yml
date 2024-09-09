@@ -39,9 +39,7 @@ jobs:
           asciidoctor -r asciidoctor-bibtex -D ./output_directory ./doc/*.adoc
 
       - name: Deploy to GitHub Pages
-#        if: env.SOURCE_CHANGED == 'true'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./output_directory
-          force_orphan: true
