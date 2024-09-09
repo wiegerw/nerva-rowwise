@@ -96,8 +96,10 @@ There are two main directions for future work. Firstly, an implementation on GPU
 Second, we consider to add more layers, loss functions and activation functions. In particular convolutional layers, pooling layers and transformer layers come to mind.
 
 # Documentation
-The documentation of the library can be found at https://wiegerw.github.io/nerva-rowwise/nerva-python.html for the Python interface, and
-https://wiegerw.github.io/nerva-rowwise/nerva-c++.html for the C++ interface. Both interfaces can be used independently.
+The documentation consists of several parts:
+* A [Python manual](https://wiegerw.github.io/nerva-rowwise/nerva-python.html) that explains how to use the Python interface.
+* A [C++ manual](https://wiegerw.github.io/nerva-rowwise/nerva-c++.html) that explains how to use the C++ interface.
+* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/nerva-libraries-implementation.pdf) of the execution of MLPs. It contains precise specifications of the layers, activation functions, loss functions etc.
 
 The following papers about Nerva are available:
 

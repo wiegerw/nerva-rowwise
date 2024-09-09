@@ -3,7 +3,7 @@ name: Deploy AsciiDoc to GitHub Pages
 on:
   push:
     branches:
-      - main  # Or your default branch
+      - main
 
 jobs:
   build:
@@ -32,13 +32,14 @@ jobs:
             echo "SOURCE_CHANGED=false" >> $GITHUB_ENV
           fi
 
-      - name: Create output directory
-        run: mkdir -p output_directory
-
-      - name: Convert AsciiDoc to HTML
-        run: asciidoctor -r asciidoctor-bibtex -D ./output_directory ./doc/*.adoc
+      - name: Compile Asciidoc
+        if: env.SOURCE_CHANGED == 'true'
+        run: |
+          mkdir -p output_directory
+          asciidoctor -r asciidoctor-bibtex -D ./output_directory ./doc/*.adoc
 
       - name: Deploy to GitHub Pages
+#        if: env.SOURCE_CHANGED == 'true'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

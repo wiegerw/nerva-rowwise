@@ -32,6 +32,7 @@ jobs:
           fi
 
       - name: Compile LaTeX
+        if: env.SOURCE_CHANGED == 'true'
         run: |
           mkdir output_directory
           cd doc
@@ -41,13 +42,8 @@ jobs:
           pdflatex nerva-libraries-implementation.tex
           cp nerva-libraries-implementation.pdf ../output_directory/
 
-      - name: Upload PDF
-        uses: actions/upload-artifact@v3
-        with:
-          name: pdf
-          path: nerva-libraries-implementation.pdf
-
       - name: Deploy to GitHub Pages
+        if: env.SOURCE_CHANGED == 'true'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
