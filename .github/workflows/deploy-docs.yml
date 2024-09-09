@@ -1,4 +1,4 @@
-name: Deploy AsciiDoc documentation to GitHub
+name: Deploy AsciiDoc documentation
 
 on:
   workflow_dispatch:
@@ -25,11 +25,11 @@ jobs:
 
       - name: Compile Asciidoc
         run: |
-          mkdir -p output_directory
-          asciidoctor -r asciidoctor-bibtex -D ./output_directory ./doc/*.adoc
+          mkdir -p output_directory/doc
+          asciidoctor -r asciidoctor-bibtex -D ./output_directory/doc ./doc/*.adoc
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./output_directory
+          publish_dir: ./output_directory/doc

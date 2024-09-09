@@ -1,4 +1,4 @@
-name: Deploy LaTeX documentation to GitHub
+name: Deploy LaTeX documentation
 
 on:
   workflow_dispatch:
@@ -24,16 +24,16 @@ jobs:
 
       - name: Compile LaTeX
         run: |
-          mkdir output_directory
+          mkdir -p output_directory/pdf
           cd doc
           pdflatex nerva-libraries-implementation.tex
           bibtex nerva-libraries-implementation
           pdflatex nerva-libraries-implementation.tex
           pdflatex nerva-libraries-implementation.tex
-          cp nerva-libraries-implementation.pdf ../output_directory/
+          cp nerva-libraries-implementation.pdf ../output_directory/pdf
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./output_directory
+          publish_dir: ./output_directory/pdf
