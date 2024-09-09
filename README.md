@@ -97,9 +97,9 @@ Second, we consider to add more layers, loss functions and activation functions.
 
 # Documentation
 The documentation consists of several parts:
-* A [Python manual](https://wiegerw.github.io/nerva-rowwise/nerva-python.html) that explains how to use the Python interface.
-* A [C++ manual](https://wiegerw.github.io/nerva-rowwise/nerva-c++.html) that explains how to use the C++ interface.
-* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/nerva-libraries-implementation.pdf) of the execution of MLPs. It contains precise specifications of the layers, activation functions, loss functions etc.
+* A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains how to use the Python interface.
+* A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) that explains how to use the C++ interface.
+* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of the execution of MLPs. It contains precise specifications of the layers, activation functions, loss functions etc.
 
 The following papers about Nerva are available:
 
