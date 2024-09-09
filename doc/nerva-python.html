@@ -8,7 +8,7 @@
 <meta name="description" content="Documentation for the nerva-rowwise repository.">
 <meta name="author" content="Wieger Wesselink">
 <meta name="copyright" content="Copyright 2024 Wieger Wesselink">
-<title>Nerva-rowwise C++ manual</title>
+<title>Nerva-rowwise Python manual</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -440,7 +440,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body id="demo" class="book toc2 toc-left">
 <div id="header">
-<h1>Nerva-rowwise C++ manual</h1>
+<h1>Nerva-rowwise Python manual</h1>
 <div class="details">
 <span id="author" class="author">Wieger Wesselink</span><br>
 <span id="email" class="email"><a href="mailto:j.w.wesselink@tue.nl">j.w.wesselink@tue.nl</a></span><br>
@@ -448,15 +448,18 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle"><h3>Contents</h3></div>
 <ul class="sectlevel1">
-<li><a href="#_installation">Installation</a></li>
+<li><a href="#_installation">Installation</a>
+<ul class="sectlevel2">
+<li><a href="#_ubuntu_gcc">Ubuntu + gcc</a></li>
+<li><a href="#_windows">Windows</a></li>
+</ul>
+</li>
 <li><a href="#_command_line_tools">Command line tools</a>
 <ul class="sectlevel2">
-<li><a href="#_the_tool_mkl">The tool mkl</a></li>
 <li><a href="#_the_tool_mlp">The tool mlp</a></li>
 <li><a href="#_the_mlp_command_line_options">The mlp command line options</a></li>
 </ul>
 </li>
-<li><a href="#_references">References</a></li>
 </ul>
 </div>
 </div>
@@ -480,93 +483,80 @@ The documentation of this project is in the initial phase, so a lot is still mis
 <div class="sect1">
 <h2 id="_installation">Installation</h2>
 <div class="sectionbody">
-<div class="ulist">
-<div class="title">The following build systems are supported</div>
-<ul>
-<li>
-<p>CMake 3.16+</p>
-</li>
-<li>
-<p>B2 (<a href="https://www.bfgroup.xyz/b2/" class="bare">https://www.bfgroup.xyz/b2/</a>)</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>This section explains how to install the <code>nerva</code> python module on Ubuntu and on Windows.</p>
+</div>
+<div class="sect2">
+<h3 id="_ubuntu_gcc">Ubuntu + gcc</h3>
+<div class="paragraph">
+<p>The Ubuntu build has been tested with Linux Mint 22, which is built on top of Ubuntu 24.04.</p>
 </div>
 <div class="paragraph">
-<p>Using CMake, the Nerva c++ library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable <code>ONEAPI_ROOT</code> should point to the OneAPI installation directory, and the variable <code>MKL_DIR</code> to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using <code>FetchContent</code> commands. The build and install can for example be done like this on Linux:</p>
+<p>The following packages need to be installed:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>mkdir build
-cd build
-cmake .. \
-    -DCMAKE_INSTALL_PREFIX=../install \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DMKL_DIR:PATH=$ONEAPI_ROOT/mkl/latest/lib/cmake/mkl
-make -j8
-make install</code></pre>
-</div>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-Setting the <code>MKL_DIR</code> variable is not necessary if the OneAPI <code>setvars.sh</code> script is run beforehand.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
-<a href="https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044" class="bare">https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044</a>
-and <a href="https://gitlab.com/libeigen/eigen/-/issues/2586" class="bare">https://gitlab.com/libeigen/eigen/-/issues/2586</a> for more details.
-To resolve this issue, a hack has been applied: by defining the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code>,
-the inclusion of the offending header file is prevented.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>On Windows, a command like this can be used:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>cmake .. ^
-    -G "NMake Makefiles" ^
-    -DCMAKE_INSTALL_PREFIX=..\install ^
-    -DCMAKE_BUILD_TYPE=Release ^
-    -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
-nmake
-nmake install</code></pre>
+<pre class="highlight"><code>pybind11-dev
+build-essential   # meta-packages that are necessary for compiling software
+python3-pip       # for installing python packages using pip
+python3-pybind11</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The unit tests can be run using the command</p>
+<p>Also, some environment variables must be set for the dependencies. An example is
+given below</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>ctest -R nerva</code></pre>
+<pre class="highlight"><code>export ONEAPI_ROOT=/home/user/intel/oneapi
+export EIGEN_INCLUDE_DIR=/home/user/repos/libeigen/eigen
+export FMT_INCLUDE_DIR=/home/user/repos/fmtlib/fmt/include
+export LYRA_INCLUDE_DIR=/home/user/repos/bfgroup/Lyra/include
+export PYBIND11_INCLUDE_DIR=/home/user/repos/pybind11/pybind11/include</code></pre>
 </div>
 </div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-The number of threads that are used at runtime by the MKL library can be controlled using the environment variables <code>MKL_NUM_THREADS</code> and <code>OMP_NUM_THREADS</code>, see also <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html" class="bare">https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html</a>.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>Setting <code>EIGEN_INCLUDE_DIR</code> is optional. If it is omitted, the default value
+<code>/usr/include/eigen3</code> is used. Eigen can be installed from the GitLab repository,
+but it is also possible to use the system package <code>libeigen3-dev</code>.
+It is recommended to install the most recent version of the OneAPI library.</p>
+</div>
+<div class="paragraph">
+<p>The <code>nerva</code> module can then be installed using</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>cd python
+pip3 install .</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_windows">Windows</h3>
+<div class="paragraph">
+<p>To get optimal performance, it may be needed to add compiler flags like <code>/arch:AVX2</code> manually to the <code>extra_compile_args</code> list in the file <a href="../python/setup.py" class="bare">../python/setup.py</a>. Unfortunately on Windows there seems to be no standard way to automatically select the correct flags.</p>
+</div>
+<div class="paragraph">
+<p>Just like on Ubuntu, environment variables must be set for the dependencies.
+An example is given below.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>set ONEAPI_ROOT="C:\Program Files (x86)\Intel\OneAPI"
+set EIGEN_INCLUDE_DIR=C:\repos\libeigen\eigen
+set FMT_INCLUDE_DIR=C:\repos\fmtlib\fmt\include
+set LYRA_INCLUDE_DIR=C:\repos\bfgroup\Lyra\include
+set PYBIND11_INCLUDE_DIR=C:\repos\pybind11\pybind11\include</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>nerva</code> package can then be installed using</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>pip install .</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -574,55 +564,7 @@ The number of threads that are used at runtime by the MKL library can be control
 <h2 id="_command_line_tools">Command line tools</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are two command line tools in the <code>tools</code> directory. The tool <code>mkl</code> can be used to do benchmarking of computing sparse and dense matrix products using the MKL library, and the tool <code>mlp</code> can be used to do training experiments with multilayer perceptrons.</p>
-</div>
-<div class="sect2">
-<h3 id="_the_tool_mkl">The tool mkl</h3>
-<div class="paragraph">
-<p>An example of running the <code>mkl</code> tool is</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>../install/bin/mkl --arows=1000 --acols=1000 --brows=1000 --threads=12 --algorithm=sdd --repetitions=3 --densities="0.5,0.2,0.1,0.05"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will use various algorithms to calculate the product <code>A = B * C</code> with <code>A</code> a sparse matrix and <code>B</code> and <code>C</code> dense matrices.</p>
-</div>
-<div class="paragraph">
-<p>The output may look like this</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>--- testing A = B * C (sdd_product) ---
-A = 1000x1000 sparse
-B = 1000x1000 dense  layout=column-major
-C = 1000x1000 dense  layout=column-major
-
-density(A) = 0.5
- 0.01147s ddd_product A=column-major, B=column-major, C=column-major
- 0.00793s ddd_product A=column-major, B=column-major, C=column-major
- 0.00854s ddd_product A=column-major, B=column-major, C=column-major
- 0.04049s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01998s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01178s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01114s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.01099s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00666s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00375s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00734s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00332s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.20097s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19891s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that the very first invocation of an MKL function can be slow.</p>
-</div>
+<p>The tool <code>mlp.py</code> can be used to do training experiments with multilayer perceptrons.</p>
 </div>
 <div class="sect2">
 <h3 id="_the_tool_mlp">The tool mlp</h3>
@@ -1214,21 +1156,10 @@ If this value is set, gradient checks are performed with the given step size. Th
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_references">References</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This is a citation to <span class="citation">[<a href="#wesselink2024nervatrulysparseimplementation">1</a>]</span>.</p>
-</div>
-<div class="paragraph">
-<p><a id="wesselink2024nervatrulysparseimplementation"></a>[1] W. Wesselink, B. Grooten, Q. Xiao, C. de Campos, and M. Pechenizkiy, “Nerva: a Truly Sparse Implementation of Neural Networks.” 2024, [Online]. Available: <a href="https://arxiv.org/abs/2407.17437" class="bare">https://arxiv.org/abs/2407.17437</a>.</p>
-</div>
-</div>
-</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-09 10:12:18 UTC
+Last updated 2024-09-09 10:14:07 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
