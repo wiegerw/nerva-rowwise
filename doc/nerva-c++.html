@@ -461,8 +461,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_number_type">Number type</a></li>
 <li><a href="#_header_files">Header files</a></li>
+<li><a href="#_classes">Classes</a></li>
 </ul>
 </li>
+<li><a href="#_matrix_operations">Matrix operations</a></li>
 <li><a href="#_references">References</a></li>
 </ul>
 </div>
@@ -1328,6 +1330,9 @@ using scalar = float;
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sect2">
+<h3 id="_classes">Classes</h3>
 <div class="sect3">
 <h4 id="_class_multilayer_perceptron">Class multilayer_perceptron</h4>
 <div class="paragraph">
@@ -1487,6 +1492,192 @@ interfaces of layers, loss functions and activation functions. This may be chang
 </div>
 </div>
 <div class="sect1">
+<h2 id="_matrix_operations">Matrix operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below. In the nerva-rowwise library these
+matrix operations <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h">have been implemented</a> using the <a href="https://eigen.tuxfamily.org/">Eigen library</a>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Operation</th>
+<th class="tableblock halign-left valign-top">Code</th>
+<th class="tableblock halign-left valign-top">Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(0_{m}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>zeros(m)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m \times 1\) column vector with elements equal to 0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(0_{mn}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>zeros(m, n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m \times n\) matrix with elements equal to 0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1_{m}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ones(m)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m \times 1\) column vector with elements equal to 1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1_{mn}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ones(m, n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m \times n\) matrix with elements equal to 1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\mathbb{I}_n\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>identity(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(n \times n\) identity matrix</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(X^\top\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>X.T</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">transposition</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(cX\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c * X</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">scalar multiplication, \(c \in \mathbb{R}\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(X + Y\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>X + Y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">addition</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(X - Y\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>X - Y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">subtraction</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(X \cdot Z\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>X * Z</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">matrix multiplication, also denoted as \(XZ\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(x^\top y~\) or \(~x y^\top\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dot(x,y)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">dot product, \(x,y \in \mathbb{R}^{m \times 1}\) or \(x,y \in \mathbb{R}^{1 \times n}\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(X \odot Y\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hadamard(X,Y)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise product of \(X\) and \(Y\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\mathsf{diag}(X)\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>diag(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">column vector that contains the diagonal of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\mathsf{Diag}(x)\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Diag(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">diagonal matrix with \(x\) as diagonal, \(x \in \mathbb{R}^{1 \times n}\)  or \(x \in \mathbb{R}^{m \times 1}\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1_m^\top \cdot X \cdot 1_n\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>elements_sum(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sum of the elements of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(x \cdot 1_n^\top\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>column_repeat(x, n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(n\) copies of column vector \(x \in \mathbb{R}^{m \times 1}\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1_m \cdot x\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>row_repeat(x, m)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m\) copies of row vector \(x \in \mathbb{R}^{1 \times n}\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1_m^\top \cdot X\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>columns_sum(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1 \times n\) row vector with sums of the columns of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(X \cdot 1_n\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rows_sum(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m \times 1\) column vector with sums of the rows of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\max(X)_{col}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>columns_max(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1 \times n\) row vector with maximum values of the columns of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\max(X)_{row}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rows_max(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m \times 1\) column vector with maximum values of the rows of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\((1_m^\top \cdot X) / n\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>columns_mean(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1 \times n\) row vector with mean values of the columns of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\((X \cdot 1_n) / m\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rows_mean(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(m \times 1\) column vector with mean values of the rows of \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(f(X)\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>apply(f, X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise application of \(f: \mathbb{R} \rightarrow \mathbb{R}\) to \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(e^X\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>exp(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise application of \(f: x \rightarrow e^x\) to \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\log(X)\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise application of the natural logarithm \(f: x \rightarrow \ln(x)\) to \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(1 / X\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>reciprocal(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise application of \(f: x \rightarrow 1/x\) to \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\sqrt{X}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sqrt(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise application of \(f: x \rightarrow \sqrt{x}\) to \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(X^{-1/2}\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>inv_sqrt(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise application of \(f: x \rightarrow x^{-1/2}\) to \(X\)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">\(\log(\sigma(X))\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>log_sigmoid(X)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">element-wise application of \(f: x \rightarrow \log(\sigma(x))\) to \(X\)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>For more background information, see the section called <code>Matrix operations</code> in the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf">Nerva library specifications</a>. Using this table leads to concise and uniform code. For example, the backpropagation implementation of a softmax layer looks like this:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">        DZ = hadamard(Y, DY - column_repeat(diag(Y * DY.transpose()), K));
+        DW = DZ.transpose() * X;
+        Db = columns_sum(DZ);
+        DX = DZ * W;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_references">References</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -1500,7 +1691,7 @@ interfaces of layers, loss functions and activation functions. This may be chang
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-12 10:16:48 UTC
+Last updated 2024-09-12 14:16:09 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
