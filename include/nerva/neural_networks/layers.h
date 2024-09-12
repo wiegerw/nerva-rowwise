@@ -487,10 +487,12 @@ struct softmax_layer : public linear_layer<Matrix>
     {
       if (NervaComputation == computation::eigen)
       {
+        // tag::matrix_operations[]
         DZ = hadamard(Y, DY - column_repeat(diag(Y * DY.transpose()), K));
         DW = DZ.transpose() * X;
         Db = columns_sum(DZ);
         DX = DZ * W;
+        // end::matrix_operations[]
       }
       else
       {
