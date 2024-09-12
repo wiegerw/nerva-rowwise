@@ -22,11 +22,12 @@ jobs:
         run: |
           gem install asciidoctor
           gem install asciidoctor-bibtex
+          gem install rouge
 
       - name: Compile Asciidoc
         run: |
           mkdir -p output_directory
-          asciidoctor -r asciidoctor-bibtex -D ./output_directory ./doc/*.adoc
+          asciidoctor -r asciidoctor-bibtex -a source-highlighter=rouge -D ./output_directory ./doc/*.adoc
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
