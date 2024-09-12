@@ -26,8 +26,6 @@ local LYRA_INCLUDE_DIR = [ os.environ LYRA_INCLUDE_DIR ] ;
 # Configure pybind11
 local PYBIND11_INCLUDE_DIR = [ os.environ PYBIND11_INCLUDE_DIR ] ;
 
-# Configure SYCL
-
 ECHO "DOCTEST_INCLUDE_DIR = $(DOCTEST_INCLUDE_DIR)" ;
 ECHO "EIGEN_INCLUDE_DIR = $(EIGEN_INCLUDE_DIR)" ;
 ECHO "FMT_INCLUDE_DIR = $(FMT_INCLUDE_DIR)" ;
@@ -55,12 +53,13 @@ project nerva
 
        <define>EIGEN_USE_MKL_ALL
        <define>NERVA_TIMER
+       <define>FMT_HEADER_ONLY
 
        # MKL
        <include>$(MKL_INCLUDE_DIR)
        <cxxflags>-DMKL_ILP64
 
-       # MKL / gcc
+       # gcc
        <toolset>gcc:<cxxflags>-march=native
        <toolset>gcc:<cxxflags>-m64
        <toolset>gcc:<cxxflags>-fopenmp
@@ -74,41 +73,52 @@ project nerva
        <toolset>gcc:<linkflags>-lm
        <toolset>gcc:<linkflags>-ldl
        <toolset>gcc:<linkflags>-Wl,-rpath,$(MKL_ROOT)/lib
-       <toolset>gcc:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/compiler/latest/lib
+       <toolset>gcc:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/latest/lib
 
-       # MKL / clang
+       # clang
        <toolset>clang:<cxxflags>-m64
        <toolset>clang:<cxxflags>-fopenmp=libomp
        <toolset>clang:<cxxflags>-Wno-unused-value
        <toolset>clang:<cxxflags>-Wno-enum-compare
        <toolset>clang:<cxxflags>-Wno-int-in-bool-context                   # suppress Eigen warnings
        <toolset>clang:<cxxflags>-Wno-deprecated-anon-enum-enum-conversion  # suppress Eigen warnings
-
        <toolset>clang:<linkflags>-L$(MKL_LIB_DIR)
        <toolset>clang:<linkflags>"-Wl,--start-group -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group"
        <toolset>clang:<linkflags>-lpthread
        <toolset>clang:<linkflags>-lm
        <toolset>clang:<linkflags>-ldl
        <toolset>clang:<linkflags>-Wl,-rpath,$(MKL_ROOT)/lib
-       <toolset>clang:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/compiler/latest/lib
+       <toolset>clang:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/latest/lib
 
        <toolset>clang-18:<linkflags>-liomp5
 
        #--- intel icpx ---#
-       <toolset>clang-icpx:<define>NERVA_SYCL
-       <toolset>clang-icpx:<cxxflags>-DMKL_ILP64
-       #<toolset>clang-icpx:<cxxflags>-Wno-writable-strings   # suppress MKL warnings
-       #<toolset>clang-icpx:<cxxflags>-Wno-tautological-constant-compare
+       <toolset>clang-icpx:<cxxflags>-fiopenmp
        <toolset>clang-icpx:<cxxflags>-fhonor-nan-compares    # otherwise std::isnan gives erroneous results
+       <toolset>clang-icpx:<linkflags>-L$(MKL_LIB_DIR)
+       <toolset>clang-icpx:<linkflags>"-Wl,--start-group -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group"
+       <toolset>clang-icpx:<linkflags>-liomp5
+       <toolset>clang-icpx:<linkflags>-Wl,-rpath,$(MKL_ROOT)/lib
+       <toolset>clang-icpx:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/latest/lib
+       <toolset>clang-icpx:<linkflags>-lpthread
+       <toolset>clang-icpx:<linkflags>-lm
+       <toolset>clang-icpx:<linkflags>-ldl
+       <toolset>clang-icpx:<linkflags>-Wl,-rpath,$(MKL_ROOT)/lib
+       <toolset>clang-icpx:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/latest/lib
+
+       <toolset>clang-icpx:<define>NERVA_SYCL
+       <toolset>clang-icpx:<cxxflags>-Wno-deprecated-declarations       # suppress SYCL warnings
+       <toolset>clang-icpx:<cxxflags>-Wno-unneeded-internal-declaration # suppress SYCL warnings
        <toolset>clang-icpx:<cxxflags>-fsycl
        <toolset>clang-icpx:<cxxflags>-fsycl-unnamed-lambda
        <toolset>clang-icpx:<cxxflags>-fsycl-targets=spir64_x86_64
-       <toolset>clang-icpx:<cxxflags>-fiopenmp
-       <toolset>clang-icpx:<linkflags>-L$(ONEAPI_ROOT)/compiler/latest/lib
        <toolset>clang-icpx:<linkflags>-fsycl
        <toolset>clang-icpx:<linkflags>-fsycl-targets=spir64_x86_64
        <toolset>clang-icpx:<linkflags>-lsycl
-       <toolset>clang-icpx:<linkflags>-liomp5
+
+       #<toolset>clang-icpx:<linkflags>-L$(ONEAPI_ROOT)/latest/lib
+       #<toolset>clang-icpx:<cxxflags>-Wno-writable-strings   # suppress MKL warnings
+       #<toolset>clang-icpx:<cxxflags>-Wno-tautological-constant-compare
        #<toolset>intel:<cxxflags>-fopenmp-targets=<arch>
    ;
 

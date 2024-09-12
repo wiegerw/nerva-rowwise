@@ -5,7 +5,6 @@ project nerva/tests
        <library>/nerva//nervalib
        <linkflags>-lpython3.12  # TODO: find a better way to do this
        <scalar>double
-       <define>NERVA_SYCL
    ;
 
 test-suite data : [ test_all r ] ;
