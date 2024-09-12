@@ -448,12 +448,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle"><h3>Contents</h3></div>
 <ul class="sectlevel1">
+<li><a href="#_introduction">Introduction</a></li>
 <li><a href="#_installation">Installation</a></li>
 <li><a href="#_command_line_tools">Command line tools</a>
 <ul class="sectlevel2">
 <li><a href="#_the_tool_mkl">The tool mkl</a></li>
 <li><a href="#_the_tool_mlp">The tool mlp</a></li>
-<li><a href="#_the_mlp_command_line_options">The mlp command line options</a></li>
+<li><a href="#mlp_tool">The mlp command line options</a></li>
+</ul>
+</li>
+<li><a href="#_overview_of_the_code">Overview of the code</a>
+<ul class="sectlevel2">
+<li><a href="#_number_type">Number type</a></li>
+<li><a href="#_header_files">Header files</a></li>
 </ul>
 </li>
 <li><a href="#_references">References</a></li>
@@ -463,40 +470,43 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-The documentation of this project is in the initial phase, so a lot is still missing.
-</td>
-</tr>
-</table>
+<style>
+  .small-code .content pre {
+      font-size: 0.7em;
+  }
+</style>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document describes the implementation of the nerva-rowwise library.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_installation">Installation</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>The following build systems are supported:</p>
+</div>
 <div class="ulist">
-<div class="title">The following build systems are supported</div>
 <ul>
 <li>
-<p>CMake 3.16+</p>
+<p><a href="https://cmake.org/">CMake</a> 3.16+</p>
 </li>
 <li>
-<p>B2 (<a href="https://www.bfgroup.xyz/b2/" class="bare">https://www.bfgroup.xyz/b2/</a>)</p>
+<p><a href="https://www.bfgroup.xyz/b2/">B2</a></p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Using CMake, the Nerva c++ library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable <code>ONEAPI_ROOT</code> should point to the OneAPI installation directory, and the variable <code>MKL_DIR</code> to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using <code>FetchContent</code> commands. The build and install can for example be done like this on Linux:</p>
+<p>Using CMake, the nerva-rowwise library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable <code>ONEAPI_ROOT</code> should point to the OneAPI installation directory, and the variable <code>MKL_DIR</code> to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using <code>FetchContent</code> commands. The build and install can for example be done like this on Linux:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>mkdir build
+<pre class="highlight"><code class="language-bash" data-lang="bash">mkdir build
 cd build
 cmake .. \
     -DCMAKE_INSTALL_PREFIX=../install \
@@ -518,11 +528,11 @@ Setting the <code>MKL_DIR</code> variable is not necessary if the OneAPI <code>s
 </tr>
 </table>
 </div>
-<div class="admonitionblock important">
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-important" title="Important"></i>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
 For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
@@ -530,6 +540,26 @@ For the clang and icpx compilers one should know that there is a longstanding is
 and <a href="https://gitlab.com/libeigen/eigen/-/issues/2586" class="bare">https://gitlab.com/libeigen/eigen/-/issues/2586</a> for more details.
 To resolve this issue, a hack has been applied: by defining the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code>,
 the inclusion of the offending header file is prevented.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For the B2 build using the icpx compiler, the environment needs to be changed like this. Alternatively, the OneAPI <code>setvars.sh</code> script can be called.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ONEAPI_ROOT/latest/lib
+PATH=$PATH:/$ONEAPI_ROOT/latest/bin</pre>
+</div>
+</div>
 </td>
 </tr>
 </table>
@@ -581,9 +611,9 @@ The number of threads that are used at runtime by the MKL library can be control
 <div class="paragraph">
 <p>An example of running the <code>mkl</code> tool is</p>
 </div>
-<div class="listingblock">
+<div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code>../install/bin/mkl --arows=1000 --acols=1000 --brows=1000 --threads=12 --algorithm=sdd --repetitions=3 --densities="0.5,0.2,0.1,0.05"</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">../install/bin/mkl --arows=1000 --acols=1000 --brows=1000 --threads=12 --algorithm=sdd --repetitions=3 --densities="0.5,0.2,0.1,0.05"</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -592,9 +622,9 @@ The number of threads that are used at runtime by the MKL library can be control
 <div class="paragraph">
 <p>The output may look like this</p>
 </div>
-<div class="listingblock">
+<div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code>--- testing A = B * C (sdd_product) ---
+<pre>--- testing A = B * C (sdd_product) ---
 A = 1000x1000 sparse
 B = 1000x1000 dense  layout=column-major
 C = 1000x1000 dense  layout=column-major
@@ -617,7 +647,7 @@ density(A) = 0.5
  0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
  0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
  0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)</code></pre>
+ 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -629,9 +659,9 @@ density(A) = 0.5
 <div class="paragraph">
 <p>An example invocation of the <code>mlp</code> tool is</p>
 </div>
-<div class="listingblock">
+<div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code>../install/bin/mlp \
+<pre class="highlight"><code class="language-bash" data-lang="bash">../install/bin/mlp \
     --layers="ReLU;ReLU;Linear" \
     --layer-sizes="3072,1024,1024,10" \
     --layer-weights=Xavier \
@@ -652,9 +682,9 @@ density(A) = 0.5
 <div class="paragraph">
 <p>The output may look like this:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code>=== Nerva c++ model ===
+<pre>=== Nerva c++ model ===
 Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
 Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
 Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
@@ -667,12 +697,12 @@ epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test acc
 epoch   2 lr: 0.01000000  loss: 1.91454245  train accuracy: 0.29976000  test accuracy: 0.29940000 time: 2.76982510s
 epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test accuracy: 0.35820000 time: 2.69554319s
 epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test accuracy: 0.40000000 time: 2.68532307s
-epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s</code></pre>
+epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_mlp_command_line_options">The mlp command line options</h3>
+<h3 id="mlp_tool">The mlp command line options</h3>
 <div class="paragraph">
 <p>The <code>mlp</code> tool has the following command line options.
 Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].</p>
@@ -1215,6 +1245,248 @@ If this value is set, gradient checks are performed with the given step size. Th
 </div>
 </div>
 <div class="sect1">
+<h2 id="_overview_of_the_code">Overview of the code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section gives an overview of the C++ code in the
+nerva-rowwise library, and some information that is needed for understanding the code.</p>
+</div>
+<div class="sect2">
+<h3 id="_number_type">Number type</h3>
+<div class="paragraph">
+<p>The nerva-rowwise library uses a type called <code>scalar</code> as its number type. By default, it is defined as a 32-bit float. It is possible to change this by defining the symbol <code>NERVA_USE_DOUBLE</code>, in which case 64 bit doubles are used. The corresponding code is</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">#ifdef NERVA_USE_DOUBLE
+using scalar = double;
+#else
+using scalar = float;
+#endif</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A more generic approach would be to add a template argument for the number type to most classes and functions. This has been tried in the past, but since it had a negative impact on the readability of the code, it was later removed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_header_files">Header files</h3>
+<div class="paragraph">
+<p>The most important header files in are given in the table below.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Header file</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/multilayer_perceptron.h">multilayer_perceptron.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A multilayer perceptron class.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/layers.h">layers.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Neural network layers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/activation_functions.h">activation_functions.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Activation functions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/loss_functions.h">loss_functions.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Loss functions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/weights.h">weights.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Weight initialization functions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/optimizers.h">optimizers.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optimizer functions, for updating neural network parameters using their gradients.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/learning_rate_schedulers.h">learning_rate_schedulers.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Learning rate schedulers, for updating the learning rate during training.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/training.h">training.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A stochastic gradient descent algorithm.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/prune.h">prune.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Algorithms for pruning sparse weight matrices. This is used for dynamic sparse training.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/grow.h">grow.h</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Algorithms for (re-)growing sparse weights. This is used for dynamic sparse training.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="_class_multilayer_perceptron">Class multilayer_perceptron</h4>
+<div class="paragraph">
+<p>A multilayer perceptron (MLP) is modeled using the class <code>multilayer_perceptron</code>. It contains a list of layers, and has member functions <code>feedforward</code>, <code>backpropagate</code> and <code>optimize</code> that can be used for training the neural network. Constructing an MLP can be done manually, as is illustrated in the tests:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">void construct_mlp(multilayer_perceptron&amp; M,
+                   const eigen::matrix&amp; W1,
+                   const eigen::matrix&amp; b1,
+                   const eigen::matrix&amp; W2,
+                   const eigen::matrix&amp; b2,
+                   const eigen::matrix&amp; W3,
+                   const eigen::matrix&amp; b3,
+                   const std::vector&lt;long&gt;&amp; sizes,
+                   long N
+                  )
+{
+  long batch_size = N;
+
+  auto layer1 = std::make_shared&lt;relu_layer&lt;eigen::matrix&gt;&gt;(sizes[0], sizes[1], batch_size);
+  M.layers.push_back(layer1);
+  auto optimizer_W1 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer1-&gt;W, layer1-&gt;DW);
+  auto optimizer_b1 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer1-&gt;b, layer1-&gt;Db);
+  layer1-&gt;optimizer = make_composite_optimizer(optimizer_W1, optimizer_b1);
+  layer1-&gt;W = W1;
+  layer1-&gt;b = b1;
+
+  auto layer2 = std::make_shared&lt;relu_layer&lt;eigen::matrix&gt;&gt;(sizes[1], sizes[2], batch_size);
+  M.layers.push_back(layer2);
+  auto optimizer_W2 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer2-&gt;W, layer2-&gt;DW);
+  auto optimizer_b2 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer2-&gt;b, layer2-&gt;Db);
+  layer2-&gt;optimizer = make_composite_optimizer(optimizer_W2, optimizer_b2);
+  layer2-&gt;W = W2;
+  layer2-&gt;b = b2;
+
+  auto layer3 = std::make_shared&lt;linear_layer&lt;eigen::matrix&gt;&gt;(sizes[2], sizes[3], batch_size);
+  M.layers.push_back(layer3);
+  auto optimizer_W3 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer3-&gt;W, layer3-&gt;DW);
+  auto optimizer_b3 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer3-&gt;b, layer3-&gt;Db);
+  layer3-&gt;optimizer = make_composite_optimizer(optimizer_W3, optimizer_b3);
+  layer3-&gt;W = W3;
+  layer3-&gt;b = b3;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will create an MLP with three linear layers that have weight matrices <code>W1, W2, W3</code> and bias vectors <code>b1, b2, b3</code>. The parameter <code>sizes</code> contains the input and output sizes of the three layers. Note that the layers and the optimizers are stored using smart pointers. This is done to facilitate the Nerva Python interface. Constructing an MLP like this is quite verbose. An easier way to construct MLPs is provided by the function <code>make_layers</code>, that offers a string based interface.</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  multilayer_perceptron M;
+  std::vector&lt;std::string&gt; layer_specifications = {"ReLU", "ReLU", "Linear"};
+  std::vector&lt;std::size_t&gt; linear_layer_sizes = {2, 2, 2, 2};
+  std::vector&lt;double&gt; linear_layer_densities = {0.6, 0.4, 1.0};
+  std::vector&lt;double&gt; linear_layer_dropouts = {0.0, 0.0, 0.0};
+  std::vector&lt;std::string&gt; linear_layer_weights = {"XavierNormalized", "Xavier", "He"};
+  std::vector&lt;std::string&gt; optimizers = {"Nesterov(0.9)", "Momentum(0.9)", "GradientDescent"};
+  long batch_size = 5;
+  std::mt19937 rng{std::random_device{}()};
+  M.layers = make_layers(layer_specifications,
+                         linear_layer_sizes,
+                         linear_layer_densities,
+                         linear_layer_dropouts,
+                         linear_layer_weights,
+                         optimizers,
+                         batch_size,
+                         rng);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the random number generator argument is used for the generation of the weights. See
+<a href="#mlp_tool">mlp command line options</a> for an overview of the supported string arguments.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_class_neural_network_layer">Class neural_network_layer</h4>
+<div class="paragraph">
+<p>The class <code>neural_network_layer</code> is the base class of all neural network layers. It has attributes for the input matrix <code>X</code> and the corresponding gradient <code>DX</code>. Usually a layer has some additional parameters that can be learned by training the neural network. The most important member functions of <code>neural_network_layer</code> are given below.</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  /// Do a feedforward step given the input `X`, and store the output in `result`.
+  virtual void feedforward(eigen::matrix&amp; result) = 0;
+
+  /// Do a backpropagate step given the output `Y`, and its gradient `DY`.
+  /// This will calculate the gradient `DX` of the input `X`, and the gradients
+  /// of the layer parameters.
+  virtual void backpropagate(const eigen::matrix&amp; Y, const eigen::matrix&amp; DY) = 0;
+
+  /// Update the layer parameters using their gradients.
+  virtual void optimize(scalar eta) = 0;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_class_loss_function">Class loss_function</h4>
+<div class="paragraph">
+<p>The class <code>loss_function</code> is the base class of all loss functions. Although a loss function is similar to a layer, the interface is different:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">  /// Calculate the loss for output `Y` and target `T`.
+  [[nodiscard]] virtual scalar value(const eigen::matrix&amp; Y, const eigen::matrix&amp; T) const = 0;
+
+  /// Calculate the gradient of the loss for output `Y` and target `T`.
+  [[nodiscard]] virtual eigen::matrix gradient(const eigen::matrix&amp; Y, const eigen::matrix&amp; T) const = 0;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So instead of the names <code>feedforward</code> and <code>backpropagate</code>, we use <code>value</code> and <code>gradient</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_activation_functions">Activation functions</h4>
+<div class="paragraph">
+<p>Currently, there is no common base class for activation functions. For example, the ReLU activation function is implemented like this:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="highlight"><code class="language-cpp" data-lang="cpp">struct relu_activation
+{
+  template &lt;typename Matrix&gt;
+  auto operator()(const Matrix&amp; X) const
+  {
+    return Relu(X);
+  }
+
+  template &lt;typename Matrix&gt;
+  auto gradient(const Matrix&amp; X) const
+  {
+    return Relu_gradient(X);
+  }
+
+  [[nodiscard]] std::string to_string() const
+  {
+    return "ReLU()";
+  }
+};</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Currently, there are some inconsistencies between the
+interfaces of layers, loss functions and activation functions. This may be changed in the future.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_references">References</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -1228,7 +1500,7 @@ If this value is set, gradient checks are performed with the given step size. Th
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-12 09:29:46 UTC
+Last updated 2024-09-12 10:16:48 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
