@@ -30,7 +30,7 @@ endif::[]
 == Introduction
 This document describes the implementation of the {library} library.
 
-== Installation
+=== Installation
 The following build systems are supported:
 
 - https://cmake.org/[CMake] 3.16+
@@ -467,7 +467,6 @@ The most important header files in are given in the table below.
 
 |`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/grow.h[grow.h]`
 |Algorithms for (re-)growing sparse weights. This is used for dynamic sparse training.
-
 |===
 
 === Classes
@@ -518,9 +517,10 @@ NOTE: Currently, there are some inconsistencies between the
 interfaces of layers, loss functions and activation functions. This may be changed in the future.
 
 == Matrix operations
-The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below. In the {library} library these
-matrix operations https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h[have been implemented] using the https://eigen.tuxfamily.org/[Eigen library].
+The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.
 
+.matrix operations
+[[table_matrix_operations]]
 |===
 |Operation |Code |Definition
 
@@ -652,17 +652,43 @@ For more background information, see the section called `Matrix operations` in t
 include::../include/nerva/neural_networks/layers.h[tag=matrix_operations]
 ----
 
+=== Eigen library
+The {library} library uses the https://eigen.tuxfamily.org/[Eigen library] for representing matrices. The matrix operations in table <<table_matrix_operations>>
+have been implemented using Eigen, see the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h[matrix_operations.h].
+
+== Performance
+The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] is used. Note that the MKL library is included in the https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html[Intel oneAPI base toolkit]. The Eigen library supports MKL by means of the compiler flag `EIGEN_USE_MKL_ALL`, see also https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html[TopicUsingIntelMKL.html].
+
+=== Intel MKL library
+The Intel MKL library has a number of highly efficient, but extremely low-level implementation of matrix operations. See https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html[blas-and-sparse-blas-routines.html] for an overview. The {library} contains some matrix classes that hide those low-level details.
+The table below gives an overview of them.
+
+|===
+|Header file |Description
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_dense_vector.h[mkl_dense_vector.h]`
+|A class `dense_vector_view` that wraps a raw pointer to a vector.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_dense_matrix.h[mkl_dense_matrix.h]`
+|A class `dense_matrix_view` that wraps a raw pointer to a matrix, and a class
+`dense_matrix` that stores a dense matrix.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_sparse_matrix.h[mkl_sparse_matrix.h]`
+|A class `sparse_matrix_csr` footnote:[Note that the name `sparse_matrix` could not be used due to a conflict with a #define of the same name buried deep inside the MKL library code] that stores a sparse matrix in
+https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)[compressed sparse row] (CSR) format.
+|===
+
+TIP: In C++23 the implementation of sparse matrices in CSR format can be greatly simplified, as shown by https://github.com/BenBrock/matrix-cpos[Ben Brock].
+
+NOTE: The sparse CSR matrix functions in the MKL library use an argument of the opaque type `sparse_matrix_t`. It is used to store unknown properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix. See also the function `sparse_matrix_csr::construct_csr`.
+
+// === Subnormal numbers
+
 // == Sparse neural networks
 //
 // === Static sparse training
 //
 // === Dynamic sparse training
-//
-// == Performance
-//
-// === Intel MKL library
-//
-// === Subnormal numbers
 
 == References
 This is a citation to cite:[wesselink2024nervatrulysparseimplementation].

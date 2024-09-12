@@ -2,7 +2,7 @@
 # nerva-rowwise
 The `nerva-rowwise` library is a C++ library for neural networks. This library
 is part of the Nerva library collection https://github.com/wiegerw/nerva, that includes
-several native Python implementations. Originally the library was developed for experimenting with truly sparse neural networks. But the library also aims to provide a transparent and accessible implementation of neural networks.
+several native Python implementations. Originally the library was developed for experimenting with truly sparse neural networks. But nowadays, the library also aims to provide a transparent and accessible implementation of neural networks.
 
 ### Features
 The `nerva-rowwise` library has the following features:
@@ -17,6 +17,19 @@ The `nerva-rowwise` library has the following features:
 ### Limitations
 * Only multilayer perceptrons are supported.
 * Only the CPU is supported.
+
+### Documentation
+The documentation consists of several parts:
+* A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) that explains the implementation.
+* A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains the Python interface.
+* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of the execution of MLPs.
+
+The following papers about Nerva are available:
+
+[1] *Nerva: a Truly Sparse Implementation of Neural Networks*,  https://arxiv.org/abs/2407.17437. It introduces the library, and describes a number of static sparse training experiments.
+
+[2] *Batch Matrix-form Equations and Implementation
+of Multilayer Perceptrons*, https://arxiv.org/abs/TODO. It describes the implementation of the Nerva libraries in great detail.
 
 ## Requirements
 A C++17 compiler. Due to the dependency on the Intel MKL library, an Intel processor is highly recommended. Intel MKL can technically work on non-Intel processors, but it is unlikely to perform optimally on them.
@@ -36,10 +49,9 @@ Nerva uses the following third-party libraries.
 # Getting Started
 
 ### Installation
-The library can be used in two different ways. C++ users can use `CMake` to install the library in a standard manner. See [TODO] for more information. Also build files for B2 are
-included.
-
-Python users can install the library via `pip`. See [TODO] for more details about that.
+The library can be used in two different ways. C++ users can use `CMake` to install the library in a standard manner. Python users can install the library via `pip`. 
+See the [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) and/or the
+[Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) for more details about this.
 
 ### Command line interface
 An easy way to start using the library is via a command line
@@ -94,19 +106,6 @@ The `nerva-rowwise` library uses a pragmatic approach with respect to performanc
 ### Future work
 There are two main directions for future work. Firstly, an implementation on GPUs is being considered. It would be very interesting to learn how well dynamic sparse training works on a GPU.
 Second, we consider to add more layers, loss functions and activation functions. In particular convolutional layers, pooling layers and transformer layers come to mind.
-
-# Documentation
-The documentation consists of several parts:
-* A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains how to use the Python interface.
-* A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) that explains how to use the C++ interface.
-* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of the execution of MLPs. It contains precise specifications of the layers, activation functions, loss functions etc.
-
-The following papers about Nerva are available:
-
-[1] *Nerva: a Truly Sparse Implementation of Neural Networks*,  https://arxiv.org/abs/2407.17437. It introduces the library, and describes a number of static sparse training experiments.
-
-[2] *Batch Matrix-form Equations and Implementation
-of Multilayer Perceptrons*, https://arxiv.org/abs/TODO. It describes the implementation of the Nerva libraries in great detail.
 
 # Contact
 If you have questions, or if you would like to contribute to the Nerva libraries, you can email Wieger Wesselink (j.w.wesselink@tue.nl).
