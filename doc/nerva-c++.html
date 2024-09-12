@@ -437,6 +437,124 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge, pre.rouge .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+  color: #cf222e;
+}
+pre.rouge .gr {
+  color: #f6f8fa;
+}
+pre.rouge .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+pre.rouge .nb {
+  color: #953800;
+}
+pre.rouge .nc {
+  color: #953800;
+}
+pre.rouge .no {
+  color: #953800;
+}
+pre.rouge .nn {
+  color: #953800;
+}
+pre.rouge .sr {
+  color: #116329;
+}
+pre.rouge .na {
+  color: #116329;
+}
+pre.rouge .nt {
+  color: #116329;
+}
+pre.rouge .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+pre.rouge .ges {
+  font-weight: bold;
+  font-style: italic;
+}
+pre.rouge .kc {
+  color: #0550ae;
+}
+pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+  color: #0550ae;
+}
+pre.rouge .sb {
+  color: #0550ae;
+}
+pre.rouge .bp {
+  color: #0550ae;
+}
+pre.rouge .ne {
+  color: #0550ae;
+}
+pre.rouge .nl {
+  color: #0550ae;
+}
+pre.rouge .py {
+  color: #0550ae;
+}
+pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+  color: #0550ae;
+}
+pre.rouge .o, pre.rouge .ow {
+  color: #0550ae;
+}
+pre.rouge .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+  color: #0a3069;
+}
+pre.rouge .nd {
+  color: #8250df;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #8250df;
+}
+pre.rouge .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+  color: #6e7781;
+}
+pre.rouge .gl {
+  color: #6e7781;
+}
+pre.rouge .gt {
+  color: #6e7781;
+}
+pre.rouge .ni {
+  color: #24292f;
+}
+pre.rouge .si {
+  color: #24292f;
+}
+pre.rouge .ge {
+  color: #24292f;
+  font-style: italic;
+}
+pre.rouge .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+</style>
 </head>
 <body id="demo" class="book toc2 toc-left">
 <div id="header">
@@ -508,14 +626,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">mkdir build
-cd build
-cmake .. \
-    -DCMAKE_INSTALL_PREFIX=../install \
-    -DCMAKE_BUILD_TYPE=RELEASE \
-    -DMKL_DIR:PATH=$ONEAPI_ROOT/mkl/latest/lib/cmake/mkl
-make -j8
-make install</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">mkdir </span>build
+<span class="nb">cd </span>build
+cmake .. <span class="se">\</span>
+    <span class="nt">-DCMAKE_INSTALL_PREFIX</span><span class="o">=</span>../install <span class="se">\</span>
+    <span class="nt">-DCMAKE_BUILD_TYPE</span><span class="o">=</span>RELEASE <span class="se">\</span>
+    <span class="nt">-DMKL_DIR</span>:PATH<span class="o">=</span><span class="nv">$ONEAPI_ROOT</span>/mkl/latest/lib/cmake/mkl
+make <span class="nt">-j8</span>
+make <span class="nb">install</span></code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -571,7 +689,7 @@ PATH=$PATH:/$ONEAPI_ROOT/latest/bin</pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>cmake .. ^
+<pre class="rouge highlight"><code>cmake .. ^
     -G "NMake Makefiles" ^
     -DCMAKE_INSTALL_PREFIX=..\install ^
     -DCMAKE_BUILD_TYPE=Release ^
@@ -585,7 +703,7 @@ nmake install</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>ctest -R nerva</code></pre>
+<pre class="rouge highlight"><code>ctest -R nerva</code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -615,7 +733,7 @@ The number of threads that are used at runtime by the MKL library can be control
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">../install/bin/mkl --arows=1000 --acols=1000 --brows=1000 --threads=12 --algorithm=sdd --repetitions=3 --densities="0.5,0.2,0.1,0.05"</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">../install/bin/mkl <span class="nt">--arows</span><span class="o">=</span>1000 <span class="nt">--acols</span><span class="o">=</span>1000 <span class="nt">--brows</span><span class="o">=</span>1000 <span class="nt">--threads</span><span class="o">=</span>12 <span class="nt">--algorithm</span><span class="o">=</span>sdd <span class="nt">--repetitions</span><span class="o">=</span>3 <span class="nt">--densities</span><span class="o">=</span><span class="s2">"0.5,0.2,0.1,0.05"</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -663,19 +781,19 @@ density(A) = 0.5
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">../install/bin/mlp \
-    --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072,1024,1024,10" \
-    --layer-weights=Xavier \
-    --optimizers="Nesterov(0.9)" \
-    --loss=SoftmaxCrossEntropy \
-    --learning-rate="Constant(0.01)" \
-    --epochs=100 \
-    --batch-size=100 \
-    --threads=12 \
-    --overall-density=0.05 \
-    --cifar10=../data/cifar-10-batches-bin \
-    --seed=123</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">../install/bin/mlp <span class="se">\</span>
+    <span class="nt">--layers</span><span class="o">=</span><span class="s2">"ReLU;ReLU;Linear"</span> <span class="se">\</span>
+    <span class="nt">--layer-sizes</span><span class="o">=</span><span class="s2">"3072,1024,1024,10"</span> <span class="se">\</span>
+    <span class="nt">--layer-weights</span><span class="o">=</span>Xavier <span class="se">\</span>
+    <span class="nt">--optimizers</span><span class="o">=</span><span class="s2">"Nesterov(0.9)"</span> <span class="se">\</span>
+    <span class="nt">--loss</span><span class="o">=</span>SoftmaxCrossEntropy <span class="se">\</span>
+    <span class="nt">--learning-rate</span><span class="o">=</span><span class="s2">"Constant(0.01)"</span> <span class="se">\</span>
+    <span class="nt">--epochs</span><span class="o">=</span>100 <span class="se">\</span>
+    <span class="nt">--batch-size</span><span class="o">=</span>100 <span class="se">\</span>
+    <span class="nt">--threads</span><span class="o">=</span>12 <span class="se">\</span>
+    <span class="nt">--overall-density</span><span class="o">=</span>0.05 <span class="se">\</span>
+    <span class="nt">--cifar10</span><span class="o">=</span>../data/cifar-10-batches-bin <span class="se">\</span>
+    <span class="nt">--seed</span><span class="o">=</span>123</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1260,11 +1378,11 @@ nerva-rowwise library, and some information that is needed for understanding the
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">#ifdef NERVA_USE_DOUBLE
-using scalar = double;
-#else
-using scalar = float;
-#endif</code></pre>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="cp">#ifdef NERVA_USE_DOUBLE
+</span><span class="k">using</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kt">double</span><span class="p">;</span>
+<span class="cp">#else
+</span><span class="k">using</span> <span class="n">scalar</span> <span class="o">=</span> <span class="kt">float</span><span class="p">;</span>
+<span class="cp">#endif</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1340,43 +1458,43 @@ using scalar = float;
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">void construct_mlp(multilayer_perceptron&amp; M,
-                   const eigen::matrix&amp; W1,
-                   const eigen::matrix&amp; b1,
-                   const eigen::matrix&amp; W2,
-                   const eigen::matrix&amp; b2,
-                   const eigen::matrix&amp; W3,
-                   const eigen::matrix&amp; b3,
-                   const std::vector&lt;long&gt;&amp; sizes,
-                   long N
-                  )
-{
-  long batch_size = N;
+<pre class="rouge highlight"><code data-lang="cpp"><span class="kt">void</span> <span class="nf">construct_mlp</span><span class="p">(</span><span class="n">multilayer_perceptron</span><span class="o">&amp;</span> <span class="n">M</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">W1</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">b1</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">W2</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">b2</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">W3</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">b3</span><span class="p">,</span>
+                   <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">long</span><span class="o">&gt;&amp;</span> <span class="n">sizes</span><span class="p">,</span>
+                   <span class="kt">long</span> <span class="n">N</span>
+                  <span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">long</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="n">N</span><span class="p">;</span>
 
-  auto layer1 = std::make_shared&lt;relu_layer&lt;eigen::matrix&gt;&gt;(sizes[0], sizes[1], batch_size);
-  M.layers.push_back(layer1);
-  auto optimizer_W1 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer1-&gt;W, layer1-&gt;DW);
-  auto optimizer_b1 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer1-&gt;b, layer1-&gt;Db);
-  layer1-&gt;optimizer = make_composite_optimizer(optimizer_W1, optimizer_b1);
-  layer1-&gt;W = W1;
-  layer1-&gt;b = b1;
+  <span class="k">auto</span> <span class="n">layer1</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">relu_layer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">);</span>
+  <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">layer1</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">optimizer_W1</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">gradient_descent_optimizer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">layer1</span><span class="o">-&gt;</span><span class="n">W</span><span class="p">,</span> <span class="n">layer1</span><span class="o">-&gt;</span><span class="n">DW</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">optimizer_b1</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">gradient_descent_optimizer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">layer1</span><span class="o">-&gt;</span><span class="n">b</span><span class="p">,</span> <span class="n">layer1</span><span class="o">-&gt;</span><span class="n">Db</span><span class="p">);</span>
+  <span class="n">layer1</span><span class="o">-&gt;</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">make_composite_optimizer</span><span class="p">(</span><span class="n">optimizer_W1</span><span class="p">,</span> <span class="n">optimizer_b1</span><span class="p">);</span>
+  <span class="n">layer1</span><span class="o">-&gt;</span><span class="n">W</span> <span class="o">=</span> <span class="n">W1</span><span class="p">;</span>
+  <span class="n">layer1</span><span class="o">-&gt;</span><span class="n">b</span> <span class="o">=</span> <span class="n">b1</span><span class="p">;</span>
 
-  auto layer2 = std::make_shared&lt;relu_layer&lt;eigen::matrix&gt;&gt;(sizes[1], sizes[2], batch_size);
-  M.layers.push_back(layer2);
-  auto optimizer_W2 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer2-&gt;W, layer2-&gt;DW);
-  auto optimizer_b2 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer2-&gt;b, layer2-&gt;Db);
-  layer2-&gt;optimizer = make_composite_optimizer(optimizer_W2, optimizer_b2);
-  layer2-&gt;W = W2;
-  layer2-&gt;b = b2;
+  <span class="k">auto</span> <span class="n">layer2</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">relu_layer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">);</span>
+  <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">layer2</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">optimizer_W2</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">gradient_descent_optimizer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">layer2</span><span class="o">-&gt;</span><span class="n">W</span><span class="p">,</span> <span class="n">layer2</span><span class="o">-&gt;</span><span class="n">DW</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">optimizer_b2</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">gradient_descent_optimizer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">layer2</span><span class="o">-&gt;</span><span class="n">b</span><span class="p">,</span> <span class="n">layer2</span><span class="o">-&gt;</span><span class="n">Db</span><span class="p">);</span>
+  <span class="n">layer2</span><span class="o">-&gt;</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">make_composite_optimizer</span><span class="p">(</span><span class="n">optimizer_W2</span><span class="p">,</span> <span class="n">optimizer_b2</span><span class="p">);</span>
+  <span class="n">layer2</span><span class="o">-&gt;</span><span class="n">W</span> <span class="o">=</span> <span class="n">W2</span><span class="p">;</span>
+  <span class="n">layer2</span><span class="o">-&gt;</span><span class="n">b</span> <span class="o">=</span> <span class="n">b2</span><span class="p">;</span>
 
-  auto layer3 = std::make_shared&lt;linear_layer&lt;eigen::matrix&gt;&gt;(sizes[2], sizes[3], batch_size);
-  M.layers.push_back(layer3);
-  auto optimizer_W3 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer3-&gt;W, layer3-&gt;DW);
-  auto optimizer_b3 = std::make_shared&lt;gradient_descent_optimizer&lt;eigen::matrix&gt;&gt;(layer3-&gt;b, layer3-&gt;Db);
-  layer3-&gt;optimizer = make_composite_optimizer(optimizer_W3, optimizer_b3);
-  layer3-&gt;W = W3;
-  layer3-&gt;b = b3;
-}</code></pre>
+  <span class="k">auto</span> <span class="n">layer3</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">linear_layer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sizes</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">);</span>
+  <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">layer3</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">optimizer_W3</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">gradient_descent_optimizer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">layer3</span><span class="o">-&gt;</span><span class="n">W</span><span class="p">,</span> <span class="n">layer3</span><span class="o">-&gt;</span><span class="n">DW</span><span class="p">);</span>
+  <span class="k">auto</span> <span class="n">optimizer_b3</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">gradient_descent_optimizer</span><span class="o">&lt;</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">layer3</span><span class="o">-&gt;</span><span class="n">b</span><span class="p">,</span> <span class="n">layer3</span><span class="o">-&gt;</span><span class="n">Db</span><span class="p">);</span>
+  <span class="n">layer3</span><span class="o">-&gt;</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">make_composite_optimizer</span><span class="p">(</span><span class="n">optimizer_W3</span><span class="p">,</span> <span class="n">optimizer_b3</span><span class="p">);</span>
+  <span class="n">layer3</span><span class="o">-&gt;</span><span class="n">W</span> <span class="o">=</span> <span class="n">W3</span><span class="p">;</span>
+  <span class="n">layer3</span><span class="o">-&gt;</span><span class="n">b</span> <span class="o">=</span> <span class="n">b3</span><span class="p">;</span>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1384,23 +1502,23 @@ using scalar = float;
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  multilayer_perceptron M;
-  std::vector&lt;std::string&gt; layer_specifications = {"ReLU", "ReLU", "Linear"};
-  std::vector&lt;std::size_t&gt; linear_layer_sizes = {2, 2, 2, 2};
-  std::vector&lt;double&gt; linear_layer_densities = {0.6, 0.4, 1.0};
-  std::vector&lt;double&gt; linear_layer_dropouts = {0.0, 0.0, 0.0};
-  std::vector&lt;std::string&gt; linear_layer_weights = {"XavierNormalized", "Xavier", "He"};
-  std::vector&lt;std::string&gt; optimizers = {"Nesterov(0.9)", "Momentum(0.9)", "GradientDescent"};
-  long batch_size = 5;
-  std::mt19937 rng{std::random_device{}()};
-  M.layers = make_layers(layer_specifications,
-                         linear_layer_sizes,
-                         linear_layer_densities,
-                         linear_layer_dropouts,
-                         linear_layer_weights,
-                         optimizers,
-                         batch_size,
-                         rng);</code></pre>
+<pre class="rouge highlight"><code data-lang="cpp">  <span class="n">multilayer_perceptron</span> <span class="n">M</span><span class="p">;</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">layer_specifications</span> <span class="o">=</span> <span class="p">{</span><span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"Linear"</span><span class="p">};</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span> <span class="n">linear_layer_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">linear_layer_densities</span> <span class="o">=</span> <span class="p">{</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">};</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">linear_layer_dropouts</span> <span class="o">=</span> <span class="p">{</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">};</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">{</span><span class="s">"XavierNormalized"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"He"</span><span class="p">};</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">optimizers</span> <span class="o">=</span> <span class="p">{</span><span class="s">"Nesterov(0.9)"</span><span class="p">,</span> <span class="s">"Momentum(0.9)"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">};</span>
+  <span class="kt">long</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">mt19937</span> <span class="n">rng</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">random_device</span><span class="p">{}()};</span>
+  <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">make_layers</span><span class="p">(</span><span class="n">layer_specifications</span><span class="p">,</span>
+                         <span class="n">linear_layer_sizes</span><span class="p">,</span>
+                         <span class="n">linear_layer_densities</span><span class="p">,</span>
+                         <span class="n">linear_layer_dropouts</span><span class="p">,</span>
+                         <span class="n">linear_layer_weights</span><span class="p">,</span>
+                         <span class="n">optimizers</span><span class="p">,</span>
+                         <span class="n">batch_size</span><span class="p">,</span>
+                         <span class="n">rng</span><span class="p">);</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1415,16 +1533,16 @@ using scalar = float;
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  /// Do a feedforward step given the input `X`, and store the output in `result`.
-  virtual void feedforward(eigen::matrix&amp; result) = 0;
+<pre class="rouge highlight"><code data-lang="cpp">  <span class="c1">/// Do a feedforward step given the input `X`, and store the output in `result`.</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">feedforward</span><span class="p">(</span><span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">result</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  /// Do a backpropagate step given the output `Y`, and its gradient `DY`.
-  /// This will calculate the gradient `DX` of the input `X`, and the gradients
-  /// of the layer parameters.
-  virtual void backpropagate(const eigen::matrix&amp; Y, const eigen::matrix&amp; DY) = 0;
+  <span class="c1">/// Do a backpropagate step given the output `Y`, and its gradient `DY`.</span>
+  <span class="c1">/// This will calculate the gradient `DX` of the input `X`, and the gradients</span>
+  <span class="c1">/// of the layer parameters.</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">backpropagate</span><span class="p">(</span><span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">Y</span><span class="p">,</span> <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">DY</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  /// Update the layer parameters using their gradients.
-  virtual void optimize(scalar eta) = 0;</code></pre>
+  <span class="c1">/// Update the layer parameters using their gradients.</span>
+  <span class="k">virtual</span> <span class="kt">void</span> <span class="n">optimize</span><span class="p">(</span><span class="n">scalar</span> <span class="n">eta</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></code></pre>
 </div>
 </div>
 </div>
@@ -1435,11 +1553,11 @@ using scalar = float;
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">  /// Calculate the loss for output `Y` and target `T`.
-  [[nodiscard]] virtual scalar value(const eigen::matrix&amp; Y, const eigen::matrix&amp; T) const = 0;
+<pre class="rouge highlight"><code data-lang="cpp">  <span class="c1">/// Calculate the loss for output `Y` and target `T`.</span>
+  <span class="p">[[</span><span class="n">nodiscard</span><span class="p">]]</span> <span class="k">virtual</span> <span class="n">scalar</span> <span class="n">value</span><span class="p">(</span><span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">Y</span><span class="p">,</span> <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">T</span><span class="p">)</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  /// Calculate the gradient of the loss for output `Y` and target `T`.
-  [[nodiscard]] virtual eigen::matrix gradient(const eigen::matrix&amp; Y, const eigen::matrix&amp; T) const = 0;</code></pre>
+  <span class="c1">/// Calculate the gradient of the loss for output `Y` and target `T`.</span>
+  <span class="p">[[</span><span class="n">nodiscard</span><span class="p">]]</span> <span class="k">virtual</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span> <span class="n">gradient</span><span class="p">(</span><span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">Y</span><span class="p">,</span> <span class="k">const</span> <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span><span class="o">&amp;</span> <span class="n">T</span><span class="p">)</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1453,25 +1571,25 @@ using scalar = float;
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">struct relu_activation
-{
-  template &lt;typename Matrix&gt;
-  auto operator()(const Matrix&amp; X) const
-  {
-    return Relu(X);
-  }
+<pre class="rouge highlight"><code data-lang="cpp"><span class="k">struct</span> <span class="nc">relu_activation</span>
+<span class="p">{</span>
+  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Matrix</span><span class="p">&gt;</span>
+  <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="k">const</span> <span class="n">Matrix</span><span class="o">&amp;</span> <span class="n">X</span><span class="p">)</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">Relu</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  template &lt;typename Matrix&gt;
-  auto gradient(const Matrix&amp; X) const
-  {
-    return Relu_gradient(X);
-  }
+  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">Matrix</span><span class="p">&gt;</span>
+  <span class="k">auto</span> <span class="nf">gradient</span><span class="p">(</span><span class="k">const</span> <span class="n">Matrix</span><span class="o">&amp;</span> <span class="n">X</span><span class="p">)</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="n">Relu_gradient</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  [[nodiscard]] std::string to_string() const
-  {
-    return "ReLU()";
-  }
-};</code></pre>
+  <span class="p">[[</span><span class="n">nodiscard</span><span class="p">]]</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">to_string</span><span class="p">()</span> <span class="k">const</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="s">"ReLU()"</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">};</span></code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1669,10 +1787,10 @@ matrix operations <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/in
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="highlight"><code class="language-cpp" data-lang="cpp">        DZ = hadamard(Y, DY - column_repeat(diag(Y * DY.transpose()), K));
-        DW = DZ.transpose() * X;
-        Db = columns_sum(DZ);
-        DX = DZ * W;</code></pre>
+<pre class="rouge highlight"><code data-lang="cpp">        <span class="n">DZ</span> <span class="o">=</span> <span class="n">hadamard</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">DY</span> <span class="o">-</span> <span class="n">column_repeat</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="n">Y</span> <span class="o">*</span> <span class="n">DY</span><span class="p">.</span><span class="n">transpose</span><span class="p">()),</span> <span class="n">K</span><span class="p">));</span>
+        <span class="n">DW</span> <span class="o">=</span> <span class="n">DZ</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span> <span class="o">*</span> <span class="n">X</span><span class="p">;</span>
+        <span class="n">Db</span> <span class="o">=</span> <span class="n">columns_sum</span><span class="p">(</span><span class="n">DZ</span><span class="p">);</span>
+        <span class="n">DX</span> <span class="o">=</span> <span class="n">DZ</span> <span class="o">*</span> <span class="n">W</span><span class="p">;</span></code></pre>
 </div>
 </div>
 </div>
@@ -1691,7 +1809,7 @@ matrix operations <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/in
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-12 14:16:09 UTC
+Last updated 2024-09-12 14:18:01 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
