@@ -11,7 +11,6 @@
 
 #include "nerva/neural_networks/activation_functions.h"
 #include "nerva/neural_networks/eigen.h"
-#include "nerva/utilities/logger.h"
 #include "nerva/neural_networks/matrix_operations.h"
 #include "nerva/neural_networks/softmax_functions.h"
 #include <cmath>
@@ -554,9 +553,13 @@ auto Negative_log_likelihood_loss_rowwise_gradient(const Matrix1& Y, const Matri
 
 struct loss_function
 {
-  [[nodiscard]] virtual auto value(const eigen::matrix& Y, const eigen::matrix& T) const -> scalar = 0;
+  // tag::doc[]
+  /// Calculate the loss for output `Y` and target `T`.
+  [[nodiscard]] virtual scalar value(const eigen::matrix& Y, const eigen::matrix& T) const = 0;
 
-  [[nodiscard]] virtual auto gradient(const eigen::matrix& Y, const eigen::matrix& T) const -> eigen::matrix = 0;
+  /// Calculate the gradient of the loss for output `Y` and target `T`.
+  [[nodiscard]] virtual eigen::matrix gradient(const eigen::matrix& Y, const eigen::matrix& T) const = 0;
+  // end::doc[]
 
   [[nodiscard]] virtual auto to_string() const -> std::string = 0;
 
@@ -577,12 +580,12 @@ struct squared_error_loss: public loss_function
     return Squared_error_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto value(const eigen::matrix& Y, const eigen::matrix& T) const -> scalar override
+  [[nodiscard]] scalar value(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Squared_error_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto gradient(const eigen::matrix& Y, const eigen::matrix& T) const -> eigen::matrix override
+  [[nodiscard]] eigen::matrix gradient(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Squared_error_loss_rowwise_gradient(Y, T);
   }
@@ -607,12 +610,12 @@ struct cross_entropy_loss: public loss_function
     return Cross_entropy_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto value(const eigen::matrix& Y, const eigen::matrix& T) const -> scalar override
+  [[nodiscard]] scalar value(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Cross_entropy_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto gradient(const eigen::matrix& Y, const eigen::matrix& T) const -> eigen::matrix override
+  [[nodiscard]] eigen::matrix gradient(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Cross_entropy_loss_rowwise_gradient(Y, T);
   }
@@ -637,12 +640,12 @@ struct softmax_cross_entropy_loss: public loss_function
     return Softmax_cross_entropy_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto value(const eigen::matrix& Y, const eigen::matrix& T) const -> scalar override
+  [[nodiscard]] scalar value(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Softmax_cross_entropy_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto gradient(const eigen::matrix& Y, const eigen::matrix& T) const -> eigen::matrix override
+  [[nodiscard]] eigen::matrix gradient(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Softmax_cross_entropy_loss_rowwise_gradient(Y, T);
   }
@@ -667,12 +670,12 @@ struct logistic_cross_entropy_loss: public loss_function
     return Logistic_cross_entropy_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto value(const eigen::matrix& Y, const eigen::matrix& T) const -> scalar override
+  [[nodiscard]] scalar value(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Logistic_cross_entropy_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto gradient(const eigen::matrix& Y, const eigen::matrix& T) const -> eigen::matrix override
+  [[nodiscard]] eigen::matrix gradient(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Logistic_cross_entropy_loss_rowwise_gradient(Y, T);
   }
@@ -697,12 +700,12 @@ struct negative_log_likelihood_loss: public loss_function
     return Negative_log_likelihood_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto value(const eigen::matrix& Y, const eigen::matrix& T) const -> scalar override
+  [[nodiscard]] scalar value(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Negative_log_likelihood_loss_rowwise(Y, T);
   }
 
-  [[nodiscard]] auto gradient(const eigen::matrix& Y, const eigen::matrix& T) const -> eigen::matrix override
+  [[nodiscard]] eigen::matrix gradient(const eigen::matrix& Y, const eigen::matrix& T) const override
   {
     return Negative_log_likelihood_loss_rowwise_gradient(Y, T);
   }

@@ -373,6 +373,7 @@ struct Trimmed_relu_gradient
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+// tag::doc[]
 struct relu_activation
 {
   template <typename Matrix>
@@ -392,6 +393,7 @@ struct relu_activation
     return "ReLU()";
   }
 };
+// end::doc[]
 
 struct leaky_relu_activation
 {

@@ -13,11 +13,13 @@
 
 namespace nerva {
 
+// tag::doc[]
 #ifdef NERVA_USE_DOUBLE
 using scalar = double;
 #else
 using scalar = float;
 #endif
+// end::doc[]
 
 enum class computation
 {

@@ -253,6 +253,7 @@ TEST_CASE("test_batch_normalization_layer")
   }
 }
 
+// tag::doc[]
 inline
 void construct_mlp(multilayer_perceptron& M,
                    const std::vector<std::string>& layer_specifications,
@@ -264,8 +265,16 @@ void construct_mlp(multilayer_perceptron& M,
                    long batch_size
                   )
 {
-  M.layers = make_layers(layer_specifications, linear_layer_sizes, linear_layer_densities, linear_layer_dropouts, linear_layer_weights, optimizers, batch_size, nerva_rng);
+  M.layers = make_layers(layer_specifications,
+                         linear_layer_sizes,
+                         linear_layer_densities,
+                         linear_layer_dropouts,
+                         linear_layer_weights,
+                         optimizers,
+                         batch_size,
+                         nerva_rng);
 }
+// end::doc[]
 
 TEST_CASE("test_mlp0")
 {
@@ -286,6 +295,46 @@ TEST_CASE("test_mlp0")
                 batch_size
                 );
   print_mlp("test_mlp0", M);
+
+  eigen::matrix X = eigen::random_matrix(N, D);
+  eigen::matrix T = eigen::random_target_rowwise(N, K, nerva_rng);
+
+  std::vector<std::string> loss_functions = {"SquaredError", "LogisticCrossEntropy", "SoftmaxCrossEntropy"};
+  for (const std::string& loss_function_text: loss_functions)
+  {
+    std::cout << "loss = " << loss_function_text << std::endl;
+    std::shared_ptr<loss_function> loss = parse_loss_function(loss_function_text);
+    test_mlp(D, K, N, M, X, T, loss);
+  }
+}
+
+TEST_CASE("test_mlp1")
+{
+  // tag::construct_mlp[]
+  multilayer_perceptron M;
+  std::vector<std::string> layer_specifications = {"ReLU", "ReLU", "Linear"};
+  std::vector<std::size_t> linear_layer_sizes = {2, 2, 2, 2};
+  std::vector<double> linear_layer_densities = {0.6, 0.4, 1.0};
+  std::vector<double> linear_layer_dropouts = {0.0, 0.0, 0.0};
+  std::vector<std::string> linear_layer_weights = {"XavierNormalized", "Xavier", "He"};
+  std::vector<std::string> optimizers = {"Nesterov(0.9)", "Momentum(0.9)", "GradientDescent"};
+  long batch_size = 5;
+  std::mt19937 rng{std::random_device{}()};
+  M.layers = make_layers(layer_specifications,
+                         linear_layer_sizes,
+                         linear_layer_densities,
+                         linear_layer_dropouts,
+                         linear_layer_weights,
+                         optimizers,
+                         batch_size,
+                         rng);
+  // end::construct_mlp[]
+
+  print_mlp("test_mlp", M);
+
+  long N = 5;
+  long D = linear_layer_sizes.front();
+  long K = linear_layer_sizes.back();
 
   eigen::matrix X = eigen::random_matrix(N, D);
   eigen::matrix T = eigen::random_target_rowwise(N, K, nerva_rng);

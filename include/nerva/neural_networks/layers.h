@@ -38,11 +38,18 @@ struct neural_network_layer
 
   [[nodiscard]] virtual auto to_string() const -> std::string = 0;
 
+  // tag::layer[]
+  /// Do a feedforward step given the input `X`, and store the output in `result`.
   virtual void feedforward(eigen::matrix& result) = 0;
 
+  /// Do a backpropagate step given the output `Y`, and its gradient `DY`.
+  /// This will calculate the gradient `DX` of the input `X`, and the gradients
+  /// of the layer parameters.
   virtual void backpropagate(const eigen::matrix& Y, const eigen::matrix& DY) = 0;
 
+  /// Update the layer parameters using their gradients.
   virtual void optimize(scalar eta) = 0;
+  // end::layer[]
 
   virtual void clip(scalar epsilon)
   {}

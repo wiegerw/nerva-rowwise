@@ -19,16 +19,26 @@ ifdef::env-github[]
 :tip-caption: :bulb:
 endif::[]
 
-IMPORTANT: The documentation of this project is in the initial phase, so a lot is still missing.
+++++
+<style>
+  .small-code .content pre {
+      font-size: 0.7em;
+  }
+</style>
+++++
+
+== Introduction
+This document describes the implementation of the {library} library.
 
 == Installation
-.The following build systems are supported
-- CMake 3.16+
-- B2 (https://www.bfgroup.xyz/b2/)
+The following build systems are supported:
 
-Using CMake, the Nerva c++ library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable `ONEAPI_ROOT` should point to the OneAPI installation directory, and the variable `MKL_DIR` to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using `FetchContent` commands. The build and install can for example be done like this on Linux:
+- https://cmake.org/[CMake] 3.16+
+- https://www.bfgroup.xyz/b2/[B2]
 
-[source]
+Using CMake, the {library} library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable `ONEAPI_ROOT` should point to the OneAPI installation directory, and the variable `MKL_DIR` to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using `FetchContent` commands. The build and install can for example be done like this on Linux:
+
+[source,bash]
 ----
 mkdir build
 cd build
@@ -41,11 +51,21 @@ make install
 ----
 TIP: Setting the `MKL_DIR` variable is not necessary if the OneAPI `setvars.sh` script is run beforehand.
 
-IMPORTANT: For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
+NOTE: For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
 https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044
 and https://gitlab.com/libeigen/eigen/-/issues/2586 for more details.
 To resolve this issue, a hack has been applied: by defining the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H`,
 the inclusion of the offending header file is prevented.
+
+[NOTE]
+====
+For the B2 build using the icpx compiler, the environment needs to be changed like this. Alternatively, the OneAPI `setvars.sh` script can be called.
+[listing]
+----
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ONEAPI_ROOT/latest/lib
+PATH=$PATH:/$ONEAPI_ROOT/latest/bin
+----
+====
 
 On Windows, a command like this can be used:
 [source]
@@ -72,14 +92,16 @@ There are two command line tools in the `tools` directory. The tool `mkl` can be
 
 === The tool mkl
 An example of running the `mkl` tool is
-[source]
+[.small-code]
+[source,bash]
 ----
 include::../examples/doc_mkl.sh[tag=doc]
 ----
 This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
 
 The output may look like this
-[source]
+[.small-code]
+[listing]
 ----
 --- testing A = B * C (sdd_product) ---
 A = 1000x1000 sparse
@@ -111,14 +133,16 @@ Note that the very first invocation of an MKL function can be slow.
 === The tool mlp
 An example invocation of the `mlp` tool is
 
-[source]
+[.small-code]
+[source,bash]
 ----
 include::../examples/doc_mpl.sh[tag=doc]
 ----
 This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from https://www.cs.toronto.edu/~kriz/cifar.html.
 
 The output may look like this:
-[source]
+[.small-code]
+[listing]
 ----
 === Nerva c++ model ===
 Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
@@ -136,6 +160,7 @@ epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test acc
 epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s
 ----
 
+[[mlp_tool]]
 === The mlp command line options
 The `mlp` tool has the following command line options.
 Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].
@@ -393,6 +418,116 @@ A threshold value used to set small elements of weight matrices to zero.
 The number of threads used by the MKL and OMP libraries.
 * `--gradient-step <value>`
 If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
+
+== Overview of the code
+This section gives an overview of the C++ code in the
+{library} library, and some information that is needed for understanding the code.
+
+=== Number type
+The {library} library uses a type called `scalar` as its number type. By default, it is defined as a 32-bit float. It is possible to change this by defining the symbol `NERVA_USE_DOUBLE`, in which case 64 bit doubles are used. The corresponding code is
+[.small-code]
+[source,cpp]
+----
+include::../include/nerva/neural_networks/settings.h[tag=doc]
+----
+A more generic approach would be to add a template argument for the number type to most classes and functions. This has been tried in the past, but since it had a negative impact on the readability of the code, it was later removed.
+
+=== Header files
+The most important header files in are given in the table below.
+
+|===
+|Header file |Description
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/multilayer_perceptron.h[multilayer_perceptron.h]`
+|A multilayer perceptron class.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/layers.h[layers.h]`
+|Neural network layers.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/activation_functions.h[activation_functions.h]`
+|Activation functions.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/loss_functions.h[loss_functions.h]`
+|Loss functions.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/weights.h[weights.h]`
+|Weight initialization functions.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/optimizers.h[optimizers.h]`
+|Optimizer functions, for updating neural network parameters using their gradients.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/learning_rate_schedulers.h[learning_rate_schedulers.h]`
+|Learning rate schedulers, for updating the learning rate during training.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/training.h[training.h]`
+|A stochastic gradient descent algorithm.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/prune.h[prune.h]`
+|Algorithms for pruning sparse weight matrices. This is used for dynamic sparse training.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/grow.h[grow.h]`
+|Algorithms for (re-)growing sparse weights. This is used for dynamic sparse training.
+
+|===
+
+==== Class multilayer_perceptron
+A multilayer perceptron (MLP) is modeled using the class `multilayer_perceptron`. It contains a list of layers, and has member functions `feedforward`, `backpropagate` and `optimize` that can be used for training the neural network. Constructing an MLP can be done manually, as is illustrated in the tests:
+[.small-code]
+[source,cpp]
+----
+include::../tests/multilayer_perceptron_test.cpp[tag=doc]
+----
+This will create an MLP with three linear layers that have weight matrices `W1, W2, W3` and bias vectors `b1, b2, b3`. The parameter `sizes` contains the input and output sizes of the three layers. Note that the layers and the optimizers are stored using smart pointers. This is done to facilitate the Nerva Python interface. Constructing an MLP like this is quite verbose. An easier way to construct MLPs is provided by the function `make_layers`, that offers a string based interface.
+
+[.small-code]
+[source,cpp]
+----
+include::../tests/gradient_test.cpp[tag=construct_mlp]
+----
+Note that the random number generator argument is used for the generation of the weights. See
+<<mlp_tool, mlp command line options>> for an overview of the supported string arguments.
+
+==== Class neural_network_layer
+The class `neural_network_layer` is the base class of all neural network layers. It has attributes for the input matrix `X` and the corresponding gradient `DX`. Usually a layer has some additional parameters that can be learned by training the neural network. The most important member functions of `neural_network_layer` are given below.
+[.small-code]
+[source,cpp]
+----
+include::../include/nerva/neural_networks/layers.h[tag=layer]
+----
+
+==== Class loss_function
+The class `loss_function` is the base class of all loss functions. Although a loss function is similar to a layer, the interface is different:
+[.small-code]
+[source,cpp]
+----
+include::../include/nerva/neural_networks/loss_functions.h[tag=doc]
+----
+So instead of the names `feedforward` and `backpropagate`, we use `value` and `gradient`.
+
+==== Activation functions
+Currently, there is no common base class for activation functions. For example, the ReLU activation function is implemented like this:
+[.small-code]
+[source,cpp]
+----
+include::../include/nerva/neural_networks/activation_functions.h[tag=doc]
+----
+
+NOTE: Currently, there are some inconsistencies between the
+interfaces of layers, loss functions and activation functions. This may be changed in the future.
+
+// == Matrix operations
+//
+// == Sparse neural networks
+//
+// === Static sparse training
+//
+// === Dynamic sparse training
+//
+// == Performance
+//
+// === Intel MKL library
+//
+// === Subnormal numbers
 
 == References
 This is a citation to cite:[wesselink2024nervatrulysparseimplementation].

@@ -29,6 +29,7 @@ void check_equal_matrices(const std::string& name1, const eigen::matrix& X1, con
   }
 }
 
+// tag::doc[]
 void construct_mlp(multilayer_perceptron& M,
                    const eigen::matrix& W1,
                    const eigen::matrix& b1,
@@ -44,22 +45,29 @@ void construct_mlp(multilayer_perceptron& M,
 
   auto layer1 = std::make_shared<relu_layer<eigen::matrix>>(sizes[0], sizes[1], batch_size);
   M.layers.push_back(layer1);
-  set_linear_layer_optimizer(*layer1, "GradientDescent");
+  auto optimizer_W1 = std::make_shared<gradient_descent_optimizer<eigen::matrix>>(layer1->W, layer1->DW);
+  auto optimizer_b1 = std::make_shared<gradient_descent_optimizer<eigen::matrix>>(layer1->b, layer1->Db);
+  layer1->optimizer = make_composite_optimizer(optimizer_W1, optimizer_b1);
   layer1->W = W1;
   layer1->b = b1;
 
   auto layer2 = std::make_shared<relu_layer<eigen::matrix>>(sizes[1], sizes[2], batch_size);
   M.layers.push_back(layer2);
-  set_linear_layer_optimizer(*layer2, "GradientDescent");
+  auto optimizer_W2 = std::make_shared<gradient_descent_optimizer<eigen::matrix>>(layer2->W, layer2->DW);
+  auto optimizer_b2 = std::make_shared<gradient_descent_optimizer<eigen::matrix>>(layer2->b, layer2->Db);
+  layer2->optimizer = make_composite_optimizer(optimizer_W2, optimizer_b2);
   layer2->W = W2;
   layer2->b = b2;
 
   auto layer3 = std::make_shared<linear_layer<eigen::matrix>>(sizes[2], sizes[3], batch_size);
   M.layers.push_back(layer3);
-  set_linear_layer_optimizer(*layer3, "GradientDescent");
+  auto optimizer_W3 = std::make_shared<gradient_descent_optimizer<eigen::matrix>>(layer3->W, layer3->DW);
+  auto optimizer_b3 = std::make_shared<gradient_descent_optimizer<eigen::matrix>>(layer3->b, layer3->Db);
+  layer3->optimizer = make_composite_optimizer(optimizer_W3, optimizer_b3);
   layer3->W = W3;
   layer3->b = b3;
 }
+// end::doc[]
 
 void test_mlp_execution(const eigen::matrix& X,
                         const eigen::matrix& T,
