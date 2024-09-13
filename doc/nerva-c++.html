@@ -573,9 +573,9 @@ pre.rouge .gs {
 </li>
 <li><a href="#_command_line_tools">Command line tools</a>
 <ul class="sectlevel2">
-<li><a href="#_the_tool_mkl">The tool mkl</a></li>
 <li><a href="#_the_tool_mlp">The tool mlp</a></li>
-<li><a href="#mlp_tool">The mlp command line options</a></li>
+<li><a href="#_the_tool_mkl">The tool mkl</a></li>
+<li><a href="#_the_tool_inspect_npz">The tool inspect_npz</a></li>
 </ul>
 </li>
 <li><a href="#_overview_of_the_code">Overview of the code</a>
@@ -593,6 +593,8 @@ pre.rouge .gs {
 <li><a href="#_performance">Performance</a>
 <ul class="sectlevel2">
 <li><a href="#_intel_mkl_library">Intel MKL library</a></li>
+<li><a href="#_nerva_computation_mode">Nerva computation mode</a></li>
+<li><a href="#_subnormal_numbers">Subnormal numbers</a></li>
 </ul>
 </li>
 <li><a href="#_references">References</a></li>
@@ -734,60 +736,38 @@ The number of threads that are used at runtime by the MKL library can be control
 <h2 id="_command_line_tools">Command line tools</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are two command line tools in the <code>tools</code> directory. The tool <code>mkl</code> can be used to do benchmarking of computing sparse and dense matrix products using the MKL library, and the tool <code>mlp</code> can be used to do training experiments with multilayer perceptrons.</p>
+<p>The following command line tools are available. They can be found in the <code>tools</code> directory.</p>
 </div>
-<div class="sect2">
-<h3 id="_the_tool_mkl">The tool mkl</h3>
-<div class="paragraph">
-<p>An example of running the <code>mkl</code> tool is</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="bash">../install/bin/mkl <span class="nt">--arows</span><span class="o">=</span>1000 <span class="nt">--acols</span><span class="o">=</span>1000 <span class="nt">--brows</span><span class="o">=</span>1000 <span class="nt">--threads</span><span class="o">=</span>12 <span class="nt">--algorithm</span><span class="o">=</span>sdd <span class="nt">--repetitions</span><span class="o">=</span>3 <span class="nt">--densities</span><span class="o">=</span><span class="s2">"0.5,0.2,0.1,0.05"</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will use various algorithms to calculate the product <code>A = B * C</code> with <code>A</code> a sparse matrix and <code>B</code> and <code>C</code> dense matrices.</p>
-</div>
-<div class="paragraph">
-<p>The output may look like this</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre>--- testing A = B * C (sdd_product) ---
-A = 1000x1000 sparse
-B = 1000x1000 dense  layout=column-major
-C = 1000x1000 dense  layout=column-major
-
-density(A) = 0.5
- 0.01147s ddd_product A=column-major, B=column-major, C=column-major
- 0.00793s ddd_product A=column-major, B=column-major, C=column-major
- 0.00854s ddd_product A=column-major, B=column-major, C=column-major
- 0.04049s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01998s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01178s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01114s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.01099s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00666s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00375s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00734s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00332s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.20097s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19891s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that the very first invocation of an MKL function can be slow.</p>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Tool</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mlp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A tool for training multilayer perceptrons.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mkl</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A tool for benchmarking sparse and dense matrix products using the Intel MKL library.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>inspect_npz</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A tool for inspecting the contents of a file in NumPy NPZ format.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="sect2">
 <h3 id="_the_tool_mlp">The tool mlp</h3>
 <div class="paragraph">
-<p>An example invocation of the <code>mlp</code> tool is</p>
+<p>The tool <code>mlp</code> can be used for training multilayer perceptrons. An example invocation of the <code>mlp</code> tool is</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
@@ -830,15 +810,14 @@ epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test acc
 epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s</pre>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="mlp_tool">The mlp command line options</h3>
+<div class="sect3">
+<h4 id="mlp_tool">mlp command line options</h4>
 <div class="paragraph">
 <p>The <code>mlp</code> tool has the following command line options.
 Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].</p>
 </div>
-<div class="sect3">
-<h4 id="_general_options">General Options</h4>
+<div class="sect4">
+<h5 id="_general_options">General options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -856,8 +835,8 @@ Show debug output.</p>
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_random_generator">Random Generator</h4>
+<div class="sect4">
+<h5 id="_random_generator_options">Random generator options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -867,8 +846,8 @@ A seed value for the random generator.</p>
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_layer_configuration">Layer Configuration</h4>
+<div class="sect4">
+<h5 id="_layer_configuration_options">Layer configuration options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -953,8 +932,8 @@ The overall density of the linear layers. This value should be in the interval \
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_training_configuration">Training Configuration</h4>
+<div class="sect4">
+<h5 id="_training_configuration_options">Training configuration options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -1154,8 +1133,8 @@ See also
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_dataset_options">Dataset Options</h4>
+<div class="sect4">
+<h5 id="_dataset_options">Dataset options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -1224,8 +1203,8 @@ A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz<
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_miscellaneous_options">Miscellaneous options</h4>
+<div class="sect4">
+<h5 id="_miscellaneous_options">Miscellaneous options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -1243,8 +1222,8 @@ Print timer messages.</p>
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_pruning_and_growing_strategies">Pruning and Growing Strategies</h4>
+<div class="sect4">
+<h5 id="_pruning_and_growing_options">Pruning and growing options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -1314,8 +1293,8 @@ The weight generation function used for growing weights. See <code>--layer-weigh
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_computation_options">Computation Options</h4>
+<div class="sect4">
+<h5 id="_computation_options">Computation options</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -1369,6 +1348,95 @@ The number of threads used by the MKL and OMP libraries.</p>
 If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.</p>
 </li>
 </ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_tool_mkl">The tool mkl</h3>
+<div class="paragraph">
+<p>The tool <code>mkl</code> is used for benchmarking sparse and dense matrix products. An example of running the <code>mkl</code> tool is</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">../install/bin/mkl <span class="nt">--arows</span><span class="o">=</span>1000 <span class="nt">--acols</span><span class="o">=</span>1000 <span class="nt">--brows</span><span class="o">=</span>1000 <span class="nt">--threads</span><span class="o">=</span>12 <span class="nt">--algorithm</span><span class="o">=</span>sdd <span class="nt">--repetitions</span><span class="o">=</span>3 <span class="nt">--densities</span><span class="o">=</span><span class="s2">"0.5,0.2,0.1,0.05"</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will use various algorithms to calculate the product <code>A = B * C</code> with <code>A</code> a sparse matrix and <code>B</code> and <code>C</code> dense matrices.</p>
+</div>
+<div class="paragraph">
+<p>The output may look like this</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre>--- testing A = B * C (sdd_product) ---
+A = 1000x1000 sparse
+B = 1000x1000 dense  layout=column-major
+C = 1000x1000 dense  layout=column-major
+
+density(A) = 0.5
+ 0.01147s ddd_product A=column-major, B=column-major, C=column-major
+ 0.00793s ddd_product A=column-major, B=column-major, C=column-major
+ 0.00854s ddd_product A=column-major, B=column-major, C=column-major
+ 0.04049s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01998s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01178s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01114s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01099s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00666s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00375s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00734s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00332s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.20097s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.19891s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the very first invocation of an MKL function can be slow.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_tool_inspect_npz">The tool inspect_npz</h3>
+<div class="paragraph">
+<p>The tool <code>inspect_npz</code> is a simple tool to show the contents of a file in NumPy NPZ format. The tool <code>mlp</code> uses this format to load and save datasets, and to load and save weight matrices + bias vectors of linear layers. The output may look like this:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre>W1 (1024x3072) norm = 0.03827324
+   [-0.00850412,  0.00766624, -0.00379110,  ..., -0.02755435,  0.00842837,  0.00725122]
+   [ 0.03012662, -0.01122476,  0.03765349,  ...,  0.02167689, -0.03734717, -0.01376905]
+   [-0.03415587, -0.00498827,  0.00635345,  ..., -0.03036389, -0.01967963,  0.03339641]
+   ...,
+   [ 0.02993325, -0.00795984,  0.00388659,  ...,  0.01343446, -0.01625269,  0.00398590]
+   [ 0.03800971, -0.01185982, -0.00944855,  ...,  0.02083720, -0.00217844,  0.02398606]
+   [-0.00879488, -0.01937520, -0.02830209,  ...,  0.03606736, -0.01065827,  0.03293588]
+b1= (1024)
+   [-0.01735129, -0.01381215,  0.01708755,  ..., -0.01117092, -0.00264273, -0.00976263]
+W2 (512x1024) norm = 0.06249978
+   [-0.02440289,  0.01362467,  0.03782336,  ...,  0.01342138, -0.01060697, -0.05055390]
+   [ 0.06187645, -0.00854158,  0.02849235,  ...,  0.05861567,  0.00708143, -0.06170959]
+   [-0.00756755,  0.04718670, -0.02303848,  ...,  0.01513476,  0.00205931,  0.05441900]
+   ...,
+   [-0.04223771,  0.00852190, -0.00465803,  ...,  0.03600422,  0.00484904, -0.02281546]
+   [ 0.03211500, -0.02740303, -0.04652309,  ...,  0.00307061,  0.02427530, -0.02245107]
+   [ 0.05210501, -0.00423148, -0.00633851,  ...,  0.02453317,  0.02723335,  0.03589169]
+b2= (512)
+   [-0.01871627,  0.01150464, -0.01767523,  ..., -0.00220927, -0.01791467, -0.02616516]
+W3 (10x512) norm = 0.10718583
+   [-0.03256247, -0.09669271, -0.06564181,  ...,  0.00394586, -0.02191557,  0.08828022]
+   [-0.09986399, -0.03712691,  0.04332626,  ..., -0.02475236, -0.07359495, -0.09421349]
+   [-0.03308030,  0.01280271,  0.09341474,  ..., -0.03470980, -0.03936023,  0.02204999]
+   ...,
+   [-0.10063093, -0.04294113, -0.04938528,  ...,  0.08151620, -0.00991420,  0.09686699]
+   [ 0.04347997, -0.08046009,  0.02828473,  ...,  0.06899156, -0.08314995,  0.07181197]
+   [ 0.00575207, -0.06347645, -0.07257712,  ..., -0.00293436, -0.00266003, -0.08468610]
+b3= (10)
+   [-0.02117447, -0.00115431, -0.03672279,  ..., -0.02902718, -0.02759255,  0.03007624]</pre>
 </div>
 </div>
 </div>
@@ -1877,16 +1945,111 @@ The sparse CSR matrix functions in the MKL library use an argument of the opaque
 </table>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_nerva_computation_mode">Nerva computation mode</h3>
+<div class="paragraph">
+<p>In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The nerva-rowwise library uses a global setting <code>NervaComputation</code> to experiment with customized implementations. For example, the function <code>softmax_layer::feedforward</code> contains this:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp">      <span class="k">if</span> <span class="p">(</span><span class="n">NervaComputation</span> <span class="o">==</span> <span class="n">computation</span><span class="o">::</span><span class="n">eigen</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">W</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span> <span class="o">+</span> <span class="n">row_repeat</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">stable_softmax</span><span class="p">()(</span><span class="n">Z</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">else</span>
+      <span class="p">{</span>
+        <span class="n">mkl</span><span class="o">::</span><span class="n">ddd_product</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">.</span><span class="n">transpose</span><span class="p">());</span>
+        <span class="n">Z</span> <span class="o">+=</span> <span class="n">row_repeat</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">stable_softmax</span><span class="p">()(</span><span class="n">Z</span><span class="p">);</span>
+      <span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this case, the default version <code>computation::eigen</code> turned out to have very poor performance. A direct call to an MKL routine is used to solve this problem. The <code>NervaComputation</code> setting is also used to experiment with BLAS implementations and SYCL implementations. See the file <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/optimizers.h">optimizers.h</a> for some examples of that.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The command line tool <code>mlp</code> has an option <code>--computation</code> to set the computation mode.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_subnormal_numbers">Subnormal numbers</h3>
+<div class="paragraph">
+<p>Experiments with sparse neural networks have shown that the performance can be negatively influenced by <a href="https://en.wikipedia.org/wiki/Subnormal_number">subnormal numbers</a>. The example program <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/examples/subnormal_numbers.cpp">subnormal_numbers.cpp</a></code> illustrates the problem. The table below is the result of the following experiment.
+The inner product of two large vectors of floating-point numbers is calculated. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from <code>1</code> to <code>1e−45</code>. For values larger than <code>1e−35</code>, the time needed for this calculation is about <code>0.044</code> seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to <code>0.37</code> seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>--- multiplication1 ---
+time =   0.044372 | value = 1.0e+00    | sum = -5.49552e+03
+time =   0.044567 | value = 1.0e-01    | sum = -5.49572e+02
+time =   0.044243 | value = 1.0e-02    | sum = -5.49304e+01
+time =   0.044434 | value = 1.0e-03    | sum = -5.49612e+00
+time =   0.044253 | value = 1.0e-04    | sum = -5.49862e-01
+time =   0.044765 | value = 1.0e-05    | sum = -5.49653e-02
+time =   0.044698 | value = 1.0e-06    | sum = -5.49624e-03
+time =   0.044683 | value = 1.0e-07    | sum = -5.49642e-04
+time =   0.044703 | value = 1.0e-08    | sum = -5.49491e-05
+time =   0.044821 | value = 1.0e-09    | sum = -5.49454e-06
+time =   0.044705 | value = 1.0e-10    | sum = -5.49557e-07
+time =   0.044657 | value = 1.0e-11    | sum = -5.49730e-08
+time =   0.045235 | value = 1.0e-12    | sum = -5.49563e-09
+time =   0.045120 | value = 1.0e-13    | sum = -5.49706e-10
+time =   0.045010 | value = 1.0e-14    | sum = -5.49719e-11
+time =   0.044988 | value = 1.0e-15    | sum = -5.49464e-12
+time =   0.044943 | value = 1.0e-16    | sum = -5.49629e-13
+time =   0.044795 | value = 1.0e-17    | sum = -5.49573e-14
+time =   0.044147 | value = 1.0e-18    | sum = -5.49449e-15
+time =   0.044166 | value = 1.0e-19    | sum = -5.49589e-16
+time =   0.044380 | value = 1.0e-20    | sum = -5.49722e-17
+time =   0.044036 | value = 1.0e-21    | sum = -5.49430e-18
+time =   0.043405 | value = 1.0e-22    | sum = -5.49577e-19
+time =   0.043615 | value = 1.0e-23    | sum = -5.49548e-20
+time =   0.043544 | value = 1.0e-24    | sum = -5.49570e-21
+time =   0.043547 | value = 1.0e-25    | sum = -5.49694e-22
+time =   0.043536 | value = 1.0e-26    | sum = -5.49365e-23
+time =   0.043560 | value = 1.0e-27    | sum = -5.49488e-24
+time =   0.043500 | value = 1.0e-28    | sum = -5.49657e-25
+time =   0.043524 | value = 1.0e-29    | sum = -5.49783e-26
+time =   0.044128 | value = 1.0e-30    | sum = -5.49559e-27
+time =   0.043585 | value = 1.0e-31    | sum = -5.49745e-28
+time =   0.043530 | value = 1.0e-32    | sum = -5.49488e-29
+time =   0.043609 | value = 1.0e-33    | sum = -5.49569e-30
+time =   0.043805 | value = 1.0e-34    | sum = -5.49446e-31
+time =   0.046169 | value = 1.0e-35    | sum = -5.49661e-32
+time =   0.070594 | value = 1.0e-36    | sum = -5.49664e-33
+time =   0.247938 | value = 1.0e-37    | sum = -5.49684e-34
+time =   0.368848 | value = 1.0e-38    | sum = -5.49553e-35
+time =   0.369819 | value = 1.0e-39    | sum = -5.49426e-36
+time =   0.368434 | value = 1.0e-40    | sum = -5.49607e-37
+time =   0.368747 | value = 1.0e-41    | sum = -5.49801e-38
+time =   0.369033 | value = 1.0e-42    | sum = -5.50173e-39
+time =   0.370241 | value = 9.9e-44    | sum = -5.47762e-40
+time =   0.370065 | value = 9.8e-45    | sum = -4.97559e-41
+time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the nerva-rowwise library different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
+In <span class="citation">[<a href="#DBLP_HighamM22">1</a>]</span> the problem of subnormal numbers is discussed.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_references">References</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This is a citation to <span class="citation">[<a href="#wesselink2024nervatrulysparseimplementation">1</a>]</span>.</p>
-</div>
-<div class="paragraph">
-<p><a id="wesselink2024nervatrulysparseimplementation"></a>[1] W. Wesselink, B. Grooten, Q. Xiao, C. de Campos, and M. Pechenizkiy, “Nerva: a Truly Sparse Implementation of Neural Networks.” 2024, [Online]. Available: <a href="https://arxiv.org/abs/2407.17437" class="bare">https://arxiv.org/abs/2407.17437</a>.</p>
+<p><a id="DBLP_HighamM22"></a>[1] N. J. Higham and T. Mary, “Mixed precision algorithms in numerical linear algebra,” <em>Acta Numer.</em>, vol. 31, pp. 347–414, 2022, [Online]. Available: <a href="https://doi.org/10.1017/S0962492922000022" class="bare">https://doi.org/10.1017/S0962492922000022</a>.</p>
 </div>
 </div>
 </div>
@@ -1899,7 +2062,7 @@ The sparse CSR matrix functions in the MKL library use an argument of the opaque
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-12 16:39:10 UTC
+Last updated 2024-09-13 14:23:35 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
