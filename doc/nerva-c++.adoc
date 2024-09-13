@@ -12,7 +12,7 @@
 :description: Documentation for the nerva-rowwise repository.
 :library: nerva-rowwise
 :imagesdir: images
-:bibliography: bibliography.bib
+:bibliography: nerva.bib
 Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
@@ -88,50 +88,23 @@ ctest -R nerva
 TIP: The number of threads that are used at runtime by the MKL library can be controlled using the environment variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`, see also https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html.
 
 == Command line tools
-There are two command line tools in the `tools` directory. The tool `mkl` can be used to do benchmarking of computing sparse and dense matrix products using the MKL library, and the tool `mlp` can be used to do training experiments with multilayer perceptrons.
+The following command line tools are available. They can be found in the `tools` directory.
 
-=== The tool mkl
-An example of running the `mkl` tool is
-[.small-code]
-[source,bash]
-----
-include::../examples/doc_mkl.sh[tag=doc]
-----
-This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
+|===
+|Tool |Description
 
-The output may look like this
-[.small-code]
-[listing]
-----
---- testing A = B * C (sdd_product) ---
-A = 1000x1000 sparse
-B = 1000x1000 dense  layout=column-major
-C = 1000x1000 dense  layout=column-major
+|`mlp`
+|A tool for training multilayer perceptrons.
 
-density(A) = 0.5
- 0.01147s ddd_product A=column-major, B=column-major, C=column-major
- 0.00793s ddd_product A=column-major, B=column-major, C=column-major
- 0.00854s ddd_product A=column-major, B=column-major, C=column-major
- 0.04049s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01998s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01178s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
- 0.01114s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.01099s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00666s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
- 0.00375s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00734s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.00332s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
- 0.20097s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19891s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
- 0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
- 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
-----
-Note that the very first invocation of an MKL function can be slow.
+|`mkl`
+|A tool for benchmarking sparse and dense matrix products using the Intel MKL library.
+
+|`inspect_npz`
+|A tool for inspecting the contents of a file in NumPy NPZ format.
+|===
 
 === The tool mlp
-An example invocation of the `mlp` tool is
+The tool `mlp` can be used for training multilayer perceptrons. An example invocation of the `mlp` tool is
 
 [.small-code]
 [source,bash]
@@ -161,11 +134,11 @@ epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test acc
 ----
 
 [[mlp_tool]]
-=== The mlp command line options
+==== mlp command line options
 The `mlp` tool has the following command line options.
 Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].
 
-==== General Options
+===== General options
 * `-?`, `-h`, `--help`
 Display help information.
 * `--verbose`, `-v`
@@ -173,11 +146,11 @@ Show verbose output.
 * `--debug`, `-d`
 Show debug output.
 
-==== Random Generator
+===== Random generator options
 * `--seed <value>`
 A seed value for the random generator.
 
-==== Layer Configuration
+===== Layer configuration options
 * `--layers <value>`
 A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);Linear` is used to specify a neural network with three layers with an ReLU, AllReLU and no activation function. The following layers are supported:
 
@@ -225,7 +198,7 @@ A comma-separated list of dropout rates of linear layers. By default, all linear
 * `--overall-density <value>`
 The overall density of the linear layers. This value should be in the interval stem:[[0,1]], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.
 
-==== Training Configuration
+===== Training configuration options
 * `--epochs <value>`
 The number of epochs of the training (default: 100).
 * `--batch-size <value>`
@@ -326,7 +299,7 @@ The weight matrices are stored with keys `W1,W2,...` and the bias vectors with k
 See also
 link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
 
-==== Dataset Options
+===== Dataset options
 * `--cifar10 <value>`
 Specify the location of the binary version of the
 link:https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] dataset. This is a directory with subdirectory `cifar-10-batches-bin`.
@@ -357,7 +330,7 @@ Normalize the dataset.
 * `--preprocessed <value>`
 A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to store preprocessed datasets. A script link:../python/tools/create_cifar10_datasets.py[create_cifar10_datasets.py] is available for creating augmented CIFAR-10 datasets.
 
-==== Miscellaneous options
+===== Miscellaneous options
 * `--precision <value>`
 The precision used for printing matrices.
 * `--info`
@@ -365,7 +338,7 @@ Print detailed information about the multilayer perceptron.
 * `--timer`
 Print timer messages.
 
-==== Pruning and Growing Strategies
+===== Pruning and growing options
 * `--prune <strategy>`
 The strategy used for pruning sparse weight matrices. The following strategies are supported:
 |===
@@ -393,7 +366,7 @@ The strategy used for growing in sparse weight matrices. The following strategie
 * `--grow-weights <value>`
 The weight generation function used for growing weights. See `--layer-weights` for supported values.
 
-==== Computation Options
+===== Computation options
 * `--computation <value>`
 The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:
 |===
@@ -418,6 +391,83 @@ A threshold value used to set small elements of weight matrices to zero.
 The number of threads used by the MKL and OMP libraries.
 * `--gradient-step <value>`
 If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
+
+=== The tool mkl
+The tool `mkl` is used for benchmarking sparse and dense matrix products. An example of running the `mkl` tool is
+[.small-code]
+[source,bash]
+----
+include::../examples/doc_mkl.sh[tag=doc]
+----
+This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
+
+The output may look like this
+[.small-code]
+[listing]
+----
+--- testing A = B * C (sdd_product) ---
+A = 1000x1000 sparse
+B = 1000x1000 dense  layout=column-major
+C = 1000x1000 dense  layout=column-major
+
+density(A) = 0.5
+ 0.01147s ddd_product A=column-major, B=column-major, C=column-major
+ 0.00793s ddd_product A=column-major, B=column-major, C=column-major
+ 0.00854s ddd_product A=column-major, B=column-major, C=column-major
+ 0.04049s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01998s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01178s sdd_product(batchsize=5, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01114s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.01099s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00666s sdd_product(batchsize=10, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00375s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00734s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.00332s sdd_product(batchsize=100, density(A)=0.499599, B=column-major, C=column-major)
+ 0.20097s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.19891s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.19893s sdd_product_forloop_eigen(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23286s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23298s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+ 0.23281s sdd_product_forloop_mkl(density(A)=0.499599, B=column-major, C=column-major)
+----
+Note that the very first invocation of an MKL function can be slow.
+
+=== The tool inspect_npz
+The tool `inspect_npz` is a simple tool to show the contents of a file in NumPy NPZ format. The tool `mlp` uses this format to load and save datasets, and to load and save weight matrices + bias vectors of linear layers. The output may look like this:
+[.small-code]
+[listing]
+----
+W1 (1024x3072) norm = 0.03827324
+   [-0.00850412,  0.00766624, -0.00379110,  ..., -0.02755435,  0.00842837,  0.00725122]
+   [ 0.03012662, -0.01122476,  0.03765349,  ...,  0.02167689, -0.03734717, -0.01376905]
+   [-0.03415587, -0.00498827,  0.00635345,  ..., -0.03036389, -0.01967963,  0.03339641]
+   ...,
+   [ 0.02993325, -0.00795984,  0.00388659,  ...,  0.01343446, -0.01625269,  0.00398590]
+   [ 0.03800971, -0.01185982, -0.00944855,  ...,  0.02083720, -0.00217844,  0.02398606]
+   [-0.00879488, -0.01937520, -0.02830209,  ...,  0.03606736, -0.01065827,  0.03293588]
+b1= (1024)
+   [-0.01735129, -0.01381215,  0.01708755,  ..., -0.01117092, -0.00264273, -0.00976263]
+W2 (512x1024) norm = 0.06249978
+   [-0.02440289,  0.01362467,  0.03782336,  ...,  0.01342138, -0.01060697, -0.05055390]
+   [ 0.06187645, -0.00854158,  0.02849235,  ...,  0.05861567,  0.00708143, -0.06170959]
+   [-0.00756755,  0.04718670, -0.02303848,  ...,  0.01513476,  0.00205931,  0.05441900]
+   ...,
+   [-0.04223771,  0.00852190, -0.00465803,  ...,  0.03600422,  0.00484904, -0.02281546]
+   [ 0.03211500, -0.02740303, -0.04652309,  ...,  0.00307061,  0.02427530, -0.02245107]
+   [ 0.05210501, -0.00423148, -0.00633851,  ...,  0.02453317,  0.02723335,  0.03589169]
+b2= (512)
+   [-0.01871627,  0.01150464, -0.01767523,  ..., -0.00220927, -0.01791467, -0.02616516]
+W3 (10x512) norm = 0.10718583
+   [-0.03256247, -0.09669271, -0.06564181,  ...,  0.00394586, -0.02191557,  0.08828022]
+   [-0.09986399, -0.03712691,  0.04332626,  ..., -0.02475236, -0.07359495, -0.09421349]
+   [-0.03308030,  0.01280271,  0.09341474,  ..., -0.03470980, -0.03936023,  0.02204999]
+   ...,
+   [-0.10063093, -0.04294113, -0.04938528,  ...,  0.08151620, -0.00991420,  0.09686699]
+   [ 0.04347997, -0.08046009,  0.02828473,  ...,  0.06899156, -0.08314995,  0.07181197]
+   [ 0.00575207, -0.06347645, -0.07257712,  ..., -0.00293436, -0.00266003, -0.08468610]
+b3= (10)
+   [-0.02117447, -0.00115431, -0.03672279,  ..., -0.02902718, -0.02759255,  0.03007624]
+----
 
 == Overview of the code
 This section gives an overview of the C++ code in the
@@ -682,7 +732,72 @@ TIP: In C++23 the implementation of sparse matrices in CSR format can be greatly
 
 NOTE: The sparse CSR matrix functions in the MKL library use an argument of the opaque type `sparse_matrix_t`. It is used to store unknown properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix. See also the function `sparse_matrix_csr::construct_csr`.
 
-// === Subnormal numbers
+=== Nerva computation mode
+In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The {library} library uses a global setting `NervaComputation` to experiment with customized implementations. For example, the function `softmax_layer::feedforward` contains this:
+[.small-code]
+[source,cpp]
+----
+include::../include/nerva/neural_networks/layers.h[tag=nerva_computation]
+----
+In this case, the default version `computation::eigen` turned out to have very poor performance. A direct call to an MKL routine is used to solve this problem. The `NervaComputation` setting is also used to experiment with BLAS implementations and SYCL implementations. See the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/optimizers.h[optimizers.h] for some examples of that.
+
+TIP: The command line tool `mlp` has an option `--computation` to set the computation mode.
+
+=== Subnormal numbers
+Experiments with sparse neural networks have shown that the performance can be negatively influenced by https://en.wikipedia.org/wiki/Subnormal_number[subnormal numbers]. The example program `link:https://github.com/wiegerw/nerva-rowwise/blob/main/examples/subnormal_numbers.cpp[subnormal_numbers.cpp]` illustrates the problem. The table below is the result of the following experiment.
+The inner product of two large vectors of floating-point numbers is calculated. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from `1` to `1e−45`. For values larger than `1e−35`, the time needed for this calculation is about `0.044` seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to `0.37` seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.
+[listing]
+----
+--- multiplication1 ---
+time =   0.044372 | value = 1.0e+00    | sum = -5.49552e+03
+time =   0.044567 | value = 1.0e-01    | sum = -5.49572e+02
+time =   0.044243 | value = 1.0e-02    | sum = -5.49304e+01
+time =   0.044434 | value = 1.0e-03    | sum = -5.49612e+00
+time =   0.044253 | value = 1.0e-04    | sum = -5.49862e-01
+time =   0.044765 | value = 1.0e-05    | sum = -5.49653e-02
+time =   0.044698 | value = 1.0e-06    | sum = -5.49624e-03
+time =   0.044683 | value = 1.0e-07    | sum = -5.49642e-04
+time =   0.044703 | value = 1.0e-08    | sum = -5.49491e-05
+time =   0.044821 | value = 1.0e-09    | sum = -5.49454e-06
+time =   0.044705 | value = 1.0e-10    | sum = -5.49557e-07
+time =   0.044657 | value = 1.0e-11    | sum = -5.49730e-08
+time =   0.045235 | value = 1.0e-12    | sum = -5.49563e-09
+time =   0.045120 | value = 1.0e-13    | sum = -5.49706e-10
+time =   0.045010 | value = 1.0e-14    | sum = -5.49719e-11
+time =   0.044988 | value = 1.0e-15    | sum = -5.49464e-12
+time =   0.044943 | value = 1.0e-16    | sum = -5.49629e-13
+time =   0.044795 | value = 1.0e-17    | sum = -5.49573e-14
+time =   0.044147 | value = 1.0e-18    | sum = -5.49449e-15
+time =   0.044166 | value = 1.0e-19    | sum = -5.49589e-16
+time =   0.044380 | value = 1.0e-20    | sum = -5.49722e-17
+time =   0.044036 | value = 1.0e-21    | sum = -5.49430e-18
+time =   0.043405 | value = 1.0e-22    | sum = -5.49577e-19
+time =   0.043615 | value = 1.0e-23    | sum = -5.49548e-20
+time =   0.043544 | value = 1.0e-24    | sum = -5.49570e-21
+time =   0.043547 | value = 1.0e-25    | sum = -5.49694e-22
+time =   0.043536 | value = 1.0e-26    | sum = -5.49365e-23
+time =   0.043560 | value = 1.0e-27    | sum = -5.49488e-24
+time =   0.043500 | value = 1.0e-28    | sum = -5.49657e-25
+time =   0.043524 | value = 1.0e-29    | sum = -5.49783e-26
+time =   0.044128 | value = 1.0e-30    | sum = -5.49559e-27
+time =   0.043585 | value = 1.0e-31    | sum = -5.49745e-28
+time =   0.043530 | value = 1.0e-32    | sum = -5.49488e-29
+time =   0.043609 | value = 1.0e-33    | sum = -5.49569e-30
+time =   0.043805 | value = 1.0e-34    | sum = -5.49446e-31
+time =   0.046169 | value = 1.0e-35    | sum = -5.49661e-32
+time =   0.070594 | value = 1.0e-36    | sum = -5.49664e-33
+time =   0.247938 | value = 1.0e-37    | sum = -5.49684e-34
+time =   0.368848 | value = 1.0e-38    | sum = -5.49553e-35
+time =   0.369819 | value = 1.0e-39    | sum = -5.49426e-36
+time =   0.368434 | value = 1.0e-40    | sum = -5.49607e-37
+time =   0.368747 | value = 1.0e-41    | sum = -5.49801e-38
+time =   0.369033 | value = 1.0e-42    | sum = -5.50173e-39
+time =   0.370241 | value = 9.9e-44    | sum = -5.47762e-40
+time =   0.370065 | value = 9.8e-45    | sum = -4.97559e-41
+time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41
+----
+On https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ[Google Groups] this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn't seem to be a portable way to achieve this. In the {library} library different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the `--clip` command line option of the `mlp` tool.
+In cite:[DBLP_HighamM22] the problem of subnormal numbers is discussed.
 
 // == Sparse neural networks
 //
@@ -691,6 +806,5 @@ NOTE: The sparse CSR matrix functions in the MKL library use an argument of the 
 // === Dynamic sparse training
 
 == References
-This is a citation to cite:[wesselink2024nervatrulysparseimplementation].
 
 bibliography::[]

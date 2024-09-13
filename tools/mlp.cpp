@@ -16,12 +16,12 @@
 #include "nerva/neural_networks/multilayer_perceptron.h"
 #include "nerva/neural_networks/parse_layer.h"
 #include "nerva/neural_networks/regrow.h"
+#include "nerva/neural_networks/sgd_options.h"
 #include "nerva/neural_networks/training.h"
 #include "nerva/neural_networks/weights.h"
+#include "nerva/utilities/command_line_tool.h"
 #include "nerva/utilities/parse_numbers.h"
 #include "nerva/utilities/string_utility.h"
-#include "nerva/neural_networks/sgd_options.h"
-#include "nerva/utilities/command_line_tool.h"
 
 #include "omp.h"
 #include "fmt/format.h"
@@ -348,7 +348,7 @@ class mlp_tool: public command_line_tool
 
     auto description() const -> std::string override
     {
-      return "Multilayer perceptron test";
+      return "A tool for training multilayer perceptrons";
     }
 
     auto run() -> bool override

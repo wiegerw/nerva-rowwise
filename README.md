@@ -22,7 +22,7 @@ The `nerva-rowwise` library has the following features:
 The documentation consists of several parts:
 * A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) that explains the implementation.
 * A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains the Python interface.
-* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of the execution of MLPs.
+* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of key components of neural networks.
 
 The following papers about Nerva are available:
 
@@ -31,7 +31,7 @@ The following papers about Nerva are available:
 [2] *Batch Matrix-form Equations and Implementation
 of Multilayer Perceptrons*, https://arxiv.org/abs/TODO. It describes the implementation of the Nerva libraries in great detail.
 
-## Requirements
+### Requirements
 A C++17 compiler. Due to the dependency on the Intel MKL library, an Intel processor is highly recommended. Intel MKL can technically work on non-Intel processors, but it is unlikely to perform optimally on them.
 
 Compilation has been tested successfully with `g++-11`, `g++-12`, `g++-13`, `clang-18`, `icpx-2024.2` and `Visual Studio 2022`.
@@ -46,10 +46,16 @@ Nerva uses the following third-party libraries.
 * pybind11 (https://github.com/pybind/pybind11)
 * Intel OneAPI (https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html)
 
+# Comparison with other frameworks
+To illustrate the most important difference between Nerva and other neural network frameworks, the following characterization comes to mind. For typical neural network frameworks one could argue that ***the specification is the implementation***<sup><a href="#footnote1">1</a></sup>, while for Nerva ***the implementation is the specification***.
+By this we mean that if you want to know precisely what a component of a neural network does, in many cases you will have to consult the source code in order to get a definitive answer. In Nerva, the specifications of key components are documented, and the implementation closely matches the specification.
+
+<a id="footnote1"></a>1. Of course, in reality the situation is not this black and white.
+
 # Getting Started
 
 ### Installation
-The library can be used in two different ways. C++ users can use `CMake` to install the library in a standard manner. Python users can install the library via `pip`. 
+C++ users can use `CMake` to install the library in a standard manner. Python users can install the library via `pip`. 
 See the [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) and/or the
 [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) for more details about this.
 
@@ -91,14 +97,11 @@ epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test acc
 ...
 ```
 
-### Class framework
-Both the C++ and the Python interface contain a class framework with classes for multilayer perceptrons, layers, loss functions, activation functions and algorithms for training a neural network.
-
 # Design philosophy
 In the first place, the `nerva-rowwise` library is intended to support research with sparse neural networks. For that purpose, it contains algorithms for dynamic sparse training. Another goal of the library is to offer a completely transparent and accessible implementation of neural networks. The `nerva-rowwise` library contains explicit formulations of backpropagation, and can thus be used to study in detail of how the execution of neural networks works. Instead, many other frameworks rely on auto differentation, which effectively hides the backpropagation from the user. The implementation of multilayer perceptrons is expressed in a small number of primitive matrix operations, that are given in this table: [TODO]. This helps to keep the implementation clean and maintainable. Furthermore, the idea is that a well-structured implementation can serve as the basis for doing performance experiments.
 
 ### Other frameworks
-There are many popular neural network frameworks available like PyTorch, Tensorflow and JAX. For those who just want to train a neural network, these frameworks are perfectly adequate, and the Nerva libraries are not meant to compete with those. The Nerva libraries are better suited to be used in a research environment, or for people who want to learn the details of neural networks. In Nerva, the implementation of neural networks is precisely specified, and the implementation matches one-on-one with the specification. That makes it suitable to study neural networks, or to experiment with new algorithms.
+There are many popular neural network frameworks available like PyTorch, Tensorflow and JAX. For those who just want to train a neural network, these frameworks are perfectly adequate, and the Nerva libraries are not meant to compete with those. The Nerva libraries are better suited to be used in a research environment, or for people who want to learn the details of neural networks.
 
 ### Performance
 The `nerva-rowwise` library uses a pragmatic approach with respect to performance. Our observation is that the performance of neural networks mostly relies on the performance of matrix multiplications, and for that we rely as much as possible on existing library solutions. For the CPU implementation we have opted for the Intel MKL library. But our implementation is modular, and this makes it relatively easy to add implementations based on other matrix libraries.

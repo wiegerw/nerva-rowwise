@@ -453,6 +453,7 @@ struct softmax_layer : public linear_layer<Matrix>
     }
     else
     {
+      // tag::nerva_computation[]
       if (NervaComputation == computation::eigen)
       {
         Z = X * W.transpose() + row_repeat(b, N);
@@ -464,6 +465,7 @@ struct softmax_layer : public linear_layer<Matrix>
         Z += row_repeat(b, N);
         result = stable_softmax()(Z);
       }
+      // end::nerva_computation[]
     }
   }
 

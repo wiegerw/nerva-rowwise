@@ -1,8 +1,4 @@
 project(NERVA_EXAMPLES)
 
-add_executable(inspect_npz_file "inspect_npz_file.cpp")
-target_link_libraries(inspect_npz_file PRIVATE Eigen3::Eigen MKL::MKL Python3::Python pybind11::pybind11)
-target_include_directories(inspect_npz_file PUBLIC ".")
-
-add_executable(mkl_slow_product "mkl_slow_product.cpp")
-target_link_libraries(mkl_slow_product PRIVATE Eigen3::Eigen MKL::MKL Python3::Python)
+add_executable(subnormal_numbers "subnormal_numbers.cpp")
+target_link_libraries(subnormal_numbers PRIVATE Eigen3::Eigen MKL::MKL)
