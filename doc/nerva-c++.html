@@ -1684,6 +1684,158 @@ interfaces of layers, loss functions and activation functions. This may be chang
 </table>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_training_a_neural_network">Training a neural network</h4>
+<div class="paragraph">
+<p>The class <code>stochastic_gradient_descent_algorithm</code> can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">epoch</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">epoch</span> <span class="o">&lt;</span> <span class="n">options</span><span class="p">.</span><span class="n">epochs</span><span class="p">;</span> <span class="o">++</span><span class="n">epoch</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">on_start_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">);</span>
+
+  <span class="n">eta</span> <span class="o">=</span> <span class="n">learning_rate</span><span class="o">-&gt;</span><span class="k">operator</span><span class="p">()(</span><span class="n">epoch</span><span class="p">);</span>
+  <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span> <span class="n">DY</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span><span class="p">);</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kt">long</span> <span class="n">batch_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">batch_index</span> <span class="o">&lt;</span> <span class="n">K</span><span class="p">;</span> <span class="n">batch_index</span><span class="o">++</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">on_start_batch</span><span class="p">(</span><span class="n">batch_index</span><span class="p">);</span>
+
+    <span class="n">eigen</span><span class="o">::</span><span class="n">eigen_slice</span> <span class="n">batch</span><span class="p">(</span><span class="n">I</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">+</span> <span class="n">batch_index</span> <span class="o">*</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span><span class="p">);</span>
+    <span class="k">auto</span> <span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">Xtrain</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">Eigen</span><span class="o">::</span><span class="n">indexing</span><span class="o">::</span><span class="n">all</span><span class="p">);</span>
+    <span class="k">auto</span> <span class="n">T</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">Ttrain</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">Eigen</span><span class="o">::</span><span class="n">indexing</span><span class="o">::</span><span class="n">all</span><span class="p">);</span>
+
+    <span class="n">M</span><span class="p">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">);</span>
+    <span class="n">DY</span> <span class="o">=</span> <span class="n">loss</span><span class="o">-&gt;</span><span class="n">gradient</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span><span class="p">;</span>
+    <span class="n">M</span><span class="p">.</span><span class="n">backpropagate</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">DY</span><span class="p">);</span>
+    <span class="n">M</span><span class="p">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">eta</span><span class="p">);</span>
+
+    <span class="n">on_end_batch</span><span class="p">(</span><span class="n">batch_index</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">on_end_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">);</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In every epoch, the dataset is divided into <code>K</code> batches. A batch <code>X</code> consists of <code>batch_size</code> examples, with corresponding targets <code>T</code> (i.e. the expected outputs). Each batch goes through the three steps of stochastic gradient descent:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>feedforward:</strong> Given an input batch <code>X</code> and
+the neural network parameters <code>Θ</code>, compute the
+output <code>Y</code>.</p>
+</li>
+<li>
+<p><strong>backpropagation:</strong> Given output <code>Y</code> corresponding to input <code>X</code> and targets <code>T</code>, compute the gradient of the loss <code>DY</code>. Then from <code>Y</code> and <code>DY</code>, compute the gradient <code>DΘ</code> of the parameters <code>Θ</code>.</p>
+</li>
+<li>
+<p><strong>optimization:</strong> Given the gradient <code>DΘ</code>, update
+the parameters <code>Θ</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Note that the algorithm uses a number of event functions:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Event</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_start_training</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the start of the training</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_end_training</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the end of the training</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_start_epoch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the start of each epoch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_end_epoch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the end of each epoch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_start_batch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the start of each batch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_end_batch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the end of each batch</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The user can respond to these events by deriving from the class <code>stochastic_gradient_descent_algorithm</code>. Typical use cases for these event functions are the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When using dropout layers, periodically the dropout masks should be renewed. This is typically done after each epoch or after a given number of batches.</p>
+</li>
+<li>
+<p>When doing dynamic sparse training, periodically a number of small weights is pruned, and new weights are added back (regrown). This is also typically done after each epoch or after a given number of batches.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An example can be found in the tool <code>mlp</code>:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp">    <span class="kt">void</span> <span class="nf">on_start_epoch</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">epoch</span><span class="p">)</span> <span class="k">override</span>
+    <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">reload_data_directory</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span>
+      <span class="p">{</span>
+        <span class="n">reload_data</span><span class="p">(</span><span class="n">epoch</span><span class="p">);</span>
+      <span class="p">}</span>
+
+      <span class="n">renew_dropout_masks</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">rng</span><span class="p">);</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">regrow_function</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">regrow_function</span><span class="p">)(</span><span class="n">M</span><span class="p">);</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">options</span><span class="p">.</span><span class="n">clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="n">M</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">options</span><span class="p">.</span><span class="n">clip</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Four actions take place at the start of every epoch.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.</p>
+</li>
+<li>
+<p>Dropout masks are renewed.</p>
+</li>
+<li>
+<p>Sparse weight matrices are pruned and regrown if a regrow function is specified.</p>
+</li>
+<li>
+<p>Small weights in the subnormal range are clipped to zero if the corresponding option is set.</p>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1735,7 +1887,7 @@ interfaces of layers, loss functions and activation functions. This may be chang
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">\(X^\top\)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>X.T</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>X.transpose()</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">transposition</p></td>
 </tr>
 <tr>
@@ -1985,9 +2137,9 @@ The command line tool <code>mlp</code> has an option <code>--computation</code> 
 <h3 id="_subnormal_numbers">Subnormal numbers</h3>
 <div class="paragraph">
 <p>Experiments with sparse neural networks have shown that the performance can be negatively influenced by <a href="https://en.wikipedia.org/wiki/Subnormal_number">subnormal numbers</a>. The example program <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/examples/subnormal_numbers.cpp">subnormal_numbers.cpp</a></code> illustrates the problem. The table below is the result of the following experiment.
-The inner product of two large vectors of floating-point numbers is calculated. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from <code>1</code> to <code>1e−45</code>. For values larger than <code>1e−35</code>, the time needed for this calculation is about <code>0.044</code> seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to <code>0.37</code> seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.</p>
+The dot product of two large vectors of floating-point numbers is computed. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from <code>1</code> to <code>1e−45</code>. For values larger than <code>1e−35</code>, the time needed for this calculation is about <code>0.044</code> seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to <code>0.37</code> seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.</p>
 </div>
-<div class="listingblock">
+<div class="listingblock small-code">
 <div class="content">
 <pre>--- multiplication1 ---
 time =   0.044372 | value = 1.0e+00    | sum = -5.49552e+03
@@ -2062,7 +2214,7 @@ In <span class="citation">[<a href="#DBLP_HighamM22">1</a>]</span> the problem o
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-13 14:23:35 UTC
+Last updated 2024-09-16 11:36:09 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
