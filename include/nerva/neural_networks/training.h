@@ -183,11 +183,11 @@ class stochastic_gradient_descent_algorithm
     {}
 
     /// \brief Event function that is called at the start of each batch
-    virtual void on_start_batch()
+    virtual void on_start_batch(unsigned int batch_index)
     {}
 
     /// \brief Event function that is called at the end of each batch
-    virtual void on_end_batch()
+    virtual void on_end_batch(unsigned int batch_index)
     {}
 
     auto run() -> std::pair<double, double>
@@ -218,11 +218,11 @@ class stochastic_gradient_descent_algorithm
 
         eigen::matrix DY(L, options.batch_size);
 
-        for (long k = 0; k < K; k++)
+        for (long batch_index = 0; batch_index < K; batch_index++)
         {
-          on_start_batch();
+          on_start_batch(batch_index);
 
-          eigen::eigen_slice batch(I.begin() + k * options.batch_size, options.batch_size);
+          eigen::eigen_slice batch(I.begin() + batch_index * options.batch_size, options.batch_size);
           auto X = data.Xtrain(batch, Eigen::indexing::all);
           auto T = data.Ttrain(batch, Eigen::indexing::all);
           M.feedforward(X, Y);
@@ -240,7 +240,7 @@ class stochastic_gradient_descent_algorithm
 
           if (options.debug)
           {
-            std::cout << "epoch: " << epoch << " batch: " << k << '\n';
+            std::cout << "epoch: " << epoch << " batch: " << batch_index << '\n';
             print_model_info(M);
             print_numpy_matrix("X", X);
             print_numpy_matrix("Y", Y);
@@ -268,7 +268,7 @@ class stochastic_gradient_descent_algorithm
 
           M.optimize(eta);
 
-          on_end_batch();
+          on_end_batch(batch_index);
         }
 
         double seconds = timer.stop("epoch");

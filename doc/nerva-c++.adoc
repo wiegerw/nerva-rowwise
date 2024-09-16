@@ -566,6 +566,85 @@ include::../include/nerva/neural_networks/activation_functions.h[tag=doc]
 NOTE: Currently, there are some inconsistencies between the
 interfaces of layers, loss functions and activation functions. This may be changed in the future.
 
+==== Training a neural network
+The class `stochastic_gradient_descent_algorithm` can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:
+[.small-code]
+[source,cpp]
+----
+for (unsigned int epoch = 0; epoch < options.epochs; ++epoch)
+{
+  on_start_epoch(epoch);
+
+  eta = learning_rate->operator()(epoch);
+  eigen::matrix DY(L, options.batch_size);
+
+  for (long batch_index = 0; batch_index < K; batch_index++)
+  {
+    on_start_batch(batch_index);
+
+    eigen::eigen_slice batch(I.begin() + batch_index * options.batch_size, options.batch_size);
+    auto X = data.Xtrain(batch, Eigen::indexing::all);
+    auto T = data.Ttrain(batch, Eigen::indexing::all);
+
+    M.feedforward(X, Y);
+    DY = loss->gradient(Y, T) / options.batch_size;
+    M.backpropagate(Y, DY);
+    M.optimize(eta);
+
+    on_end_batch(batch_index);
+  }
+  on_end_epoch(epoch);
+}
+----
+In every epoch, the dataset is divided into `K` batches. A batch `X` consists of `batch_size` examples, with corresponding targets `T` (i.e. the expected outputs). Each batch goes through the three steps of stochastic gradient descent:
+
+. *feedforward:* Given an input batch `X` and
+the neural network parameters `Θ`, compute the
+output `Y`.
+. *backpropagation:* Given output `Y` corresponding to input `X` and targets `T`, compute the gradient of the loss `DY`. Then from `Y` and `DY`, compute the gradient `DΘ` of the parameters `Θ`.
+. *optimization:* Given the gradient `DΘ`, update
+the parameters `Θ`.
+
+Note that the algorithm uses a number of event functions:
+|===
+|Event |Description
+
+|`on_start_training`
+|Is called at the start of the training
+
+|`on_end_training`
+|Is called at the end of the training
+
+|`on_start_epoch`
+|Is called at the start of each epoch
+
+|`on_end_epoch`
+|Is called at the end of each epoch
+
+|`on_start_batch`
+|Is called at the start of each batch
+
+|`on_end_batch`
+|Is called at the end of each batch
+|===
+The user can respond to these events by deriving from the class `stochastic_gradient_descent_algorithm`. Typical use cases for these event functions are the following:
+
+- When using dropout layers, periodically the dropout masks should be renewed. This is typically done after each epoch or after a given number of batches.
+- When doing dynamic sparse training, periodically a number of small weights is pruned, and new weights are added back (regrown). This is also typically done after each epoch or after a given number of batches.
+
+An example can be found in the tool `mlp`:
+[.small-code]
+[source,cpp]
+----
+include::../tools/mlp.cpp[tag=event]
+----
+Four actions take place at the start of every epoch.
+
+- A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.
+- Dropout masks are renewed.
+- Sparse weight matrices are pruned and regrown if a regrow function is specified.
+- Small weights in the subnormal range are clipped to zero if the corresponding option is set.
+
 == Matrix operations
 The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.
 
@@ -595,7 +674,7 @@ The most important part of the implementation of neural networks consists of mat
 |stem:[n \times n] identity matrix
 
 |stem:[X^\top]
-|`X.T`
+|`X.transpose()`
 |transposition
 
 |stem:[cX]
@@ -745,7 +824,8 @@ TIP: The command line tool `mlp` has an option `--computation` to set the comput
 
 === Subnormal numbers
 Experiments with sparse neural networks have shown that the performance can be negatively influenced by https://en.wikipedia.org/wiki/Subnormal_number[subnormal numbers]. The example program `link:https://github.com/wiegerw/nerva-rowwise/blob/main/examples/subnormal_numbers.cpp[subnormal_numbers.cpp]` illustrates the problem. The table below is the result of the following experiment.
-The inner product of two large vectors of floating-point numbers is calculated. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from `1` to `1e−45`. For values larger than `1e−35`, the time needed for this calculation is about `0.044` seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to `0.37` seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.
+The dot product of two large vectors of floating-point numbers is computed. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from `1` to `1e−45`. For values larger than `1e−35`, the time needed for this calculation is about `0.044` seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to `0.37` seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.
+[.small-code]
 [listing]
 ----
 --- multiplication1 ---

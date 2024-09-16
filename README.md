@@ -19,7 +19,7 @@ The `nerva-rowwise` library has the following features:
 * Only the CPU is supported.
 
 ### Documentation
-The documentation consists of several parts:
+The documentation consists of three parts:
 * A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) that explains the implementation.
 * A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains the Python interface.
 * A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of key components of neural networks.

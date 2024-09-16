@@ -140,8 +140,8 @@ void set_optimizers(multilayer_perceptron& M, const std::string& optimizer)
 class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::dataset>
 {
   protected:
-    std::filesystem::path preprocessed_dir;
-    std::shared_ptr<prune_and_grow> regrow;
+    std::filesystem::path reload_data_directory;
+    std::shared_ptr<prune_and_grow> regrow_function;
 
     using super = stochastic_gradient_descent_algorithm<datasets::dataset>;
     using super::data;
@@ -161,40 +161,41 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
                   const std::shared_ptr<grow_function>& grow
     )
       : super(M, data, options, loss, learning_rate, rng),
-        preprocessed_dir(preprocessed_dir_)
+        reload_data_directory(preprocessed_dir_)
     {
       if (prune)
       {
-        regrow = std::make_shared<prune_and_grow>(prune, grow);
+        regrow_function = std::make_shared<prune_and_grow>(prune, grow);
       }
     }
 
     /// \brief Reloads the dataset if a directory with preprocessed data was specified.
     void reload_data(unsigned int epoch)
     {
-      if (!preprocessed_dir.empty())
-      {
-        data.load((preprocessed_dir / ("epoch" + std::to_string(epoch) + ".npz")).string());
-      }
+      data.load((reload_data_directory / ("epoch" + std::to_string(epoch) + ".npz")).string());
     }
 
     void on_start_training() override
     {
-      reload_data(0);
+      if (!reload_data_directory.empty())
+      {
+        reload_data(0);
+      }
     }
 
+    // tag::event[]
     void on_start_epoch(unsigned int epoch) override
     {
-      if (epoch > 0)
+      if (epoch > 0 && !reload_data_directory.empty())
       {
         reload_data(epoch);
       }
 
       renew_dropout_masks(M, rng);
 
-      if (epoch > 0 && regrow)
+      if (epoch > 0 && regrow_function)
       {
-        (*regrow)(M);
+        (*regrow_function)(M);
       }
 
       if (epoch > 0 && options.clip > 0)
@@ -202,6 +203,7 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
         M.clip(options.clip);
       }
     }
+    // end::event[]
 
     void on_end_epoch(unsigned int epoch) override
     {

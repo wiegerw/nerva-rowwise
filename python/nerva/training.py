@@ -131,13 +131,13 @@ class StochasticGradientDescentAlgorithm(object):
         Event function that is called at the end of each epoch
         """
 
-    def on_start_batch(self) -> None:
+    def on_start_batch(self, batch_index: int) -> None:
         """
         Event function that is called at the start of each batch
         """
         pass
 
-    def on_end_batch(self) -> None:
+    def on_end_batch(self, batch_index: int) -> None:
         """
         Event function that is called at the end of each batch
         """
@@ -171,7 +171,7 @@ class StochasticGradientDescentAlgorithm(object):
             lr = self.learning_rate(epoch)  # update the learning at the start of each epoch
 
             for k, (X, T) in enumerate(self.train_loader):
-                self.on_start_batch()
+                self.on_start_batch(k)
                 T = to_one_hot(T, num_classes)
                 Y = M.feedforward(X)
                 DY = self.loss.gradient(Y, T) / options.batch_size
@@ -186,7 +186,7 @@ class StochasticGradientDescentAlgorithm(object):
                 M.backpropagate(Y, DY)
                 M.optimize(lr)
 
-                self.on_end_batch()
+                self.on_end_batch(k)
 
             self.timer.stop(epoch_label)
             seconds = self.timer.seconds(epoch_label)
