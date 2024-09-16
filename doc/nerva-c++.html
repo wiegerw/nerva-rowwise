@@ -589,11 +589,13 @@ pre.rouge .gs {
 <li><a href="#_matrix_operations">Matrix operations</a>
 <ul class="sectlevel2">
 <li><a href="#_eigen_library">Eigen library</a></li>
+<li><a href="#_mkl_library">MKL library</a></li>
 </ul>
 </li>
 <li><a href="#_performance">Performance</a>
 <ul class="sectlevel2">
-<li><a href="#_intel_mkl_library">Intel MKL library</a></li>
+<li><a href="#_mini_batches">Mini-batches</a></li>
+<li><a href="#_matrix_products">Matrix products</a></li>
 <li><a href="#_nerva_computation_mode">Nerva computation mode</a></li>
 <li><a href="#_subnormal_numbers">Subnormal numbers</a></li>
 </ul>
@@ -675,7 +677,7 @@ Setting the <code>MKL_DIR</code> variable is not necessary if the OneAPI <code>s
 For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
 <a href="https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044" class="bare">https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044</a>
 and <a href="https://gitlab.com/libeigen/eigen/-/issues/2586" class="bare">https://gitlab.com/libeigen/eigen/-/issues/2586</a> for more details.
-To resolve this issue, a hack has been applied: by defining the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code>,
+To resolve this issue, a hack has been applied in Nerva: by defining the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code>,
 the inclusion of the offending header file is prevented.
 </td>
 </tr>
@@ -689,7 +691,7 @@ the inclusion of the offending header file is prevented.
 </td>
 <td class="content">
 <div class="paragraph">
-<p>For the B2 build using the icpx compiler, the environment needs to be changed like this. Alternatively, the OneAPI <code>setvars.sh</code> script can be called.</p>
+<p>For the B2 build using the icpx compiler, the environment needs to be changed like this in advance. Alternatively, the OneAPI <code>setvars.sh</code> script can be called.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2052,7 +2054,7 @@ the parameters <code>Θ</code>.</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For more background information, see the section called <code>Matrix operations</code> in the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf">Nerva library specifications</a>. Using this table leads to concise and uniform code. For example, the backpropagation implementation of a softmax layer looks like this:</p>
+<p>Using this table leads to concise and uniform code. For example, the backpropagation implementation of a softmax layer looks like this:</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
@@ -2062,26 +2064,23 @@ the parameters <code>Θ</code>.</p>
         <span class="n">DX</span> <span class="o">=</span> <span class="n">DZ</span> <span class="o">*</span> <span class="n">W</span><span class="p">;</span></code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>See the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf">Nerva library specifications</a> for an overview of how these matrix operations are used.</p>
+</div>
 <div class="sect2">
 <h3 id="_eigen_library">Eigen library</h3>
 <div class="paragraph">
-<p>The nerva-rowwise library uses the <a href="https://eigen.tuxfamily.org/">Eigen library</a> for representing matrices. The matrix operations in table <a href="#table_matrix_operations">matrix operations</a>
-have been implemented using Eigen, see the file <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h">matrix_operations.h</a>.</p>
+<p>The nerva-rowwise library uses the <a href="https://eigen.tuxfamily.org/">Eigen library</a> for representing matrices. The matrix operations in table <a href="#table_matrix_operations">matrix operations</a> have been implemented using Eigen, see the file <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h">matrix_operations.h</a>.</p>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_performance">Performance</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> is used. Note that the MKL library is included in the <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html">Intel oneAPI base toolkit</a>. The Eigen library supports MKL by means of the compiler flag <code>EIGEN_USE_MKL_ALL</code>, see also <a href="https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html">TopicUsingIntelMKL.html</a>.</p>
 </div>
 <div class="sect2">
-<h3 id="_intel_mkl_library">Intel MKL library</h3>
+<h3 id="_mkl_library">MKL library</h3>
 <div class="paragraph">
-<p>The Intel MKL library has a number of highly efficient, but extremely low-level implementation of matrix operations. See <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html">blas-and-sparse-blas-routines.html</a> for an overview. The nerva-rowwise library contains some matrix classes that hide those low-level details.
-The table below gives an overview of them.</p>
+<p>Using the Eigen library alone is not sufficient for obtaining high performance. Therefore, the nerva-rowwise library uses the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> as a backend. The Eigen library supports MKL by means of the compiler flag <code>EIGEN_USE_MKL_ALL</code>, see also <a href="https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html">TopicUsingIntelMKL.html</a>.
+Note that the MKL library is included in the <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html">Intel oneAPI base toolkit</a>.</p>
+</div>
+<div class="paragraph">
+<p>The MKL library supports a number of highly efficient, but extremely low-level interfaces for matrix operations. See <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html">blas-and-sparse-blas-routines.html</a> for an overview. The nerva-rowwise library contains matrix classes that hide those low-level details from the user. The table below gives an overview of them.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2130,16 +2129,46 @@ In C++23 the implementation of sparse matrices in CSR format can be greatly simp
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The sparse CSR matrix functions in the MKL library take an argument of the opaque type <code>sparse_matrix_t</code>. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the nerva-rowwise library recalculates this parameter after every change to a sparse matrix. See also the function <code>sparse_matrix_csr::construct_csr</code>.
+The sparse CSR matrix functions in the MKL library take an argument of the opaque type <code>sparse_matrix_t</code>. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the nerva-rowwise library recalculates this parameter after every change to a sparse matrix, which may cause some inefficiencies. See also the function <code>sparse_matrix_csr::construct_csr</code>.
 </td>
 </tr>
 </table>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_performance">Performance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section discusses various aspects that play a role for the performance of a neural network library.</p>
+</div>
+<div class="sect2">
+<h3 id="_mini_batches">Mini-batches</h3>
+<div class="paragraph">
+<p>In textbooks and tutorials, the training of a neural network is usually explained in terms of individual examples. But in order to achieve high performance, it is absolutely necessary to use mini-batches. On <a href="https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Iterative_method">Wikipedia</a> this is explained as follows:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>A compromise between computing the true gradient and the gradient at a single sample is to compute the gradient against more than one training sample (called a "mini-batch") at each step. This can perform significantly better than "true" stochastic gradient descent described, because the code can make use of vectorization libraries rather than computing each step separately.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>To support mini-batches, the nerva-rowwise library defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf">Nerva library specifications</a>. For the latter, many neural network frameworks rely on <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a>, see also <span class="citation">[<a href="#DBLP_BaydinPRS17">1</a>]</span>. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_matrix_products">Matrix products</h3>
+<div class="paragraph">
+<p>The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> is used. Currently, this dependency is hard coded, but there are plans to make this optional. To experiment with other implementations, like SYCL or BLAS, a global setting is used that is discussed in the next section.</p>
+</div>
+</div>
 <div class="sect2">
 <h3 id="_nerva_computation_mode">Nerva computation mode</h3>
 <div class="paragraph">
-<p>In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The nerva-rowwise library uses a global setting <code>NervaComputation</code> to experiment with customized implementations. For example, the function <code>softmax_layer::feedforward</code> contains this:</p>
+<p>In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The nerva-rowwise library uses a global setting <code>NervaComputation</code> to experiment with other implementations. For example, the function <code>softmax_layer::feedforward</code> contains this:</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
@@ -2231,7 +2260,7 @@ time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41</pre>
 </div>
 <div class="paragraph">
 <p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the nerva-rowwise library different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
-In <span class="citation">[<a href="#DBLP_HighamM22">1</a>]</span> the problem of subnormal numbers is discussed.</p>
+In <span class="citation">[<a href="#DBLP_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.</p>
 </div>
 </div>
 </div>
@@ -2240,7 +2269,10 @@ In <span class="citation">[<a href="#DBLP_HighamM22">1</a>]</span> the problem o
 <h2 id="_references">References</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a id="DBLP_HighamM22"></a>[1] N. J. Higham and T. Mary, “Mixed precision algorithms in numerical linear algebra,” <em>Acta Numer.</em>, vol. 31, pp. 347–414, 2022, [Online]. Available: <a href="https://doi.org/10.1017/S0962492922000022" class="bare">https://doi.org/10.1017/S0962492922000022</a>.</p>
+<p><a id="DBLP_BaydinPRS17"></a>[1] A. G. Baydin, B. A. Pearlmutter, A. A. Radul, and J. M. Siskind, “Automatic Differentiation in Machine Learning: a Survey,” <em>J. Mach. Learn. Res.</em>, vol. 18, pp. 153:1–153:43, 2017, [Online]. Available: <a href="https://jmlr.org/papers/v18/17-468.html" class="bare">https://jmlr.org/papers/v18/17-468.html</a>.</p>
+</div>
+<div class="paragraph">
+<p><a id="DBLP_HighamM22"></a>[2] N. J. Higham and T. Mary, “Mixed precision algorithms in numerical linear algebra,” <em>Acta Numer.</em>, vol. 31, pp. 347–414, 2022, [Online]. Available: <a href="https://doi.org/10.1017/S0962492922000022" class="bare">https://doi.org/10.1017/S0962492922000022</a>.</p>
 </div>
 </div>
 </div>
@@ -2253,7 +2285,7 @@ In <span class="citation">[<a href="#DBLP_HighamM22">1</a>]</span> the problem o
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-16 14:36:31 UTC
+Last updated 2024-09-16 16:37:33 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
