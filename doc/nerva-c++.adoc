@@ -57,12 +57,12 @@ TIP: Setting the `MKL_DIR` variable is not necessary if the OneAPI `setvars.sh` 
 NOTE: For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
 https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044
 and https://gitlab.com/libeigen/eigen/-/issues/2586 for more details.
-To resolve this issue, a hack has been applied: by defining the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H`,
+To resolve this issue, a hack has been applied in Nerva: by defining the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H`,
 the inclusion of the offending header file is prevented.
 
 [NOTE]
 ====
-For the B2 build using the icpx compiler, the environment needs to be changed like this. Alternatively, the OneAPI `setvars.sh` script can be called.
+For the B2 build using the icpx compiler, the environment needs to be changed like this in advance. Alternatively, the OneAPI `setvars.sh` script can be called.
 [listing]
 ----
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ONEAPI_ROOT/latest/lib
@@ -793,23 +793,22 @@ The most important part of the implementation of neural networks consists of mat
 |element-wise application of stem:[f: x \rightarrow \log(\sigma(x))] to stem:[X]
 |===
 
-For more background information, see the section called `Matrix operations` in the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf[Nerva library specifications]. Using this table leads to concise and uniform code. For example, the backpropagation implementation of a softmax layer looks like this:
+Using this table leads to concise and uniform code. For example, the backpropagation implementation of a softmax layer looks like this:
 [.small-code]
 [source,cpp]
 ----
 include::../include/nerva/neural_networks/layers.h[tag=matrix_operations]
 ----
+See the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf[Nerva library specifications] for an overview of how these matrix operations are used.
 
 === Eigen library
-The {library} library uses the https://eigen.tuxfamily.org/[Eigen library] for representing matrices. The matrix operations in table <<table_matrix_operations>>
-have been implemented using Eigen, see the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h[matrix_operations.h].
+The {library} library uses the https://eigen.tuxfamily.org/[Eigen library] for representing matrices. The matrix operations in table <<table_matrix_operations>> have been implemented using Eigen, see the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h[matrix_operations.h].
 
-== Performance
-The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] is used. Note that the MKL library is included in the https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html[Intel oneAPI base toolkit]. The Eigen library supports MKL by means of the compiler flag `EIGEN_USE_MKL_ALL`, see also https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html[TopicUsingIntelMKL.html].
+=== MKL library
+Using the Eigen library alone is not sufficient for obtaining high performance. Therefore, the {library} library uses the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] as a backend. The Eigen library supports MKL by means of the compiler flag `EIGEN_USE_MKL_ALL`, see also https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html[TopicUsingIntelMKL.html].
+Note that the MKL library is included in the https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html[Intel oneAPI base toolkit].
 
-=== Intel MKL library
-The Intel MKL library has a number of highly efficient, but extremely low-level implementation of matrix operations. See https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html[blas-and-sparse-blas-routines.html] for an overview. The {library} library contains some matrix classes that hide those low-level details.
-The table below gives an overview of them.
+The MKL library supports a number of highly efficient, but extremely low-level interfaces for matrix operations. See https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html[blas-and-sparse-blas-routines.html] for an overview. The {library} library contains matrix classes that hide those low-level details from the user. The table below gives an overview of them.
 
 |===
 |Header file |Description
@@ -828,10 +827,25 @@ https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Y
 
 TIP: In C++23 the implementation of sparse matrices in CSR format can be greatly simplified, as shown by https://github.com/BenBrock/matrix-cpos[Ben Brock].
 
-NOTE: The sparse CSR matrix functions in the MKL library take an argument of the opaque type `sparse_matrix_t`. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix. See also the function `sparse_matrix_csr::construct_csr`.
+NOTE: The sparse CSR matrix functions in the MKL library take an argument of the opaque type `sparse_matrix_t`. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix, which may cause some inefficiencies. See also the function `sparse_matrix_csr::construct_csr`.
+
+== Performance
+This section discusses various aspects that play a role for the performance of a neural network library.
+
+=== Mini-batches
+In textbooks and tutorials, the training of a neural network is usually explained in terms of individual examples. But in order to achieve high performance, it is absolutely necessary to use mini-batches. On https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Iterative_method[Wikipedia] this is explained as follows:
+
+____
+A compromise between computing the true gradient and the gradient at a single sample is to compute the gradient against more than one training sample (called a "mini-batch") at each step. This can perform significantly better than "true" stochastic gradient descent described, because the code can make use of vectorization libraries rather than computing each step separately.
+____
+
+To support mini-batches, the {library} library defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf[Nerva library specifications]. For the latter, many neural network frameworks rely on https://en.wikipedia.org/wiki/Automatic_differentiation[Automatic differentiation], see also cite:[DBLP_BaydinPRS17]. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.
+
+=== Matrix products
+The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] is used. Currently, this dependency is hard coded, but there are plans to make this optional. To experiment with other implementations, like SYCL or BLAS, a global setting is used that is discussed in the next section.
 
 === Nerva computation mode
-In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The {library} library uses a global setting `NervaComputation` to experiment with customized implementations. For example, the function `softmax_layer::feedforward` contains this:
+In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The {library} library uses a global setting `NervaComputation` to experiment with other implementations. For example, the function `softmax_layer::feedforward` contains this:
 [.small-code]
 [source,cpp]
 ----
