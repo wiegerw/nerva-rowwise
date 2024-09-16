@@ -36,7 +36,10 @@ The following build systems are supported:
 - https://cmake.org/[CMake] 3.16+
 - https://www.bfgroup.xyz/b2/[B2]
 
-Using CMake, the {library} library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable `ONEAPI_ROOT` should point to the OneAPI installation directory, and the variable `MKL_DIR` to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using `FetchContent` commands. The build and install can for example be done like this on Linux:
+Using CMake, the {library} library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable `ONEAPI_ROOT` should point to the OneAPI installation directory, and the variable `MKL_DIR` to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using `FetchContent` commands.
+
+==== Linux install
+The build and install can for example be done like this on a Linux system:
 
 [source,bash]
 ----
@@ -67,7 +70,23 @@ PATH=$PATH:/$ONEAPI_ROOT/latest/bin
 ----
 ====
 
-On Windows, a command like this can be used:
+==== SYCL install
+There is an experimental computation mode for SYCL matrix operations, that can be enabled in the `mlp` tool using the flag `--computation=sycl`. This is only supported on Linux in combination with the Intel `icpx` compiler. It can be enabled using the following build command:
+[source]
+----
+source $ONEAPI_ROOT/setvars.sh
+cmake .. \
+-DCMAKE_C_COMPILER=$ONEAPI_ROOT/compiler/latest/bin/icx \
+-DCMAKE_CXX_COMPILER=$ONEAPI_ROOT/compiler/latest/bin/icpx \
+-DCMAKE_INSTALL_PREFIX=../install \
+-DCMAKE_BUILD_TYPE=RELEASE \
+-DENABLE_SYCL=ON
+----
+
+NOTE: The initial tests with SYCL matrix operations on CPU have a rather disappointing performance.
+
+==== Windows Visual Studio install
+On Windows, a Visual Studio command line build can be done like this:
 [source]
 ----
 cmake .. ^
@@ -566,7 +585,7 @@ include::../include/nerva/neural_networks/activation_functions.h[tag=doc]
 NOTE: Currently, there are some inconsistencies between the
 interfaces of layers, loss functions and activation functions. This may be changed in the future.
 
-==== Training a neural network
+=== Training a neural network
 The class `stochastic_gradient_descent_algorithm` can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:
 [.small-code]
 [source,cpp]
@@ -789,7 +808,7 @@ have been implemented using Eigen, see the file https://github.com/wiegerw/nerva
 The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] is used. Note that the MKL library is included in the https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html[Intel oneAPI base toolkit]. The Eigen library supports MKL by means of the compiler flag `EIGEN_USE_MKL_ALL`, see also https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html[TopicUsingIntelMKL.html].
 
 === Intel MKL library
-The Intel MKL library has a number of highly efficient, but extremely low-level implementation of matrix operations. See https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html[blas-and-sparse-blas-routines.html] for an overview. The {library} contains some matrix classes that hide those low-level details.
+The Intel MKL library has a number of highly efficient, but extremely low-level implementation of matrix operations. See https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html[blas-and-sparse-blas-routines.html] for an overview. The {library} library contains some matrix classes that hide those low-level details.
 The table below gives an overview of them.
 
 |===
@@ -809,7 +828,7 @@ https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Y
 
 TIP: In C++23 the implementation of sparse matrices in CSR format can be greatly simplified, as shown by https://github.com/BenBrock/matrix-cpos[Ben Brock].
 
-NOTE: The sparse CSR matrix functions in the MKL library use an argument of the opaque type `sparse_matrix_t`. It is used to store unknown properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix. See also the function `sparse_matrix_csr::construct_csr`.
+NOTE: The sparse CSR matrix functions in the MKL library take an argument of the opaque type `sparse_matrix_t`. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix. See also the function `sparse_matrix_csr::construct_csr`.
 
 === Nerva computation mode
 In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The {library} library uses a global setting `NervaComputation` to experiment with customized implementations. For example, the function `softmax_layer::feedforward` contains this:
