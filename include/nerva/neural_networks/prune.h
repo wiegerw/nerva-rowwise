@@ -57,11 +57,9 @@ std::pair<scalar, std::size_t> nth_element(FwdIt first, FwdIt last, std::size_t 
   return {value, num_copies};
 }
 
-/// Generic version of `std::nth_element` applied to accepted elements of a sequence [first, last).
-/// \param first an iterator
-/// \param last an iterator
+/// Generic version of `std::nth_element` applied to accepted elements of a sparse matrix.
 /// \param k an index in the range `0, ..., A.size() - 1)`
-/// \param accept a predicate function; only values \c x for which `accept(x) == true` are considered
+/// \param accept A predicate function. Accepted values are \c x for which `accept(x) == true`
 /// \param comp comparison function object
 /// \return A pair `(value, m)` with \c value the value of the element with index \c n, if the elements were
 /// sorted according to \c comp, and \c m the number of accepted elements equal to \c value in the range `0, ..., k-1`.
@@ -172,7 +170,6 @@ std::pair<std::size_t, std::size_t> limit_prune_counts(mkl::sparse_matrix_csr<Sc
 }
 
 /// Replaces the smallest \a count elements (in absolute value) from the matrix \a A
-/// \tparam Matrix eigen::matrix or mkl::sparse_matrix_csr
 /// \param A A matrix
 /// \param count The number of elements to be pruned
 /// \param accept Only weights that satisfy `accept` are pruned
@@ -228,7 +225,7 @@ std::size_t prune_negative_weights(mkl::sparse_matrix_csr<T>& A, std::size_t cou
 
 /// Replaces all elements \a x with `|x| <= threshold` from the matrix \a A
 /// \param A A matrix
-/// \param count The maximum number of elements to be pruned
+/// \param threshold The threshold value
 /// \param value The value that is assigned to the pruned elements (default 0)
 /// \return The number of elements that have been pruned
 template <typename Scalar>
@@ -256,11 +253,15 @@ std::size_t prune_SET(mkl::sparse_matrix_csr<Scalar>& A, scalar zeta, Scalar val
   return count;
 }
 
+// tag::doc[]
 struct prune_function
 {
+  /// Removes elements from the support of matrix `W`
   virtual std::size_t operator()(mkl::sparse_matrix_csr<scalar>& W) const = 0;
+
   virtual ~prune_function() = default;
 };
+// end::doc[]
 
 struct prune_magnitude_function: public prune_function
 {
