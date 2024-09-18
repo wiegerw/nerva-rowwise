@@ -566,16 +566,15 @@ pre.rouge .gs {
 <div id="toc" class="toc2">
 <div id="toctitle"><h3>Contents</h3></div>
 <ul class="sectlevel1">
+<li><a href="#_introduction">Introduction</a></li>
 <li><a href="#_installation">Installation</a>
 <ul class="sectlevel2">
-<li><a href="#_ubuntu_gcc">Ubuntu + gcc</a></li>
-<li><a href="#_windows">Windows</a></li>
+<li><a href="#_dependencies">Dependencies</a></li>
 </ul>
 </li>
 <li><a href="#_command_line_tools">Command line tools</a>
 <ul class="sectlevel2">
-<li><a href="#_the_tool_mlp">The tool mlp</a></li>
-<li><a href="#_the_mlp_command_line_options">The mlp command line options</a></li>
+<li><a href="#_the_tool_mlp_py">The tool mlp.py</a></li>
 </ul>
 </li>
 </ul>
@@ -584,17 +583,18 @@ pre.rouge .gs {
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-The documentation of this project is in the initial phase, so a lot is still missing.
-</td>
-</tr>
-</table>
+<style>
+  .small-code .content pre {
+      font-size: 0.7em;
+  }
+</style>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This document describes the Python bindings of the nerva-rowwise library.</p>
 </div>
 </div>
 </div>
@@ -602,77 +602,44 @@ The documentation of this project is in the initial phase, so a lot is still mis
 <h2 id="_installation">Installation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section explains how to install the <code>nerva</code> python module on Ubuntu and on Windows.</p>
+<p>The nerva-rowwise Python bindings can be installed via <code>pip</code>. The installation is done via a <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py">setup.py</a> script. The script has some dependencies, that are resolved using environment variables.</p>
 </div>
 <div class="sect2">
-<h3 id="_ubuntu_gcc">Ubuntu + gcc</h3>
-<div class="paragraph">
-<p>The Ubuntu build has been tested with Linux Mint 22, which is built on top of Ubuntu 24.04.</p>
+<h3 id="_dependencies">Dependencies</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Intel MKL library <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html">oneMKL</a></p>
+</li>
+<li>
+<p>FMT <a href="https://github.com/fmtlib/fmt" class="bare">https://github.com/fmtlib/fmt</a></p>
+</li>
+<li>
+<p>Eigen <a href="https://eigen.tuxfamily.org/" class="bare">https://eigen.tuxfamily.org/</a></p>
+</li>
+<li>
+<p>pybind11 <a href="https://github.com/pybind/pybind11" class="bare">https://github.com/pybind/pybind11</a></p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>The following packages need to be installed:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>pybind11-dev
-build-essential   # meta-packages that are necessary for compiling software
-python3-pip       # for installing python packages using pip
-python3-pybind11</code></pre>
-</div>
+<p>The MKL dependency can be resolved by setting the <code>MKL_ROOT</code> environment variable, or by setting the <code>ONEAPI_ROOT</code> environment variable.</p>
 </div>
 <div class="paragraph">
-<p>Also, some environment variables must be set for the dependencies. An example is
-given below</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>export ONEAPI_ROOT=/home/user/intel/oneapi
-export EIGEN_INCLUDE_DIR=/home/user/repos/libeigen/eigen
-export FMT_INCLUDE_DIR=/home/user/repos/fmtlib/fmt/include
-export LYRA_INCLUDE_DIR=/home/user/repos/bfgroup/Lyra/include
-export PYBIND11_INCLUDE_DIR=/home/user/repos/pybind11/pybind11/include</code></pre>
-</div>
+<p>To resolve the FMT, Eigen and pybind11 dependencies, the environment variables
+<code>EIGEN_INCLUDE_DIR</code>, <code>FMT_INCLUDE_DIR</code> and <code>PYBIND11_INCLUDE_DIR</code> can be set.</p>
 </div>
 <div class="paragraph">
-<p>Setting <code>EIGEN_INCLUDE_DIR</code> is optional. If it is omitted, the default value
-<code>/usr/include/eigen3</code> is used. Eigen can be installed from the GitLab repository,
-but it is also possible to use the system package <code>libeigen3-dev</code>.
-It is recommended to install the most recent version of the OneAPI library.</p>
+<p>An alternative solution is to use CMake to resolve these three dependencies, see also the
+<a href="nerva-c%2B%2B.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded in the <code>_deps</code> subdirectories of the CMake build directory. After that only the environment variable <code>CMAKE_DEPS_DIR</code> needs to be set.</p>
 </div>
 <div class="paragraph">
-<p>The <code>nerva</code> module can then be installed using</p>
+<p>The <code>nerva</code> Python module can then be installed using</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code>cd python
-pip3 install .</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_windows">Windows</h3>
-<div class="paragraph">
-<p>To get optimal performance, it may be needed to add compiler flags like <code>/arch:AVX2</code> manually to the <code>extra_compile_args</code> list in the file <a href="../python/setup.py" class="bare">../python/setup.py</a>. Unfortunately on Windows there seems to be no standard way to automatically select the correct flags.</p>
-</div>
-<div class="paragraph">
-<p>Just like on Ubuntu, environment variables must be set for the dependencies.
-An example is given below.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>set ONEAPI_ROOT="C:\Program Files (x86)\Intel\OneAPI"
-set EIGEN_INCLUDE_DIR=C:\repos\libeigen\eigen
-set FMT_INCLUDE_DIR=C:\repos\fmtlib\fmt\include
-set LYRA_INCLUDE_DIR=C:\repos\bfgroup\Lyra\include
-set PYBIND11_INCLUDE_DIR=C:\repos\pybind11\pybind11\include</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>nerva</code> package can then be installed using</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>pip install .</code></pre>
+pip install .</code></pre>
 </div>
 </div>
 </div>
@@ -685,13 +652,13 @@ set PYBIND11_INCLUDE_DIR=C:\repos\pybind11\pybind11\include</code></pre>
 <p>The tool <code>mlp.py</code> can be used to do training experiments with multilayer perceptrons.</p>
 </div>
 <div class="sect2">
-<h3 id="_the_tool_mlp">The tool mlp</h3>
+<h3 id="_the_tool_mlp_py">The tool mlp.py</h3>
 <div class="paragraph">
-<p>An example invocation of the <code>mlp</code> tool is</p>
+<p>An example invocation of the <code>mlp.py</code> tool is</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>../install/bin/mlp \
+<pre class="rouge highlight"><code>python ../python/tools/mlp.py \
     --layers="ReLU;ReLU;Linear" \
     --layer-sizes="3072,1024,1024,10" \
     --layer-weights=Xavier \
@@ -702,573 +669,38 @@ set PYBIND11_INCLUDE_DIR=C:\repos\pybind11\pybind11\include</code></pre>
     --batch-size=100 \
     --threads=12 \
     --overall-density=0.05 \
-    --cifar10=../data/cifar-10-batches-bin \
+    --datadir=../data \
     --seed=123</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from <a href="https://www.cs.toronto.edu/~kriz/cifar.html" class="bare">https://www.cs.toronto.edu/~kriz/cifar.html</a>.</p>
+<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that installs the CIFAR-10 dataset in the folder <code>../data</code> if it doesn&#8217;t yet exist.</p>
 </div>
 <div class="paragraph">
 <p>The output may look like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>=== Nerva c++ model ===
-Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
-Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
-Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
+<pre class="rouge highlight"><code>=== Nerva python model ===
+Sequential(
+  Sparse(output_size=1024, density=0.042382812500000006, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Sparse(output_size=1024, density=0.06357421875000001, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Dense(output_size=10, activation=NoActivation(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0)
+)
 loss = SoftmaxCrossEntropyLoss()
-scheduler = ConstantScheduler(lr=0.01)
+scheduler = ConstantScheduler(lr=0.009999999776482582)
 layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
 
-epoch   0 lr: 0.01000000  loss: 2.30284437  train accuracy: 0.07904000  test accuracy: 0.08060000 time: 0.00000000s
-epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test accuracy: 0.21320000 time: 2.74594253s
-epoch   2 lr: 0.01000000  loss: 1.91454245  train accuracy: 0.29976000  test accuracy: 0.29940000 time: 2.76982510s
-epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test accuracy: 0.35820000 time: 2.69554319s
-epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test accuracy: 0.40000000 time: 2.68532307s
-epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_mlp_command_line_options">The mlp command line options</h3>
-<div class="paragraph">
-<p>The <code>mlp</code> tool has the following command line options.
-Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].</p>
-</div>
-<div class="sect3">
-<h4 id="_general_options">General Options</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>-?</code>, <code>-h</code>, <code>--help</code>
-Display help information.</p>
-</li>
-<li>
-<p><code>--verbose</code>, <code>-v</code>
-Show verbose output.</p>
-</li>
-<li>
-<p><code>--debug</code>, <code>-d</code>
-Show debug output.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_random_generator">Random Generator</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--seed &lt;value&gt;</code>
-A seed value for the random generator.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_layer_configuration">Layer Configuration</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--layers &lt;value&gt;</code>
-A semicolon separated list of layers. For example, <code>--layers=ReLU;AllReLU(0.3);Linear</code> is used to specify a neural network with three layers with an ReLU, AllReLU and no activation function. The following layers are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Linear</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer without activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ReLU</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with ReLU activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Sigmoid</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with sigmoid activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Softmax</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with softmax activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LogSoftmax</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with log-softmax activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HyperbolicTangent</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with hyperbolic tangent activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AllReLU</code>(\(\alpha\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with All ReLU activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SReLU</code>(\(\alpha\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with SReLU activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TReLU</code>(\(\epsilon\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with trimmed ReLU activation</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BatchNorm</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Batch normalization layer</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--layer-sizes &lt;value&gt;</code>
-A comma-separated list of the sizes of linear layers of the multilayer perceptron. For example, <code>--layer-sizes=3072,1024,512,10</code> specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.</p>
-</li>
-<li>
-<p><code>--densities &lt;value&gt;</code>
-A comma-separated list of linear layer densities. By default, all linear layers are dense (i.e. have density 1.0). If only one value is
- specified, it will be used for all linear layers.</p>
-</li>
-<li>
-<p><code>--dropouts &lt;value&gt;</code>
-A comma-separated list of dropout rates of linear layers. By default, all linear layers have no dropout (i.e. dropout rate 0.0).</p>
-</li>
-<li>
-<p><code>--overall-density &lt;value&gt;</code>
-The overall density of the linear layers. This value should be in the interval \([0,1\)], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_training_configuration">Training Configuration</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--epochs &lt;value&gt;</code>
-The number of epochs of the training (default: 100).</p>
-</li>
-<li>
-<p><code>--batch-size &lt;value&gt;</code>
-The batch size of the training.</p>
-</li>
-<li>
-<p><code>--no-shuffle</code>
-Do not shuffle the dataset during training.</p>
-</li>
-<li>
-<p><code>--no-statistics</code>
-Do not display intermediate statistics during training.</p>
-</li>
-<li>
-<p><code>--optimizers &lt;value&gt;</code>
-A semicolon-separated list of optimizers used for linear and batch normalization layers. The following optimizers are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>GradientDescent</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Gradient descent optimization</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Momentum</code>(\(\mu\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Momentum optimization with momentum parameter \(\mu\)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Nesterov</code>(\(\mu\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Nesterov optimization with momentum parameter \(\mu\)</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--learning-rate &lt;value&gt;</code>
-A semicolon-separated list of learning rate schedulers of linear and batch normalization layers. If only one learning rate scheduler is specified, it is applied to all layers. The following learning rate schedulers are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Constant(lr)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Constant learning rate <code>lr</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TimeBased(lr, decay)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Adaptive learning rate with decay</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>StepBased(lr, drop_rate, change_rate)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Step based learning rate where the learning rate is regularly dropped
-to a lower value</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MultistepLR(lr, milestones, gamma)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Step based learning rate, where <code>milestones</code> contains the epoch numbers in which the learning rate is dropped.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Exponential(lr, change_rate)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Exponentially decreasing learning rate</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>See also <a href="https://en.wikipedia.org/wiki/Learning_rate" class="bare">https://en.wikipedia.org/wiki/Learning_rate</a>.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--loss &lt;value&gt;</code>
-The loss function used for training the multilayer perceptron. The following loss functions are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SquaredError</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Squared error loss.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CrossEntropy</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Cross entropy loss (N.B. prone to numerical problems!)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LogisticCrossEntropy</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logistic cross entropy loss.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SoftmaxCrossEntropy</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Softmax cross entropy loss. Matches <code>CrossEntropy</code> of PyTorch. Suitable for classification experiments.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NegativeLogLikelihood</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Negative log likelihood loss.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--layer-weights &lt;value&gt;</code>
-The generator that is used for initializing the weights of the linear layers. The following weight generators are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Xavier</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierNormalized</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Normalized Xavier weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>He</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Uniform</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Uniform weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Zero</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">All weights are zero (N.B. This usually doesn&#8217;t work)</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--load-weights &lt;value&gt;</code>
-Load weights and biases from a dictionary in NumPy <code>.npz</code> format.
-The weight matrices should be stored with keys <code>W1,W2,&#8230;&#8203;</code> and the bias vectors with keys <code>b1,b2,&#8230;&#8203;</code>.
-See also
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>.</p>
-</li>
-<li>
-<p><code>--save-weights &lt;value&gt;</code>
-Save weights and biases to a dictionary in NumPy <code>.npz</code> format.
-The weight matrices are stored with keys <code>W1,W2,&#8230;&#8203;</code> and the bias vectors with keys <code>b1,b2,&#8230;&#8203;</code>.
-See also
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_dataset_options">Dataset Options</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--cifar10 &lt;value&gt;</code>
-Specify the location of the binary version of the
-<a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> dataset. This is a directory with subdirectory <code>cifar-10-batches-bin</code>.</p>
-</li>
-<li>
-<p><code>--dataset &lt;value&gt;</code>
-Specify a synthetic dataset to use. The following datasets are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-<th class="tableblock halign-left valign-top">Features</th>
-<th class="tableblock halign-left valign-top">Classes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>checkerboard</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A checkerboard pattern, see also <a href="https://kaifishr.github.io/2021/01/14/micro-mlp.html#checkerboard">checkerboard</a>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mini</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A dataset with random values.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--dataset-size &lt;value&gt;</code>
-The size of the synthetic dataset (default: 1000).</p>
-</li>
-<li>
-<p><code>--load-dataset &lt;value&gt;</code>
-Load the dataset from a file in NumPy <code>.npz</code> format. See <code>--load-weights</code> for information about the format.</p>
-</li>
-<li>
-<p><code>--save-dataset &lt;value&gt;</code>
-Save the dataset to a file in NumPy <code>.npz</code> format. See <code>--save-weights</code> for information about the format.</p>
-</li>
-<li>
-<p><code>--normalize</code>
-Normalize the dataset.</p>
-</li>
-<li>
-<p><code>--preprocessed &lt;value&gt;</code>
-A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <code>--load-weights</code> for information about the format. This can for example be used to store preprocessed datasets. A script <a href="../python/tools/create_cifar10_datasets.py">create_cifar10_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_miscellaneous_options">Miscellaneous options</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--precision &lt;value&gt;</code>
-The precision used for printing matrices.</p>
-</li>
-<li>
-<p><code>--info</code>
-Print detailed information about the multilayer perceptron.</p>
-</li>
-<li>
-<p><code>--timer</code>
-Print timer messages.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_pruning_and_growing_strategies">Pruning and Growing Strategies</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--prune &lt;strategy&gt;</code>
-The strategy used for pruning sparse weight matrices. The following strategies are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Magnitude(&lt;drop_fraction&gt;)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Magnitude based pruning. A fraction of the weights with the smallest absolute value is dropped.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SET(&lt;drop_fraction&gt;)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SET pruning (TODO).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Threshold(&lt;value&gt;)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Weights below the given threshold are pruned.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--grow &lt;strategy&gt;</code>
-The strategy used for growing in sparse weight matrices. The following strategies are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Random</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Weights are added at random positions (outside the support of the sparse matrix).</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--grow-weights &lt;value&gt;</code>
-The weight generation function used for growing weights. See <code>--layer-weights</code> for supported values.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_computation_options">Computation Options</h4>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--computation &lt;value&gt;</code>
-The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>eigen</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">All computations are done using the Eigen library. Note that by setting the flag <code>EIGEN_USE_MKL_ALL</code> Eigen will attempt to use MKL library calls.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mkl</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Some computations are implemented using MKL functions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>blas</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Some computations are implemented using BLAS functions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sycl</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Some computations are implemented using SYCL functions.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--clip &lt;value&gt;</code>
-A threshold value used to set small elements of weight matrices to zero.</p>
-</li>
-<li>
-<p><code>--threads &lt;value&gt;</code>
-The number of threads used by the MKL and OMP libraries.</p>
-</li>
-<li>
-<p><code>--gradient-step &lt;value&gt;</code>
-If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.</p>
-</li>
-</ul>
+
+=== Training Nerva model ===
+epoch   0  lr: 0.01000000  loss: 2.30246344  train accuracy: 0.10724000  test accuracy: 0.11390000  time: 0.00000000s
+epoch   1  lr: 0.01000000  loss: 1.89570341  train accuracy: 0.32142000  test accuracy: 0.32030000  time: 4.15395873s
+epoch   2  lr: 0.01000000  loss: 1.66956488  train accuracy: 0.40332000  test accuracy: 0.40220000  time: 3.60670412s
+epoch   3  lr: 0.01000000  loss: 1.53549386  train accuracy: 0.45616000  test accuracy: 0.44940000  time: 3.24853144s
+epoch   4  lr: 0.01000000  loss: 1.43913857  train accuracy: 0.49054000  test accuracy: 0.47920000  time: 3.29059404s
+epoch   5  lr: 0.01000000  loss: 1.36875251  train accuracy: 0.51380000  test accuracy: 0.49070000  time: 3.83244992s
+epoch   6  lr: 0.01000000  loss: 1.29761993  train accuracy: 0.54106000  test accuracy: 0.50710000  time: 3.59350869s
+epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test accuracy: 0.51690000  time: 3.96624650s</code></pre>
 </div>
 </div>
 </div>
@@ -1277,7 +709,7 @@ If this value is set, gradient checks are performed with the given step size. Th
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-18 15:24:05 UTC
+Last updated 2024-09-18 15:24:26 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

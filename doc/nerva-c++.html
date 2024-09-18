@@ -654,7 +654,7 @@ pre.rouge .gs {
 <div class="paragraph">
 <p>The build and install can for example be done like this on a Linux system:</p>
 </div>
-<div class="listingblock">
+<div id="cmake-build" class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash"><span class="nb">mkdir </span>build
 <span class="nb">cd </span>build
@@ -686,8 +686,8 @@ Setting the <code>MKL_DIR</code> variable is not necessary if the OneAPI <code>s
 </td>
 <td class="content">
 For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
-<a href="https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044" class="bare">https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044</a>
-and <a href="https://gitlab.com/libeigen/eigen/-/issues/2586" class="bare">https://gitlab.com/libeigen/eigen/-/issues/2586</a> for more details.
+<a href="https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044">1456044</a>
+and <a href="https://gitlab.com/libeigen/eigen/-/issues/2586">issues/2586</a> for more details.
 To resolve this issue, a hack has been applied in Nerva: by defining the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code>,
 the inclusion of the offending header file is prevented.
 </td>
@@ -775,7 +775,7 @@ nmake install</code></pre>
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-The number of threads that are used at runtime by the MKL library can be controlled using the environment variables <code>MKL_NUM_THREADS</code> and <code>OMP_NUM_THREADS</code>, see also <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html" class="bare">https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html</a>.
+The number of threads that are used at runtime by the MKL library can be controlled using the environment variables <code>MKL_NUM_THREADS</code> and <code>OMP_NUM_THREADS</code>, see also <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html">techniques-to-set-the-number-of-threads.html</a>.
 </td>
 </tr>
 </table>
@@ -1781,7 +1781,7 @@ the neural network parameters <code>Θ</code>, compute the
 output <code>Y</code>.</p>
 </li>
 <li>
-<p><strong>backpropagation:</strong> Given output <code>Y</code> corresponding to input <code>X</code> and targets <code>T</code>, compute the gradient of the loss <code>DY</code>. Then from <code>Y</code> and <code>DY</code>, compute the gradient <code>DΘ</code> of the parameters <code>Θ</code>.</p>
+<p><strong>backpropagation:</strong> Given output <code>Y</code> corresponding to input <code>X</code> and targets <code>T</code>, compute the gradient  <code>DY</code> of <code>Y</code> with respect to the loss function. Then from <code>Y</code> and <code>DY</code>, compute the gradient <code>DΘ</code> of the parameters <code>Θ</code>.</p>
 </li>
 <li>
 <p><strong>optimization:</strong> Given the gradient <code>DΘ</code>, update
@@ -2359,7 +2359,9 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="k">struct</span> <span class="nc">prune_function</span>
 <span class="p">{</span>
-  <span class="c1">/// Removes elements from the support of matrix `W`</span>
+  <span class="c1">/// Removes elements from the support of a sparse matrix</span>
+  <span class="c1">/// @param W A sparse matrix</span>
+  <span class="c1">/// @return The number of elements removed from the support</span>
   <span class="k">virtual</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="k">operator</span><span class="p">()(</span><span class="n">mkl</span><span class="o">::</span><span class="n">sparse_matrix_csr</span><span class="o">&lt;</span><span class="n">scalar</span><span class="o">&gt;&amp;</span> <span class="n">W</span><span class="p">)</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
   <span class="k">virtual</span> <span class="o">~</span><span class="n">prune_function</span><span class="p">()</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
@@ -2378,7 +2380,7 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 </div>
 </div>
 <div class="paragraph">
-<p>In the command line tool <code>mlp</code> the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute <code>regrow_function</code> that applies pruning and growing to an MLP. See also the <a href="#on_start_epoch">[on_start_epoch]</a> event.</p>
+<p>In the command line tool <code>mlp</code> the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute <code>regrow_function</code> that applies pruning and growing to the sparse layers of an MLP. See also the <a href="#on_start_epoch">[on_start_epoch]</a> event.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2424,7 +2426,7 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-18 15:24:05 UTC
+Last updated 2024-09-18 15:24:26 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
