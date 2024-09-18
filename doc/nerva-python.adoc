@@ -12,362 +12,81 @@
 :description: Documentation for the nerva-rowwise repository.
 :library: nerva-rowwise
 :imagesdir: images
+:bibliography: nerva.bib
 Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
 :tip-caption: :bulb:
 endif::[]
 
-IMPORTANT: The documentation of this project is in the initial phase, so a lot is still missing.
+++++
+<style>
+  .small-code .content pre {
+      font-size: 0.7em;
+  }
+</style>
+++++
+
+== Introduction
+This document describes the Python bindings of the {library} library.
 
 == Installation
+The {library} Python bindings can be installed via `pip`. The installation is done via a https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py[setup.py] script. The script has some dependencies, that are resolved using environment variables.
 
-This section explains how to install the `nerva` python module on Ubuntu and on Windows.
+=== Dependencies
+- Intel MKL library https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html[oneMKL]
+- FMT https://github.com/fmtlib/fmt
+- Eigen https://eigen.tuxfamily.org/
+- pybind11 https://github.com/pybind/pybind11
 
-=== Ubuntu + gcc
-The Ubuntu build has been tested with Linux Mint 22, which is built on top of Ubuntu 24.04.
+The MKL dependency can be resolved by setting the `MKL_ROOT` environment variable, or by setting the `ONEAPI_ROOT` environment variable.
 
-The following packages need to be installed:
+To resolve the FMT, Eigen and pybind11 dependencies, the environment variables
+`EIGEN_INCLUDE_DIR`, `FMT_INCLUDE_DIR` and `PYBIND11_INCLUDE_DIR` can be set.
 
-[source]
-----
-pybind11-dev
-build-essential   # meta-packages that are necessary for compiling software
-python3-pip       # for installing python packages using pip
-python3-pybind11
-----
+An alternative solution is to use CMake to resolve these three dependencies, see also the
+link:nerva-c%2B%2B.adoc#cmake-build[CMake install] section in the C++ documentation. The `cmake` command causes the three libraries to be downloaded in the `_deps` subdirectories of the CMake build directory. After that only the environment variable `CMAKE_DEPS_DIR` needs to be set.
 
-Also, some environment variables must be set for the dependencies. An example is
-given below
-
-[source]
-----
-export ONEAPI_ROOT=/home/user/intel/oneapi
-export EIGEN_INCLUDE_DIR=/home/user/repos/libeigen/eigen
-export FMT_INCLUDE_DIR=/home/user/repos/fmtlib/fmt/include
-export LYRA_INCLUDE_DIR=/home/user/repos/bfgroup/Lyra/include
-export PYBIND11_INCLUDE_DIR=/home/user/repos/pybind11/pybind11/include
-----
-Setting `EIGEN_INCLUDE_DIR` is optional. If it is omitted, the default value
-`/usr/include/eigen3` is used. Eigen can be installed from the GitLab repository,
-but it is also possible to use the system package `libeigen3-dev`.
-It is recommended to install the most recent version of the OneAPI library.
-
-The `nerva` module can then be installed using
-
+The `nerva` Python module can then be installed using
 [source]
 ----
 cd python
-pip3 install .
-----
-
-=== Windows
-To get optimal performance, it may be needed to add compiler flags like `/arch:AVX2` manually to the `extra_compile_args` list in the file link:../python/setup.py[]. Unfortunately on Windows there seems to be no standard way to automatically select the correct flags.
-
-Just like on Ubuntu, environment variables must be set for the dependencies.
-An example is given below.
-
-[source]
-----
-set ONEAPI_ROOT="C:\Program Files (x86)\Intel\OneAPI"
-set EIGEN_INCLUDE_DIR=C:\repos\libeigen\eigen
-set FMT_INCLUDE_DIR=C:\repos\fmtlib\fmt\include
-set LYRA_INCLUDE_DIR=C:\repos\bfgroup\Lyra\include
-set PYBIND11_INCLUDE_DIR=C:\repos\pybind11\pybind11\include
-----
-
-The `nerva` package can then be installed using
-
-[source]
-----
 pip install .
 ----
 
 == Command line tools
 The tool `mlp.py` can be used to do training experiments with multilayer perceptrons.
 
-=== The tool mlp
-An example invocation of the `mlp` tool is
+=== The tool mlp.py
+An example invocation of the `mlp.py` tool is
 
 [source]
 ----
-include::../examples/doc_mpl.sh[tag=doc]
+include::../examples/doc_mlp_python.sh[tag=doc]
 ----
-This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from https://www.cs.toronto.edu/~kriz/cifar.html.
+This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that installs the CIFAR-10 dataset in the folder `../data` if it doesn't yet exist.
 
 The output may look like this:
 [source]
 ----
-=== Nerva c++ model ===
-Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
-Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
-Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
+=== Nerva python model ===
+Sequential(
+  Sparse(output_size=1024, density=0.042382812500000006, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Sparse(output_size=1024, density=0.06357421875000001, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Dense(output_size=10, activation=NoActivation(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0)
+)
 loss = SoftmaxCrossEntropyLoss()
-scheduler = ConstantScheduler(lr=0.01)
+scheduler = ConstantScheduler(lr=0.009999999776482582)
 layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
 
-epoch   0 lr: 0.01000000  loss: 2.30284437  train accuracy: 0.07904000  test accuracy: 0.08060000 time: 0.00000000s
-epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test accuracy: 0.21320000 time: 2.74594253s
-epoch   2 lr: 0.01000000  loss: 1.91454245  train accuracy: 0.29976000  test accuracy: 0.29940000 time: 2.76982510s
-epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test accuracy: 0.35820000 time: 2.69554319s
-epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test accuracy: 0.40000000 time: 2.68532307s
-epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s
+
+=== Training Nerva model ===
+epoch   0  lr: 0.01000000  loss: 2.30246344  train accuracy: 0.10724000  test accuracy: 0.11390000  time: 0.00000000s
+epoch   1  lr: 0.01000000  loss: 1.89570341  train accuracy: 0.32142000  test accuracy: 0.32030000  time: 4.15395873s
+epoch   2  lr: 0.01000000  loss: 1.66956488  train accuracy: 0.40332000  test accuracy: 0.40220000  time: 3.60670412s
+epoch   3  lr: 0.01000000  loss: 1.53549386  train accuracy: 0.45616000  test accuracy: 0.44940000  time: 3.24853144s
+epoch   4  lr: 0.01000000  loss: 1.43913857  train accuracy: 0.49054000  test accuracy: 0.47920000  time: 3.29059404s
+epoch   5  lr: 0.01000000  loss: 1.36875251  train accuracy: 0.51380000  test accuracy: 0.49070000  time: 3.83244992s
+epoch   6  lr: 0.01000000  loss: 1.29761993  train accuracy: 0.54106000  test accuracy: 0.50710000  time: 3.59350869s
+epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test accuracy: 0.51690000  time: 3.96624650s
 ----
-
-=== The mlp command line options
-The `mlp` tool has the following command line options.
-Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].
-
-==== General Options
-* `-?`, `-h`, `--help`
-Display help information.
-* `--verbose`, `-v`
-Show verbose output.
-* `--debug`, `-d`
-Show debug output.
-
-==== Random Generator
-* `--seed <value>`
-A seed value for the random generator.
-
-==== Layer Configuration
-* `--layers <value>`
-A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);Linear` is used to specify a neural network with three layers with an ReLU, AllReLU and no activation function. The following layers are supported:
-
-|===
-|Specification |Description
-
-|`Linear`
-|Linear layer without activation
-
-|`ReLU`
-|Linear layer with ReLU activation
-
-|`Sigmoid`
-|Linear layer with sigmoid activation
-
-|`Softmax`
-|Linear layer with softmax activation
-
-|`LogSoftmax`
-|Linear layer with log-softmax activation
-
-|`HyperbolicTangent`
-|Linear layer with hyperbolic tangent activation
-
-|`AllReLU`(stem:[\alpha])
-|Linear layer with All ReLU activation
-
-|`SReLU`(stem:[\alpha])
-|Linear layer with SReLU activation
-
-|`TReLU`(stem:[\epsilon])
-|Linear layer with trimmed ReLU activation
-
-|`BatchNorm`
-|Batch normalization layer
-|===
-
-* `--layer-sizes <value>`
-A comma-separated list of the sizes of linear layers of the multilayer perceptron. For example, `--layer-sizes=3072,1024,512,10` specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.
-* `--densities <value>`
-A comma-separated list of linear layer densities. By default, all linear layers are dense (i.e. have density 1.0). If only one value is
- specified, it will be used for all linear layers.
-* `--dropouts <value>`
-A comma-separated list of dropout rates of linear layers. By default, all linear layers have no dropout (i.e. dropout rate 0.0).
-* `--overall-density <value>`
-The overall density of the linear layers. This value should be in the interval stem:[[0,1]], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.
-
-==== Training Configuration
-* `--epochs <value>`
-The number of epochs of the training (default: 100).
-* `--batch-size <value>`
-The batch size of the training.
-* `--no-shuffle`
-Do not shuffle the dataset during training.
-* `--no-statistics`
-Do not display intermediate statistics during training.
-* `--optimizers <value>`
-A semicolon-separated list of optimizers used for linear and batch normalization layers. The following optimizers are supported:
-|===
-|Specification |Description
-
-|`GradientDescent`
-|Gradient descent optimization
-
-|`Momentum`(stem:[\mu])
-|Momentum optimization with momentum parameter stem:[\mu]
-
-|`Nesterov`(stem:[\mu])
-|Nesterov optimization with momentum parameter stem:[\mu]
-|===
-
-* `--learning-rate <value>`
-A semicolon-separated list of learning rate schedulers of linear and batch normalization layers. If only one learning rate scheduler is specified, it is applied to all layers. The following learning rate schedulers are supported:
-|===
-|Specification |Description
-
-|`Constant(lr)`
-|Constant learning rate `lr`
-
-|`TimeBased(lr, decay)`
-|Adaptive learning rate with decay
-
-|`StepBased(lr, drop_rate, change_rate)`
-|Step based learning rate where the learning rate is regularly dropped
-to a lower value
-
-|`MultistepLR(lr, milestones, gamma)`
-|Step based learning rate, where `milestones` contains the epoch numbers in which the learning rate is dropped.
-
-|`Exponential(lr, change_rate)`
-|Exponentially decreasing learning rate
-|===
-See also https://en.wikipedia.org/wiki/Learning_rate.
-
-* `--loss <value>`
-The loss function used for training the multilayer perceptron. The following loss functions are supported:
-|===
-|Specification |Description
-
-|`SquaredError`
-|Squared error loss.
-
-|`CrossEntropy`
-|Cross entropy loss (N.B. prone to numerical problems!)
-
-|`LogisticCrossEntropy`
-|Logistic cross entropy loss.
-
-|`SoftmaxCrossEntropy`
-|Softmax cross entropy loss. Matches `CrossEntropy` of PyTorch. Suitable for classification experiments.
-
-|`NegativeLogLikelihood`
-|Negative log likelihood loss.
-|===
-
-* `--layer-weights <value>`
-The generator that is used for initializing the weights of the linear layers. The following weight generators are supported:
-|===
-|Specification |Description
-
-|`Xavier`
-|Xavier weights
-
-|`XavierNormalized`
-|Normalized Xavier weights
-
-|`He`
-|Kaiming He weights
-
-|`Uniform`
-|Uniform weights
-
-|`Zero`
-|All weights are zero (N.B. This usually doesn't work)
-|===
-
-* `--load-weights <value>`
-Load weights and biases from a dictionary in NumPy `.npz` format.
-The weight matrices should be stored with keys `W1,W2,...` and the bias vectors with keys `b1,b2,...`.
-See also
-link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
-
-* `--save-weights <value>`
-Save weights and biases to a dictionary in NumPy `.npz` format.
-The weight matrices are stored with keys `W1,W2,...` and the bias vectors with keys `b1,b2,...`.
-See also
-link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
-
-==== Dataset Options
-* `--cifar10 <value>`
-Specify the location of the binary version of the
-link:https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] dataset. This is a directory with subdirectory `cifar-10-batches-bin`.
-* `--dataset <value>`
-Specify a synthetic dataset to use. The following datasets are supported:
-|===
-|Specification |Description |Features |Classes
-
-|`checkerboard`
-|A checkerboard pattern, see also link:https://kaifishr.github.io/2021/01/14/micro-mlp.html#checkerboard[checkerboard].
-|2
-|2
-
-|`mini`
-|A dataset with random values.
-|3
-|2
-|===
-
-* `--dataset-size <value>`
-The size of the synthetic dataset (default: 1000).
-* `--load-dataset <value>`
-Load the dataset from a file in NumPy `.npz` format. See `--load-weights` for information about the format.
-* `--save-dataset <value>`
-Save the dataset to a file in NumPy `.npz` format. See `--save-weights` for information about the format.
-* `--normalize`
-Normalize the dataset.
-* `--preprocessed <value>`
-A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to store preprocessed datasets. A script link:../python/tools/create_cifar10_datasets.py[create_cifar10_datasets.py] is available for creating augmented CIFAR-10 datasets.
-
-==== Miscellaneous options
-* `--precision <value>`
-The precision used for printing matrices.
-* `--info`
-Print detailed information about the multilayer perceptron.
-* `--timer`
-Print timer messages.
-
-==== Pruning and Growing Strategies
-* `--prune <strategy>`
-The strategy used for pruning sparse weight matrices. The following strategies are supported:
-|===
-|Specification |Description
-
-|`Magnitude(<drop_fraction>)`
-|Magnitude based pruning. A fraction of the weights with the smallest absolute value is dropped.
-
-|`SET(<drop_fraction>)`
-|SET pruning (TODO).
-
-|`Threshold(<value>)`
-|Weights below the given threshold are pruned.
-|===
-
-* `--grow <strategy>`
-The strategy used for growing in sparse weight matrices. The following strategies are supported:
-|===
-|Specification |Description
-
-|`Random`
-|Weights are added at random positions (outside the support of the sparse matrix).
-|===
-
-* `--grow-weights <value>`
-The weight generation function used for growing weights. See `--layer-weights` for supported values.
-
-==== Computation Options
-* `--computation <value>`
-The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:
-|===
-|Specification |Description
-
-|`eigen`
-|All computations are done using the Eigen library. Note that by setting the flag `EIGEN_USE_MKL_ALL` Eigen will attempt to use MKL library calls.
-
-|`mkl`
-|Some computations are implemented using MKL functions.
-
-|`blas`
-|Some computations are implemented using BLAS functions.
-
-|`sycl`
-|Some computations are implemented using SYCL functions.
-|===
-
-* `--clip <value>`
-A threshold value used to set small elements of weight matrices to zero.
-* `--threads <value>`
-The number of threads used by the MKL and OMP libraries.
-* `--gradient-step <value>`
-If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.

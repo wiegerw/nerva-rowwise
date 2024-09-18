@@ -256,7 +256,9 @@ std::size_t prune_SET(mkl::sparse_matrix_csr<Scalar>& A, scalar zeta, Scalar val
 // tag::doc[]
 struct prune_function
 {
-  /// Removes elements from the support of matrix `W`
+  /// Removes elements from the support of a sparse matrix
+  /// @param W A sparse matrix
+  /// @return The number of elements removed from the support
   virtual std::size_t operator()(mkl::sparse_matrix_csr<scalar>& W) const = 0;
 
   virtual ~prune_function() = default;

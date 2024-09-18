@@ -41,6 +41,7 @@ Using CMake, the {library} library can be built in a standard way. The only prer
 ==== Linux install
 The build and install can for example be done like this on a Linux system:
 
+[[cmake-build]]
 [source,bash]
 ----
 mkdir build
@@ -55,8 +56,8 @@ make install
 TIP: Setting the `MKL_DIR` variable is not necessary if the OneAPI `setvars.sh` script is run beforehand.
 
 NOTE: For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
-https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044
-and https://gitlab.com/libeigen/eigen/-/issues/2586 for more details.
+https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044[1456044]
+and https://gitlab.com/libeigen/eigen/-/issues/2586[issues/2586] for more details.
 To resolve this issue, a hack has been applied in Nerva: by defining the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H`,
 the inclusion of the offending header file is prevented.
 
@@ -104,7 +105,7 @@ The unit tests can be run using the command
 ctest -R nerva
 ----
 
-TIP: The number of threads that are used at runtime by the MKL library can be controlled using the environment variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`, see also https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html.
+TIP: The number of threads that are used at runtime by the MKL library can be controlled using the environment variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`, see also https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html[techniques-to-set-the-number-of-threads.html].
 
 == Command line tools
 The following command line tools are available. They can be found in the `tools` directory.
@@ -128,7 +129,7 @@ The tool `mlp` can be used for training multilayer perceptrons. An example invoc
 [.small-code]
 [source,bash]
 ----
-include::../examples/doc_mpl.sh[tag=doc]
+include::../examples/doc_mlp.sh[tag=doc]
 ----
 This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from https://www.cs.toronto.edu/~kriz/cifar.html.
 
@@ -621,7 +622,7 @@ In every epoch, the dataset is divided into `K` batches. A batch `X` consists of
 . *feedforward:* Given an input batch `X` and
 the neural network parameters `Θ`, compute the
 output `Y`.
-. *backpropagation:* Given output `Y` corresponding to input `X` and targets `T`, compute the gradient of the loss `DY`. Then from `Y` and `DY`, compute the gradient `DΘ` of the parameters `Θ`.
+. *backpropagation:* Given output `Y` corresponding to input `X` and targets `T`, compute the gradient  `DY` of `Y` with respect to the loss function. Then from `Y` and `DY`, compute the gradient `DΘ` of the parameters `Θ`.
 . *optimization:* Given the gradient `DΘ`, update
 the parameters `Θ`.
 
@@ -970,7 +971,7 @@ include::../include/nerva/neural_networks/prune.h[tag=doc]
 include::../include/nerva/neural_networks/grow.h[tag=doc]
 ----
 
-In the command line tool `mlp` the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute `regrow_function` that applies pruning and growing to an MLP. See also the <<on_start_epoch>> event.
+In the command line tool `mlp` the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute `regrow_function` that applies pruning and growing to the sparse layers of an MLP. See also the <<on_start_epoch>> event.
 
 === Experiments with sparse training
 In cite:[wesselink2024nervatrulysparseimplementation] we report on some of our experiments with sparse neural networks.
