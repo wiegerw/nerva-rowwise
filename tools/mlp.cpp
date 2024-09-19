@@ -25,6 +25,7 @@
 
 #include "omp.h"
 #include "fmt/format.h"
+#include <algorithm>
 #include <iostream>
 #include <random>
 
@@ -41,8 +42,12 @@ auto parse_linear_layer_densities(const std::string& densities_text,
                                   double overall_density,
                                   const std::vector<std::size_t>& linear_layer_sizes) -> std::vector<double>
 {
-  std::vector<double> densities = parse_comma_separated_real_numbers(densities_text);
-  auto n = linear_layer_sizes.size() - 1;  // the number of linear layers
+  std::vector<std::string> words = utilities::regex_split(utilities::trim_copy(densities_text), ";");
+  std::vector<double> densities;
+  std::transform(words.begin(), words.end(), std::back_inserter(densities),
+    [](const std::string& word){ return std::stold(word); });
+
+  std::size_t n = linear_layer_sizes.size() - 1;  // the number of linear layers
 
   if (densities.empty())
   {
@@ -56,9 +61,14 @@ auto parse_linear_layer_densities(const std::string& densities_text,
     }
   }
 
+  if (densities.size() == 1)
+  {
+    return std::vector<double>(n, densities.front());
+  }
+
   if (densities.size() != n)
   {
-    throw std::runtime_error("the number of densities does not match with the number of linear layers");
+    throw std::runtime_error(fmt::format("The number of densities {} does not match with the number of linear layers {}.", densities.size(), n));
   }
 
   return densities;
@@ -67,16 +77,26 @@ auto parse_linear_layer_densities(const std::string& densities_text,
 inline
 auto parse_linear_layer_dropouts(const std::string& dropouts_text, std::size_t linear_layer_count) -> std::vector<double>
 {
-  std::vector<double> dropouts = parse_comma_separated_real_numbers(dropouts_text);
+  std::vector<std::string> words = utilities::regex_split(utilities::trim_copy(dropouts_text), ";");
+  std::vector<double> dropouts;
+  std::transform(words.begin(), words.end(), std::back_inserter(dropouts),
+    [](const std::string& word){ return std::stold(word); });
+
+  std::size_t n = linear_layer_count;
 
   if (dropouts.empty())
   {
     return std::vector<double>(linear_layer_count, 0.0);
   }
 
-  if (dropouts.size() != linear_layer_count)
+  if (dropouts.size() == 1)
   {
-    throw std::runtime_error("the number of dropouts does not match with the number of linear layers");
+    return std::vector<double>(n, dropouts.front());
+  }
+
+  if (dropouts.size() != n)
+  {
+    throw std::runtime_error(fmt::format("The number of dropouts {} does not match with the number of linear layers {}.", dropouts.size(), n));
   }
 
   return dropouts;
@@ -90,13 +110,12 @@ auto parse_layer_weights(const std::string& text, std::size_t linear_layer_count
   std::vector<std::string> words = utilities::regex_split(utilities::trim_copy(text), ";");
   if (words.size() == 1)
   {
-    auto init = words.front();
-    return { n, init };
+    return { n, words.front() };
   }
 
   if (words.size() != n)
   {
-    throw std::runtime_error(fmt::format("the number of weight initializers ({}) does not match with the number of linear layers ({})", words.size(), n));
+    throw std::runtime_error(fmt::format("The number of weight initializers ({}) does not match with the number of linear layers ({}).", words.size(), n));
   }
 
   return words;
@@ -105,7 +124,7 @@ auto parse_layer_weights(const std::string& text, std::size_t linear_layer_count
 inline
 auto parse_optimizers(const std::string& text, std::size_t count) -> std::vector<std::string>
 {
-  std::vector<std::string> words = utilities::regex_split(text, "\\s*,\\s*");
+  std::vector<std::string> words = utilities::regex_split(utilities::trim_copy(text), ";");
   if (words.empty())
   {
     return {count, "GradientDescent"};

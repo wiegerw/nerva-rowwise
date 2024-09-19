@@ -9,22 +9,6 @@
 
 #pragma once
 
-// supported layers:
-//
-// Linear
-// Sigmoid
-// ReLU
-// Softmax
-// LogSoftmax
-// HyperbolicTangent
-// AllRelu(<alpha>)
-// LeakyRelu(<alpha>)
-// TReLU(<epsilon>)
-// SReLU(<al>,<tl>,<ar>,<tr>)
-//
-// BatchNorm
-// Dropout(<rate>)
-
 #include "nerva/neural_networks/parse_layer_utilities.h"
 #include "nerva/neural_networks/layers.h"
 #include "nerva/neural_networks/batch_normalization_layers.h"
@@ -94,15 +78,15 @@ std::shared_ptr<dense_linear_layer> make_dense_linear_layer(std::size_t D,
     set_linear_layer_optimizer(*layer, optimizer);
     return layer;
   }
-  else if (func.name == "AllRelu")
+  else if (func.name == "AllReLU")
   {
     scalar alpha = func.as_scalar("alpha");
-    auto layer = std::make_shared<dense_trelu_layer>(D, K, N, alpha);
+    auto layer = std::make_shared<dense_all_relu_layer>(D, K, N, alpha);
     set_weights_and_bias(*layer, weights, rng);
     set_linear_layer_optimizer(*layer, optimizer);
     return layer;
   }
-  else if (func.name == "LeakyRelu")
+  else if (func.name == "LeakyReLU")
   {
     scalar alpha = func.as_scalar("alpha");
     auto layer = std::make_shared<dense_leaky_relu_layer>(D, K, N, alpha);
@@ -129,7 +113,7 @@ std::shared_ptr<dense_linear_layer> make_dense_linear_layer(std::size_t D,
     set_srelu_layer_optimizer(*layer, optimizer);
     return layer;
   }
-  throw std::runtime_error("unsupported dense layer '" + func.name + "'");
+  throw std::runtime_error("Unsupported dense layer '" + func.name + "'");
 }
 
 inline
@@ -195,7 +179,7 @@ std::shared_ptr<sparse_linear_layer> make_sparse_linear_layer(std::size_t D,
   else if (func.name == "AllReLU")
   {
     scalar alpha = func.as_scalar("alpha");
-    auto layer = std::make_shared<sparse_trelu_layer>(D, K, N, alpha);
+    auto layer = std::make_shared<sparse_all_relu_layer>(D, K, N, alpha);
     set_support_random(*layer, density, rng);
     set_weights_and_bias(*layer, weights, rng);
     set_linear_layer_optimizer(*layer, optimizer);
@@ -288,7 +272,7 @@ std::shared_ptr<neural_network_layer> make_dense_linear_dropout_layer(std::size_
     set_linear_layer_optimizer(*layer, optimizer);
     return layer;
   }
-  else if (func.name == "AllRelu")
+  else if (func.name == "AllReLU")
   {
     scalar alpha = func.as_scalar("alpha");
     auto layer = std::make_shared<dense_trelu_dropout_layer>(D, K, N, dropout, alpha);
@@ -296,7 +280,7 @@ std::shared_ptr<neural_network_layer> make_dense_linear_dropout_layer(std::size_
     set_linear_layer_optimizer(*layer, optimizer);
     return layer;
   }
-  else if (func.name == "LeakyRelu")
+  else if (func.name == "LeakyReLU")
   {
     scalar alpha = func.as_scalar("alpha");
     auto layer = std::make_shared<dense_leaky_relu_dropout_layer>(D, K, N, dropout, alpha);

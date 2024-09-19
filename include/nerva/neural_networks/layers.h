@@ -429,6 +429,9 @@ struct softmax_layer : public linear_layer<Matrix>
   using super::Db;
   using super::X;
   using super::DX;
+  using super::input_size;
+  using super::output_size;
+  using super::optimizer;
   static constexpr bool IsSparse = std::is_same_v<Matrix, mkl::sparse_matrix_csr<scalar>>;
 
   eigen::matrix Z;
@@ -437,6 +440,18 @@ struct softmax_layer : public linear_layer<Matrix>
   softmax_layer(std::size_t D, std::size_t K, std::size_t N)
     : super(D, K, N), Z(N, K), DZ(N, K)
   {}
+
+  [[nodiscard]] auto to_string() const -> std::string override
+  {
+    if constexpr (IsSparse)
+    {
+      return fmt::format("Sparse(input_size={}, output_size={}, density={}, optimizer={}, activation={})", input_size(), output_size(), W.density(), optimizer->to_string(), "Softmax()");
+    }
+    else
+    {
+      return fmt::format("Dense(input_size={}, output_size={}, optimizer={}, activation={})", input_size(), output_size(), optimizer->to_string(), "Softmax()");
+    }
+  }
 
   void feedforward(eigen::matrix& result) override
   {
@@ -520,6 +535,9 @@ struct log_softmax_layer : public linear_layer<Matrix>
   using super::Db;
   using super::X;
   using super::DX;
+  using super::input_size;
+  using super::output_size;
+  using super::optimizer;
   static constexpr bool IsSparse = std::is_same_v<Matrix, mkl::sparse_matrix_csr<scalar>>;
 
   eigen::matrix Z;
@@ -528,6 +546,18 @@ struct log_softmax_layer : public linear_layer<Matrix>
   log_softmax_layer(std::size_t D, std::size_t K, std::size_t N)
     : super(D, K, N), Z(N, K), DZ(N, K)
   {}
+
+  [[nodiscard]] auto to_string() const -> std::string override
+  {
+    if constexpr (IsSparse)
+    {
+      return fmt::format("Sparse(input_size={}, output_size={}, density={}, optimizer={}, activation={})", input_size(), output_size(), W.density(), optimizer->to_string(), "LogSoftmax()");
+    }
+    else
+    {
+      return fmt::format("Dense(input_size={}, output_size={}, optimizer={}, activation={})", input_size(), output_size(), optimizer->to_string(), "LogSoftmax()");
+    }
+  }
 
   void feedforward(eigen::matrix& result) override
   {

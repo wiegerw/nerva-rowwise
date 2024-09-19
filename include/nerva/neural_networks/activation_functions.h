@@ -417,7 +417,7 @@ struct leaky_relu_activation
 
   [[nodiscard]] std::string to_string() const
   {
-    return fmt::format("LeakyRelu({})", alpha);
+    return fmt::format("LeakyReLU({})", alpha);
   }
 };
 
@@ -443,7 +443,7 @@ struct all_relu_activation
 
   [[nodiscard]] std::string to_string() const
   {
-    return fmt::format("AllRelu({})", alpha);
+    return fmt::format("AllReLU({})", alpha);
   }
 };
 
