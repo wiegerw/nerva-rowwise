@@ -577,6 +577,7 @@ pre.rouge .gs {
 <li><a href="#_the_tool_mlp_py">The tool mlp.py</a></li>
 </ul>
 </li>
+<li><a href="#_io">I/O</a></li>
 </ul>
 </div>
 </div>
@@ -605,7 +606,7 @@ pre.rouge .gs {
 <h2 id="_installation">Installation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The nerva-rowwise Python bindings can be installed via <code>pip</code>. The installation is done via a <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py">setup.py</a> script. The script has some dependencies, that are resolved using environment variables.</p>
+<p>The nerva-rowwise Python bindings can be installed via <code>pip</code>. The installation is done via a <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py">setup.py</a> script. The script has several dependencies, that need to be resolved using environment variables.</p>
 </div>
 <div class="sect2">
 <h3 id="_dependencies">Dependencies</h3>
@@ -634,7 +635,7 @@ pre.rouge .gs {
 </div>
 <div class="paragraph">
 <p>An alternative solution is to use CMake to resolve these three dependencies, see also the
-<a href="nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded in the <code>_deps</code> subdirectory of the CMake build directory. After that only the environment variable <code>CMAKE_DEPS_DIR</code> needs to be set.</p>
+<a href="nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded automatically in the <code>_deps</code> subdirectory of the CMake build directory. After that it is sufficient to set the environment variable <code>CMAKE_DEPS_DIR</code>.</p>
 </div>
 <div class="paragraph">
 <p>The <code>nerva</code> Python module can then be installed using</p>
@@ -663,7 +664,7 @@ pip install .</code></pre>
 <div class="content">
 <pre class="rouge highlight"><code>python ../python/tools/mlp.py \
     --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072,1024,1024,10" \
+    --layer-sizes="3072;1024;1024;10" \
     --layer-weights=Xavier \
     --optimizers="Nesterov(0.9)" \
     --loss=SoftmaxCrossEntropy \
@@ -677,7 +678,7 @@ pip install .</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that installs the CIFAR-10 dataset in the folder <code>../data</code> if it doesn&#8217;t yet exist.</p>
+<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that it automatically downloads the CIFAR-10 dataset in the folder <code>../data</code> if it doesn&#8217;t yet exist.</p>
 </div>
 <div class="paragraph">
 <p>The output may look like this:</p>
@@ -709,8 +710,19 @@ epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test ac
 <div class="sect3">
 <h4 id="mlp_tool">mlp.py command line options</h4>
 <div class="paragraph">
-<p>This section gives an overview of the command line interface of the <code>mlp.py</code> tool. It has several options that take a list of items as input. The items of such a list are always separated by semicolons.
-Some values like take parameters. We use named parameters, e.g. <code>AllReLU(alpha=0.3)</code>. In case that there is only one parameter, the name may be omitted: <code>AllReLU(0.3)</code>. If the parameters have default values, they may be omitted. For example, <code>TReLU</code> corresponds to <code>TReLU(al=0,tl=0,ar=0,tr=1)</code>.</p>
+<p>This section gives an overview of the command line interface of the <code>mlp.py</code> tool.</p>
+</div>
+<div class="sect4">
+<h5 id="_parameters_lists">Parameters lists</h5>
+<div class="paragraph">
+<p>Some command line options take a list of items as input, for example a list of layers. These items must be separated by semicolons, e.g. <code>--layers="ReLU;ReLU;Linear"</code>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_named_parameters">Named parameters</h5>
+<div class="paragraph">
+<p>Some of the items take parameters. For this we use a function call syntax with named parameters, e.g. <code>AllReLU(alpha=0.3)</code>. In case that there is only one parameter, the name may be omitted: <code>AllReLU(0.3)</code>. If the parameters have default values, they may be omitted. For example, <code>TReLU</code> or <code>TReLU()</code> is equivalent to <code>TReLU(al=0,tl=0,ar=0,tr=1)</code>.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_general_options">General options</h5>
@@ -785,15 +797,16 @@ A semicolon separated list of layers. For example, <code>--layers=ReLU;AllReLU(0
 <td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with hyperbolic tangent activation</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AllReLU</code>(\(\alpha\))</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>AllReLU(&lt;alpha&gt;)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with All ReLU activation</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SReLU</code>(\(\alpha\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with SReLU activation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SReLU(&lt;al&gt;,&lt;tl&gt;,&lt;ar&gt;,&lt;tr&gt;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with SReLU activation. The default value for the parameters are <code>al=0, tl=0, ar=0, tr=1</code>. For these
+ values <code>SReLU</code> coincides with <code>ReLU</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TReLU</code>(\(\epsilon\))</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TReLU(&lt;epsilon&gt;)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with trimmed ReLU activation</p></td>
 </tr>
 <tr>
@@ -806,7 +819,7 @@ A semicolon separated list of layers. For example, <code>--layers=ReLU;AllReLU(0
 <ul>
 <li>
 <p><code>--layer-sizes &lt;value&gt;</code>
-A comma-separated list of the sizes of linear layers of the multilayer perceptron. For example, <code>--layer-sizes=3072,1024,512,10</code> specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.</p>
+A semicolon-separated list of the sizes of linear layers of the multilayer perceptron. For example, <code>--layer-sizes=3072;1024;512;10</code> specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.</p>
 </li>
 <li>
 <p><code>--densities &lt;value&gt;</code>
@@ -821,8 +834,46 @@ A comma-separated list of dropout rates of linear layers. By default, all linear
 <p><code>--overall-density &lt;value&gt;</code>
 The overall density of the linear layers. This value should be in the interval \([0,1\)], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.</p>
 </li>
+<li>
+<p><code>--layer-weights &lt;value&gt;</code>
+The generator that is used for initializing the weights of the linear layers. The following weight generators are supported:</p>
+</li>
 </ul>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Specification</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Xavier</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier weights</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierNormalized</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Normalized Xavier weights</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>He</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Uniform</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Uniform weights</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Zero</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">All weights are zero (N.B. This usually doesn&#8217;t work)</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect4">
 <h5 id="_training_configuration_options">Training configuration options</h5>
@@ -961,48 +1012,6 @@ The loss function used for training the multilayer perceptron. The following los
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>NegativeLogLikelihood</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Negative log likelihood loss.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--layer-weights &lt;value&gt;</code>
-The generator that is used for initializing the weights of the linear layers. The following weight generators are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Xavier</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierNormalized</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Normalized Xavier weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>He</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Uniform</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Uniform weights</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Zero</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">All weights are zero (N.B. This usually doesn&#8217;t work)</p></td>
 </tr>
 </tbody>
 </table>
@@ -1158,59 +1167,22 @@ If this value is set, gradient checks are performed with the given step size. Th
 <div class="ulist">
 <ul>
 <li>
-<p><code>--cifar10 &lt;value&gt;</code>
-Specify the location of the binary version of the
-<a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> dataset. This is a directory with subdirectory <code>cifar-10-batches-bin</code>.</p>
+<p><code>--cifar10 &lt;directory&gt;</code>
+Specify the directory where the binary version of the
+<a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> dataset is stored. This is a directory with subdirectory <code>cifar-10-batches-bin</code> for the C++ version or <code>cifar-10-batches-py</code> for the Python version of the dataset.</p>
 </li>
 <li>
-<p><code>--dataset &lt;value&gt;</code>
-Specify a synthetic dataset to use. The following datasets are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Specification</th>
-<th class="tableblock halign-left valign-top">Description</th>
-<th class="tableblock halign-left valign-top">Features</th>
-<th class="tableblock halign-left valign-top">Classes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>checkerboard</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A checkerboard pattern, see also <a href="https://kaifishr.github.io/2021/01/14/micro-mlp.html#checkerboard">checkerboard</a>.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mini</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A dataset with random values.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--dataset-size &lt;value&gt;</code>
-The size of the synthetic dataset (default: 1000).</p>
+<p><code>--mnist &lt;directory&gt;</code>
+Specify the directory where the <a href="https://en.wikipedia.org/wiki/MNIST_database">MNIST</a> dataset is stored.
+It should be stored in a file named <code>mnist.npz</code>, that can be downloaded <a href="https://s3.amazonaws.com/img-datasets/mnist.npz">here</a>.</p>
 </li>
 <li>
-<p><code>--load-dataset &lt;value&gt;</code>
-Load the dataset from a file in NumPy <code>.npz</code> format. See <code>--load-weights</code> for information about the format.</p>
+<p><code>--load-data &lt;value&gt;</code>
+Load the dataset from a file in NumPy <code>.npz</code> format. See</p>
 </li>
 <li>
-<p><code>--save-dataset &lt;value&gt;</code>
-Save the dataset to a file in NumPy <code>.npz</code> format. See <code>--save-weights</code> for information about the format.</p>
+<p><code>--save-data &lt;value&gt;</code>
+Save the dataset to a file in NumPy <code>.npz</code> format. See</p>
 </li>
 <li>
 <p><code>--normalize</code>
@@ -1218,7 +1190,7 @@ Normalize the dataset.</p>
 </li>
 <li>
 <p><code>--preprocessed &lt;value&gt;</code>
-A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <code>--load-weights</code> for information about the format. This can for example be used to store preprocessed datasets. A script <a href="../python/tools/create_cifar10_datasets.py">create_cifar10_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
+A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <code>--load-weights</code> for information about the format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
 </li>
 </ul>
 </div>
@@ -1246,10 +1218,21 @@ Print timer messages.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_io">I/O</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
+</div>
+<div class="paragraph">
+<p>The <code>mlp.py</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-24 07:34:59 UTC
+Last updated 2024-09-24 10:02:36 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
