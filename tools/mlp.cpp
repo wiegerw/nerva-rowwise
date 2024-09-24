@@ -314,7 +314,7 @@ class mlp_tool: public command_line_tool
     // pruning + growing
     std::string prune_strategy;
     std::string grow_strategy = "Random";
-    std::string grow_weights = "Zero";
+    std::string grow_weights = "Xavier";
 
     void add_options(lyra::cli& cli) override
     {

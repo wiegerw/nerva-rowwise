@@ -6,8 +6,9 @@
 
 import re
 from typing import List
-from nerva.weights import WeightInitializer
-from nerva.layers import Sparse, Sequential
+
+from nerva.layers import Sparse
+from nerva.multilayer_perceptron import MultilayerPerceptron
 
 
 def parse_arguments(text: str, name: str, n: int) -> List[str]:
@@ -25,7 +26,7 @@ class RegrowFunction(object):
     """
     Interface for regrowing the sparse layers of a neural network
     """
-    def __call__(self, M: Sequential):
+    def __call__(self, M: MultilayerPerceptron):
         raise NotImplementedError
 
 
@@ -86,37 +87,3 @@ def parse_prune_function(strategy: str):
         return PruneSET(float(arguments[0]))
 
     raise RuntimeError(f"unknown prune strategy '{strategy}'")
-
-
-class GrowFunction(object):
-    def __call__(self, layer: Sparse, count: int):
-        raise NotImplementedError
-
-
-class GrowRandom(GrowFunction):
-    def __init__(self, init: WeightInitializer):
-        self.init = init
-
-    def __call__(self, layer: Sparse, count: int):
-        layer.grow_random(count, self.init)
-
-
-def parse_grow_function(strategy: str, init: WeightInitializer):
-    if strategy == 'Random':
-        return GrowRandom(init)
-    else:
-        raise RuntimeError(f"unknown grow strategy '{strategy}'")
-
-
-class PruneGrow(RegrowFunction):
-    def __init__(self, prune: PruneFunction, grow: GrowFunction):
-        self.prune = prune
-        self.grow = grow
-
-    def __call__(self, M: Sequential):
-        for layer in M.layers:
-            if isinstance(layer, Sparse):
-                weight_count = layer.weight_count()
-                count = self.prune(layer)
-                print(f'regrowing {count}/{weight_count} weights')
-                self.grow(layer, count)

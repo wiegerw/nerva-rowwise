@@ -4,14 +4,14 @@
 
 from typing import List
 
+import nervalibrowwise
 import torch
 
 from nerva.datasets import DataLoader
-from nerva.learning_rate import LearningRateScheduler
-from nerva.loss import LossFunction
-from nerva.layers import Sequential, print_model_info
+from nerva.learning_rate_schedulers import LearningRateScheduler
+from nerva.loss_functions import LossFunction
+from nerva.multilayer_perceptron import MultilayerPerceptron, print_model_info
 from nerva.utilities import MapTimer, pp
-import nervalibrowwise
 
 
 def to_one_hot(x: torch.LongTensor, num_classes: int):
@@ -93,7 +93,7 @@ class SGDOptions(nervalibrowwise.sgd_options):
 
 class StochasticGradientDescentAlgorithm(object):
     def __init__(self,
-                 M: Sequential,
+                 M: MultilayerPerceptron,
                  train_loader: DataLoader,
                  test_loader: DataLoader,
                  options: SGDOptions,

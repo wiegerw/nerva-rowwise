@@ -8,88 +8,27 @@ import argparse
 import shlex
 import sys
 from pathlib import Path
-from typing import List, Union
+from typing import List
 
 import torch
-from nerva.activation import parse_activation, Activation
+
 from nerva.datasets import create_cifar10_augmented_dataloaders, create_cifar10_dataloaders, \
     create_mnist_dataloaders, create_npz_dataloaders, extract_tensors_from_dataloader
-from nerva.layers import print_model_info, BatchNormalization, Dense, Sparse, Layer, Sequential
-from nerva.learning_rate import LearningRateScheduler, parse_learning_rate
-from nerva.loss import LossFunction, parse_loss_function
+from nerva.grow import GrowFunction, parse_grow_function
+from nerva.layers import Dense, Sparse, make_layers
+from nerva.learning_rate_schedulers import LearningRateScheduler, parse_learning_rate
+from nerva.loss_functions import LossFunction, parse_loss_function
+from nerva.multilayer_perceptron import print_model_info, MultilayerPerceptron
 from nerva.optimizers import Optimizer, GradientDescent, parse_optimizer
-from nerva.pruning import PruneFunction, GrowFunction, PruneGrow, parse_prune_function, parse_grow_function
+from nerva.prune import PruneFunction, parse_prune_function
+from nerva.regrow import PruneGrow
 from nerva.training import StochasticGradientDescentAlgorithm, SGDOptions, compute_sparse_layer_densities, \
     to_one_hot, compute_statistics
 from nerva.utilities import manual_seed, nerva_timer_enable, pp, set_nerva_computation
 from nerva.weights import WeightInitializer, parse_weight_initializer
 
 
-def make_linear_layer(input_size: int,
-                      output_size: int,
-                      density: float,
-                      dropout_rate: float,
-                      activation: Activation,
-                      weight_initializer: WeightInitializer,
-                      optimizer: Optimizer
-                     ) -> Union[Dense, Sparse]:
-    if density == 1.0:
-        return Dense(input_size,
-                     output_size,
-                     activation=activation,
-                     optimizer=optimizer,
-                     weight_initializer=weight_initializer,
-                     dropout_rate=dropout_rate)
-    else:
-        return Sparse(input_size,
-                      output_size,
-                      density,
-                      activation=activation,
-                      optimizer=optimizer,
-                      weight_initializer=weight_initializer)
-
-
-def make_layers(layer_specifications: list[str],
-                linear_layer_sizes: list[int],
-                linear_layer_densities: list[float],
-                linear_layer_dropouts: list[float],
-                linear_layer_weights: list[WeightInitializer],
-                optimizers: list[Optimizer]
-               ) -> List[Layer]:
-
-    assert len(linear_layer_densities) == len(linear_layer_dropouts) == len(linear_layer_weights) == len(linear_layer_sizes) - 1
-    assert len(optimizers) == len(layer_specifications)
-
-    result = []
-
-    linear_layer_index = 0
-    optimizer_index = 0
-    input_size = linear_layer_sizes[0]
-
-    for spec in layer_specifications:
-        if spec == "BatchNormalization":
-            output_size = input_size
-            optimizer = optimizers[optimizer_index]
-            optimizer_index += 1
-            blayer = BatchNormalization(input_size, output_size, optimizer)
-            result.append(blayer)
-        else:  # linear spec
-            output_size = linear_layer_sizes[linear_layer_index + 1]
-            density = linear_layer_densities[linear_layer_index]
-            dropout_rate = linear_layer_dropouts[linear_layer_index]
-            activation = parse_activation(spec)
-            weights = linear_layer_weights[linear_layer_index]
-            optimizer = optimizers[optimizer_index]
-            linear_layer_index += 1
-            optimizer_index += 1
-            llayer = make_linear_layer(input_size, output_size, density, dropout_rate, activation, weights, optimizer)
-            result.append(llayer)
-        input_size = output_size
-
-    return result
-
-
-class MLPNerva(Sequential):
+class MLPNerva(MultilayerPerceptron):
     """ Nerva Multilayer perceptron
     """
     def __init__(self,
@@ -213,7 +152,7 @@ def make_argument_parser():
     # pruning + growing (experimental!)
     cmdline_parser.add_argument("--prune", help="The pruning strategy: Magnitude(<rate>), SET(<rate>) or Threshold(<value>)", type=str)
     cmdline_parser.add_argument("--grow", help="The growing strategy: (default: Random)", type=str)
-    cmdline_parser.add_argument('--grow-weights', type=str, help='The function used for growing weigths: Xavier, XavierNormalized, He, PyTorch, Zero')
+    cmdline_parser.add_argument('--grow-weights', type=str, help='The function used for growing weigths: Xavier, XavierNormalized, He, PyTorch, Zero', default='Xavier')
 
     # multi-threading
     cmdline_parser.add_argument("--threads", help="The number of threads being used", type=int)
@@ -278,7 +217,7 @@ def initialize_frameworks(args):
 
 class SGD(StochasticGradientDescentAlgorithm):
     def __init__(self,
-                 M: Sequential,
+                 M: MultilayerPerceptron,
                  train_loader,
                  test_loader,
                  options: SGDOptions,

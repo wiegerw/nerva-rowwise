@@ -77,10 +77,10 @@ datasets::dataset load_cifar10_dataset(const std::string& directory, bool normal
   namespace fs = std::filesystem;
   for (int i = 0; i < 5; i++)
   {
-    auto path = fs::path(directory) / fs::path("data_batch_" + std::to_string(i + 1) + ".bin");
+    auto path = fs::path(directory) / fs::path("cifar-10-batches-bin") / fs::path("data_batch_" + std::to_string(i + 1) + ".bin");
     read_cifar10_slice(path.string(), result.Xtrain, result.Ttrain, i * 10000);
   }
-  auto path = fs::path(directory) / fs::path("test_batch.bin");
+  auto path = fs::path(directory) / fs::path("cifar-10-batches-bin") / fs::path("test_batch.bin");
   read_cifar10_slice(path.string(), result.Xtest, result.Ttest, 0);
   NERVA_LOG(log::verbose) << std::endl;
 

@@ -6,14 +6,13 @@ import os
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
+import nervalibrowwise
 import numpy as np
 import torch
 import torchvision
 from torch.nn import functional as F
 from torchvision import datasets, transforms
 
-
-import nervalibrowwise
 from nerva.utilities import flatten_numpy
 
 

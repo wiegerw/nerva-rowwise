@@ -11,6 +11,6 @@
     --epochs=100 \
     --batch-size=100 \
     --threads=12 \
-    --cifar10=../data/cifar-10-batches-bin \
+    --cifar10=../data \
     --seed=123
 # end::doc[]

@@ -16,7 +16,7 @@
 :library: nerva-rowwise
 :mlptool: mlp
 
-Wieger Wesselink <j.w.wesselink@tue.nl>
+// Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
 endif::[]
@@ -174,7 +174,7 @@ Some of the items take parameters. For this we use a function call syntax with n
 * `-?`, `-h`, `--help`
 Display help information.
 * `--debug`, `-d`
-Show debug output.
+Show debug output. This prints batches, weight matrices, bias vectors, gradients etc.
 // end::general-options[]
 * `--verbose`, `-v`
 Show verbose output.
@@ -354,8 +354,8 @@ Save the dataset to a file in NumPy `.npz` format. See
 
 * `--normalize`
 Normalize the dataset.
-* `--preprocessed <value>`
-A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to precompute augmented datasets. A script link:../python/tools/generate_cifar10_augmented_datasets.py[generate_cifar10_augmented_datasets.py] is available for creating augmented CIFAR-10 datasets.
+* `--preprocessed <directory>`
+A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See <<io>> for information about the `.npz` format. This can for example be used to precompute augmented datasets. A script link:../python/tools/generate_cifar10_augmented_datasets.py[generate_cifar10_augmented_datasets.py] is available for creating augmented CIFAR-10 datasets.
 // end::dataset-options[]
 
 * `--generate-data <name>`
@@ -379,13 +379,17 @@ The size of the generated dataset (default: 1000).
 `--save-weights` for information about the format.
 `--load-weights` for information about the format.
 
+// tag::miscellaneous-options[]
 ===== Miscellaneous options
-* `--precision <value>`
-The precision used for printing matrices.
 * `--info`
 Print detailed information about the multilayer perceptron.
 * `--timer`
 Print timer messages.
+* `--precision <value>`
+The precision used for printing matrix elements.
+* `--edgeitems <value>`
+The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.
+// end::miscellaneous-options[]
 
 // tag::pruning-options[]
 ===== Pruning and growing options
@@ -414,7 +418,8 @@ The strategy used for growing in sparse weight matrices. The following strategie
 |===
 
 * `--grow-weights <value>`
-The weight generation function used for growing weights. See `--layer-weights` for supported values.
+The weight generation function used for growing weights.
+See `--layer-weights` for supported values. The default value is `Xavier`.
 // end::pruning-options[]
 
 // tag::computation-options[]
@@ -839,32 +844,8 @@ See the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva
 === Eigen library
 The {library} library uses the https://eigen.tuxfamily.org/[Eigen library] for representing matrices. The matrix operations in table <<table_matrix_operations>> have been implemented using Eigen, see the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h[matrix_operations.h].
 
-=== MKL library
-Using the Eigen library alone is not sufficient for obtaining high performance. Therefore, the {library} library uses the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] as a backend. The Eigen library supports MKL by means of the compiler flag `EIGEN_USE_MKL_ALL`, see also https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html[TopicUsingIntelMKL.html].
-Note that the MKL library is included in the https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html[Intel oneAPI base toolkit].
-
-The MKL library supports a number of highly efficient, but extremely low-level interfaces for matrix operations. See https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html[blas-and-sparse-blas-routines.html] for an overview. The {library} library contains matrix classes that hide those low-level details from the user. The table below gives an overview of them.
-
-|===
-|Header file |Description
-
-|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_dense_vector.h[mkl_dense_vector.h]`
-|A class `dense_vector_view` that wraps a raw pointer to a vector.
-
-|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_dense_matrix.h[mkl_dense_matrix.h]`
-|A class `dense_matrix_view` that wraps a raw pointer to a matrix, and a class
-`dense_matrix` that stores a dense matrix.
-
-|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_sparse_matrix.h[mkl_sparse_matrix.h]`
-|A class `sparse_matrix_csr` footnote:[Note that the name `sparse_matrix` could not be used due to a conflict with a #define of the same name buried deep inside the MKL library code] that stores a sparse matrix in
-https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)[compressed sparse row] (CSR) format.
-|===
-
-TIP: In C++23 the implementation of sparse matrices in CSR format can be greatly simplified, as shown by https://github.com/BenBrock/matrix-cpos[Ben Brock].
-
-NOTE: The sparse CSR matrix functions in the MKL library take an argument of the opaque type `sparse_matrix_t`. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix, which may cause some inefficiencies. See also the function `sparse_matrix_csr::construct_csr`.
-
 // tag::io[]
+[[io]]
 == I/O
 The default storage format used in the Nerva libraries is the NumPy NPZ format, see link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format]. The reason for choosing this format is portability between C++ and Python implementations. A file in `.npz` format can be used to store a dictionary of arrays.
 

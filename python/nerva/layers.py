@@ -1,13 +1,14 @@
-# Copyright 2022 - 2023 Wieger Wesselink.
+# Copyright 2022 - 2024 Wieger Wesselink.
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE or http://www.boost.org/LICENSE_1_0.txt)
 
-from typing import Optional, List, Union, Tuple
+from typing import List, Union
 
-from nerva.activation import Activation, NoActivation
+import nervalibrowwise
+
+from nerva.activation_functions import Activation, NoActivation, parse_activation
 from nerva.optimizers import Optimizer, GradientDescent
 from nerva.weights import WeightInitializer, Xavier
-import nervalibrowwise
 
 
 class Layer(object):
@@ -79,8 +80,8 @@ class Sparse(Layer):
                  output_size: int,
                  density: float,
                  activation: Activation=NoActivation(),
-                 optimizer=GradientDescent(),
-                 weight_initializer=Xavier()):
+                 optimizer: Optimizer=GradientDescent(),
+                 weight_initializer: WeightInitializer=Xavier()):
         """
         A sparse layer.
 
@@ -170,95 +171,65 @@ class BatchNormalization(Layer):
         return f'BatchNormalization(optimizer={self.optimizer})'
 
 
-# neural networks
-class Sequential(object):
-    def __init__(self, layers: Optional[Union[List[Layer], Tuple[Layer]]]=None):
-        self.layers = []
-        self.compiled_model = None
-        if layers:
-            for layer in layers:
-                self.add(layer)
-
-    def add(self, layer: Layer):
-        self.layers.append(layer)
-
-    def _check_layers(self):
-        """
-        Checks if the architecture of the layers is OK
-        """
-        layers = self.layers
-
-        # At least one layer
-        if not layers:
-            raise RuntimeError('No layers are defined')
-
-    def compile(self, batch_size: int) -> None:
-        self._check_layers()
-
-        M = nervalibrowwise.MLP()
-
-        # add layers
-        for i, layer in enumerate(self.layers):
-            cpp_layer = layer.compile(batch_size)
-            M.append_layer(cpp_layer)
-        self.compiled_model = M
-
-    def feedforward(self, X):
-        return self.compiled_model.feedforward(X)
-
-    def backpropagate(self, Y, dY):
-        return self.compiled_model.backpropagate(Y, dY)
-
-    def optimize(self, eta):
-        self.compiled_model.optimize(eta)
-
-    def renew_dropout_masks(self):
-        nervalibrowwise.renew_dropout_masks(self.compiled_model)
-
-    def __str__(self):
-        layers = ',\n  '.join([str(layer) for layer in self.layers])
-        return f'Sequential(\n  {layers}\n)'
-
-    def set_support_random(self):
-        for layer in self.layers:
-            if isinstance(layer, Sparse):
-                layer.set_support_random(layer.density)
-
-    def set_weights_and_bias(self, weight_initializers: List[WeightInitializer]):
-        print(f'Initializing weights using {", ".join(str(w) for w in weight_initializers)}')
-        self.compiled_model.set_weights_and_bias([str(w) for w in weight_initializers])
-
-    def load_weights_and_bias(self, filename: str):
-        """
-        Loads the weights and biases from a file in .npz format
-
-        The weight matrices are stored using the keys W1, W2, ... and the bias vectors using the keys "b1, b2, ..."
-        :param filename: the name of the file
-        """
-        print(f'Loading weights and bias from {filename}')
-        self.compiled_model.load_weights_and_bias(filename)
-
-    def save_weights_and_bias(self, filename: str):
-        """
-        Loads the weights and biases from a file in .npz format
-
-        The weight matrices are stored using the keys W1, W2, ... and the bias vectors using the keys "b1, b2, ..."
-        :param filename: the name of the file
-        """
-        print(f'Saving weights and bias to {filename}')
-        self.compiled_model.save_weights_and_bias(filename)
-
-    def info(self, msg):
-        self.compiled_model.info(msg)
+def make_linear_layer(input_size: int,
+                      output_size: int,
+                      density: float,
+                      dropout_rate: float,
+                      activation: Activation,
+                      weight_initializer: WeightInitializer,
+                      optimizer: Optimizer
+                     ) -> Union[Dense, Sparse]:
+    if density == 1.0:
+        return Dense(input_size,
+                     output_size,
+                     activation=activation,
+                     optimizer=optimizer,
+                     weight_initializer=weight_initializer,
+                     dropout_rate=dropout_rate)
+    else:
+        return Sparse(input_size,
+                      output_size,
+                      density,
+                      activation=activation,
+                      optimizer=optimizer,
+                      weight_initializer=weight_initializer)
 
 
-def compute_sparse_layer_densities(overall_density: float, layer_sizes: List[int], erk_power_scale: float=1) -> List[float]:
-    return nervalibrowwise.compute_sparse_layer_densities(overall_density, layer_sizes, erk_power_scale)
+def make_layers(layer_specifications: list[str],
+                linear_layer_sizes: list[int],
+                linear_layer_densities: list[float],
+                linear_layer_dropouts: list[float],
+                linear_layer_weights: list[WeightInitializer],
+                optimizers: list[Optimizer]
+               ) -> List[Layer]:
 
+    assert len(linear_layer_densities) == len(linear_layer_dropouts) == len(linear_layer_weights) == len(linear_layer_sizes) - 1
+    assert len(optimizers) == len(layer_specifications)
 
-def print_model_info(M: Sequential) -> None:
-    """
-    Prints detailed information about a multilayer perceptron
-    :param M: a multilayer perceptron
-    """
-    nervalibrowwise.print_model_info(M.compiled_model)
+    result = []
+
+    linear_layer_index = 0
+    optimizer_index = 0
+    input_size = linear_layer_sizes[0]
+
+    for spec in layer_specifications:
+        if spec == "BatchNormalization":
+            output_size = input_size
+            optimizer = optimizers[optimizer_index]
+            optimizer_index += 1
+            blayer = BatchNormalization(input_size, output_size, optimizer)
+            result.append(blayer)
+        else:  # linear spec
+            output_size = linear_layer_sizes[linear_layer_index + 1]
+            density = linear_layer_densities[linear_layer_index]
+            dropout_rate = linear_layer_dropouts[linear_layer_index]
+            activation = parse_activation(spec)
+            weights = linear_layer_weights[linear_layer_index]
+            optimizer = optimizers[optimizer_index]
+            linear_layer_index += 1
+            optimizer_index += 1
+            llayer = make_linear_layer(input_size, output_size, density, dropout_rate, activation, weights, optimizer)
+            result.append(llayer)
+        input_size = output_size
+
+    return result

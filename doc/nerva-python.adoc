@@ -15,7 +15,7 @@
 :library: nerva-rowwise
 :mlptool: mlp.py
 
-Wieger Wesselink <j.w.wesselink@tue.nl>
+// Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
 endif::[]
@@ -29,7 +29,7 @@ endif::[]
 ++++
 
 == Introduction
-This document describes the Python bindings of the {library} library.
+This document describes the implementation of the `nerva` Python module, that contains bindings to the {library} C++ library.
 
 == Installation
 The {library} Python bindings can be installed via `pip`. The installation is done via a https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py[setup.py] script. The script has several dependencies, that need to be resolved using environment variables.
@@ -109,12 +109,50 @@ include::nerva-cpp.adoc[tags=computation-options]
 
 include::nerva-cpp.adoc[tags=dataset-options]
 
-===== Miscellaneous options
-* `--precision <value>`
-The precision used for printing matrices.
-* `--info`
-Print detailed information about the multilayer perceptron.
-* `--timer`
-Print timer messages.
+include::nerva-cpp.adoc[tags=miscellaneous-options]
+
+== Overview of the code
+This section gives an overview of the Python code in the
+{library} library, and some explanations about the code.
+
+=== Number type
+The {library} library uses 32-bit floats as its number type. The C++ library also supports 64-bit floats.
+
+=== Module contents
+The most important files in the `nerva` module are given in the table below.
+
+|===
+|File |Description
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/multilayer_perceptron.py[multilayer_perceptron.py]`
+|A multilayer perceptron class.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/layers.py[layers.py]`
+|Neural network layers.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/activation_functions.py[activation_functions.py]`
+|Activation functions.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/loss_functions.py[loss_functions.py]`
+|Loss functions.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/weights.py[weights.py]`
+|Weight initialization functions.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/optimizers.py[optimizers.py]`
+|Optimizer functions, for updating neural network parameters using their gradients.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/learning_rate_schedulers.py[learning_rate_schedulers.py]`
+|Learning rate schedulers, for updating the learning rate during training.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/training.py[training.py]`
+|A stochastic gradient descent algorithm.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/prune.py[prune.py]`
+|Algorithms for pruning sparse weight matrices. This is used for dynamic sparse training.
+
+|`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/grow.py[grow.py]`
+|Algorithms for (re-)growing sparse weights. This is used for dynamic sparse training.
+|===
 
 include::nerva-cpp.adoc[tags=io]

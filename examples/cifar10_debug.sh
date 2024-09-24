@@ -13,5 +13,6 @@
     --threads=12 \
     --overall-density=0.05 \
     --cifar10=../data \
-    --seed=123
+    --seed=123 \
+    --debug
 # end::doc[]
