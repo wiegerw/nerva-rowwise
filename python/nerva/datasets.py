@@ -10,8 +10,6 @@ import numpy as np
 import torch
 import torchvision
 from torch.nn import functional as F
-from torchvision import transforms, datasets
-import torch
 from torchvision import datasets, transforms
 
 

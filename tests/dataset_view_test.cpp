@@ -12,7 +12,7 @@
 
 #include <cmath>
 #include <random>
-#include "nerva/datasets/make_dataset.h"
+#include "nerva/datasets/generate_dataset.h"
 #include "nerva/neural_networks/eigen.h"
 #include "nerva/neural_networks/multilayer_perceptron.h"
 #include "nerva/neural_networks/training.h"
@@ -22,7 +22,7 @@ using namespace nerva;
 TEST_CASE("test_mlp")
 {
   std::mt19937 rng{std::random_device{}()};
-  datasets::dataset data = datasets::make_dataset("checkerboard", 100, rng);
+  datasets::dataset data = datasets::generate_dataset("checkerboard", 100, rng);
   datasets::dataset_view data1 = datasets::make_dataset_view(data);
 
   eigen::matrix W1 {

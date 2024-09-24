@@ -4,11 +4,10 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-/// \file nerva/datasets/make_dataset.h
+/// \file nerva/datasets/generate_dataset.h
 /// \brief add your file description here.
 
-#ifndef NERVA_DATASETS_MAKE_DATASET_H
-#define NERVA_DATASETS_MAKE_DATASET_H
+#pragma once
 
 #include "nerva/datasets/cifar10reader.h"
 #include "nerva/datasets/dataset.h"
@@ -17,7 +16,7 @@
 namespace nerva::datasets {
 
 template<typename RandomNumberGenerator>
-std::pair<eigen::matrix, eigen::matrix> make_dataset_checkerboard(long n, RandomNumberGenerator rng)
+std::pair<eigen::matrix, eigen::matrix> generate_dataset_checkerboard(long n, RandomNumberGenerator rng)
 {
   eigen::matrix X(2, n);
   eigen::matrix T(2, n);
@@ -40,7 +39,7 @@ std::pair<eigen::matrix, eigen::matrix> make_dataset_checkerboard(long n, Random
 }
 
 template<typename RandomNumberGenerator>
-std::pair<eigen::matrix, eigen::matrix> make_dataset_mini(long n, RandomNumberGenerator rng)
+std::pair<eigen::matrix, eigen::matrix> generate_dataset_mini(long n, RandomNumberGenerator rng)
 {
   long D = 3; // number of features
   long K = 2; // number of classes
@@ -70,7 +69,7 @@ std::pair<eigen::matrix, eigen::matrix> make_dataset_mini(long n, RandomNumberGe
 
 // Returns a dataset in rowwise layout
 template<typename RandomNumberGenerator>
-dataset make_dataset(const std::string& name, std::size_t n, RandomNumberGenerator rng)
+dataset generate_dataset(const std::string& name, std::size_t n, RandomNumberGenerator rng)
 {
   dataset result;
   auto n_train = n;
@@ -78,13 +77,13 @@ dataset make_dataset(const std::string& name, std::size_t n, RandomNumberGenerat
 
   if (name == "checkerboard")
   {
-    std::tie(result.Xtrain, result.Ttrain) = make_dataset_checkerboard(n_train, rng);
-    std::tie(result.Xtest, result.Ttest) = make_dataset_checkerboard(n_test, rng);
+    std::tie(result.Xtrain, result.Ttrain) = generate_dataset_checkerboard(n_train, rng);
+    std::tie(result.Xtest, result.Ttest) = generate_dataset_checkerboard(n_test, rng);
   }
   else if (name == "mini")
   {
-    std::tie(result.Xtrain, result.Ttrain) = make_dataset_mini(n_train, rng);
-    std::tie(result.Xtest, result.Ttest) = make_dataset_mini(n_test, rng);
+    std::tie(result.Xtrain, result.Ttrain) = generate_dataset_mini(n_train, rng);
+    std::tie(result.Xtest, result.Ttest) = generate_dataset_mini(n_test, rng);
   }
   else
   {
@@ -95,4 +94,3 @@ dataset make_dataset(const std::string& name, std::size_t n, RandomNumberGenerat
 
 } // namespace nerva::datasets
 
-#endif // NERVA_DATASETS_MAKE_DATASET_H

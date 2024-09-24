@@ -32,7 +32,7 @@ endif::[]
 This document describes the Python bindings of the {library} library.
 
 == Installation
-The {library} Python bindings can be installed via `pip`. The installation is done via a https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py[setup.py] script. The script has some dependencies, that are resolved using environment variables.
+The {library} Python bindings can be installed via `pip`. The installation is done via a https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py[setup.py] script. The script has several dependencies, that need to be resolved using environment variables.
 
 === Dependencies
 - Intel MKL library https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html[oneMKL]
@@ -46,7 +46,7 @@ To resolve the FMT, Eigen and pybind11 dependencies, the environment variables
 `EIGEN_INCLUDE_DIR`, `FMT_INCLUDE_DIR` and `PYBIND11_INCLUDE_DIR` can be set.
 
 An alternative solution is to use CMake to resolve these three dependencies, see also the
-link:nerva-cpp.adoc#cmake-build[CMake install] section in the C++ documentation. The `cmake` command causes the three libraries to be downloaded in the `_deps` subdirectory of the CMake build directory. After that only the environment variable `CMAKE_DEPS_DIR` needs to be set.
+link:nerva-cpp.adoc#cmake-build[CMake install] section in the C++ documentation. The `cmake` command causes the three libraries to be downloaded automatically in the `_deps` subdirectory of the CMake build directory. After that it is sufficient to set the environment variable `CMAKE_DEPS_DIR`.
 
 The `nerva` Python module can then be installed using
 [source]
@@ -65,7 +65,7 @@ An example invocation of the `mlp.py` tool is
 ----
 include::../examples/cifar10_sparse_python.sh[tag=doc]
 ----
-This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that installs the CIFAR-10 dataset in the folder `../data` if it doesn't yet exist.
+This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that it automatically downloads the CIFAR-10 dataset in the folder `../data` if it doesn't yet exist.
 
 The output may look like this:
 [.small-code]
@@ -107,36 +107,7 @@ include::nerva-cpp.adoc[tags=pruning-options]
 
 include::nerva-cpp.adoc[tags=computation-options]
 
-===== Dataset options
-* `--cifar10 <value>`
-Specify the location of the binary version of the
-link:https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] dataset. This is a directory with subdirectory `cifar-10-batches-bin`.
-* `--dataset <value>`
-Specify a synthetic dataset to use. The following datasets are supported:
-|===
-|Specification |Description |Features |Classes
-
-|`checkerboard`
-|A checkerboard pattern, see also link:https://kaifishr.github.io/2021/01/14/micro-mlp.html#checkerboard[checkerboard].
-|2
-|2
-
-|`mini`
-|A dataset with random values.
-|3
-|2
-|===
-
-* `--dataset-size <value>`
-The size of the synthetic dataset (default: 1000).
-* `--load-dataset <value>`
-Load the dataset from a file in NumPy `.npz` format. See `--load-weights` for information about the format.
-* `--save-dataset <value>`
-Save the dataset to a file in NumPy `.npz` format. See `--save-weights` for information about the format.
-* `--normalize`
-Normalize the dataset.
-* `--preprocessed <value>`
-A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to store preprocessed datasets. A script link:../python/tools/create_cifar10_datasets.py[create_cifar10_datasets.py] is available for creating augmented CIFAR-10 datasets.
+include::nerva-cpp.adoc[tags=dataset-options]
 
 ===== Miscellaneous options
 * `--precision <value>`
@@ -145,3 +116,5 @@ The precision used for printing matrices.
 Print detailed information about the multilayer perceptron.
 * `--timer`
 Print timer messages.
+
+include::nerva-cpp.adoc[tags=io]

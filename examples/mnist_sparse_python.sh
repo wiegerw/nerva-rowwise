@@ -3,7 +3,7 @@
 # tag::doc[]
 python ../python/tools/mlp.py \
     --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="784,1024,512,10" \
+    --layer-sizes="784;1024;512;10" \
     --layer-weights=Xavier \
     --optimizers="Momentum(0.9);Momentum(0.9);Momentum(0.9)" \
     --loss=SoftmaxCrossEntropy \

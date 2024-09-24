@@ -259,6 +259,17 @@ std::vector<Number> parse_comma_separated_numbers(const std::string& text)
   return result;
 }
 
+template <typename Number = std::size_t>
+std::vector<Number> parse_semicolon_separated_numbers(const std::string& text)
+{
+  std::vector<Number> result;
+  for (const std::string& word: utilities::regex_split(text, ";"))
+  {
+    result.push_back(parse_natural_number<Number>(word));
+  }
+  return result;
+}
+
 } // namespace nerva
 
 #endif // NERVA_PARSE_NUMBERS_H

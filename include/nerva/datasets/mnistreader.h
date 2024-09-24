@@ -25,7 +25,7 @@ dataset load_mnist_dataset(const std::string& directory, bool normalize = true)
 
   auto normalize_data = [](eigen::matrix& X)
   {
-    X = X.unaryExpr([](scalar t) { return scalar(2) * ((t / scalar(255)) - scalar(0.5)); });
+    X = X.unaryExpr([](scalar t) { return static_cast<scalar>(2) * ((t / static_cast<scalar>(255)) - static_cast<scalar>(0.5)); });
   };
 
   auto path = fs::path(directory) / fs::path("mnist.npz");

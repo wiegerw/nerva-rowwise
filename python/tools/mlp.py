@@ -122,7 +122,7 @@ def parse_dropouts(text: str, linear_layer_count: int) -> List[float]:
     if not text:
         return [0.0] * n
 
-    dropouts = [float(x) for x in text.strip().split(',')]
+    dropouts = [float(x) for x in text.strip().split(';')]
 
     if len(dropouts) == 1:
         return [dropouts[0]] * n
@@ -399,11 +399,11 @@ def main():
     else:
         train_loader, test_loader = None, None
 
-    linear_layer_sizes = [int(s) for s in args.layer_sizes.split(',')]
+    linear_layer_sizes = [int(s) for s in args.layer_sizes.split(';')]
     linear_layer_count = len(linear_layer_sizes) - 1
 
     if args.densities:
-        linear_layer_densities = list(float(d) for d in args.densities.split(','))
+        linear_layer_densities = list(float(d) for d in args.densities.split(';'))
     elif args.overall_density:
         linear_layer_densities = compute_sparse_layer_densities(args.overall_density, linear_layer_sizes)
     else:

@@ -3,7 +3,7 @@
 # tag::doc[]
 ../install/bin/mlp \
     --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072,1024,1024,10" \
+    --layer-sizes="3072;1024;1024;10" \
     --layer-weights=Xavier \
     --optimizers="Nesterov(0.9)" \
     --loss=SoftmaxCrossEntropy \

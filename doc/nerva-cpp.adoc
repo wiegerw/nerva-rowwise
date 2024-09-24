@@ -159,8 +159,14 @@ epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test acc
 // tag::mlptool-options[]
 [[mlp_tool]]
 ==== {mlptool} command line options
-This section gives an overview of the command line interface of the `{mlptool}` tool. It has several options that take a list of items as input. The items of such a list are always separated by semicolons.
-Some values like take parameters. We use named parameters, e.g. `AllReLU(alpha=0.3)`. In case that there is only one parameter, the name may be omitted: `AllReLU(0.3)`. If the parameters have default values, they may be omitted. For example, `TReLU` corresponds to `TReLU(al=0,tl=0,ar=0,tr=1)`.
+This section gives an overview of the command line interface of the `{mlptool}` tool.
+
+===== Parameters lists
+
+Some command line options take a list of items as input, for example a list of layers. These items must be separated by semicolons, e.g. `--layers="ReLU;ReLU;Linear"`.
+
+===== Named parameters
+Some of the items take parameters. For this we use a function call syntax with named parameters, e.g. `AllReLU(alpha=0.3)`. In case that there is only one parameter, the name may be omitted: `AllReLU(0.3)`. If the parameters have default values, they may be omitted. For example, `TReLU` or `TReLU()` is equivalent to `TReLU(al=0,tl=0,ar=0,tr=1)`.
 // end::mlptool-options[]
 
 // tag::general-options[]
@@ -205,13 +211,14 @@ A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);L
 |`HyperbolicTangent`
 |Linear layer with hyperbolic tangent activation
 
-|`AllReLU`(stem:[\alpha])
+|`AllReLU(<alpha>)`
 |Linear layer with All ReLU activation
 
-|`SReLU`(stem:[\alpha])
-|Linear layer with SReLU activation
+|`SReLU(<al>,<tl>,<ar>,<tr>)`
+|Linear layer with SReLU activation. The default value for the parameters are `al=0, tl=0, ar=0, tr=1`. For these
+ values `SReLU` coincides with `ReLU`.
 
-|`TReLU`(stem:[\epsilon])
+|`TReLU(<epsilon>)`
 |Linear layer with trimmed ReLU activation
 
 |`BatchNorm`
@@ -219,7 +226,7 @@ A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);L
 |===
 
 * `--layer-sizes <value>`
-A comma-separated list of the sizes of linear layers of the multilayer perceptron. For example, `--layer-sizes=3072,1024,512,10` specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.
+A semicolon-separated list of the sizes of linear layers of the multilayer perceptron. For example, `--layer-sizes=3072;1024;512;10` specifies the sizes of three linear layers. The first one has 3072 inputs and 1024 outputs, the second one 1024 inputs and 512 outputs, and the third one has 512 inputs and 10 outputs.
 * `--densities <value>`
 A comma-separated list of linear layer densities. By default, all linear layers are dense (i.e. have density 1.0). If only one value is
  specified, it will be used for all linear layers.
@@ -227,6 +234,26 @@ A comma-separated list of linear layer densities. By default, all linear layers 
 A comma-separated list of dropout rates of linear layers. By default, all linear layers have no dropout (i.e. dropout rate 0.0).
 * `--overall-density <value>`
 The overall density of the linear layers. This value should be in the interval stem:[[0,1]], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.
+* `--layer-weights <value>`
+The generator that is used for initializing the weights of the linear layers. The following weight generators are supported:
+|===
+|Specification |Description
+
+|`Xavier`
+|Xavier weights
+
+|`XavierNormalized`
+|Normalized Xavier weights
+
+|`He`
+|Kaiming He weights
+
+|`Uniform`
+|Uniform weights
+
+|`Zero`
+|All weights are zero (N.B. This usually doesn't work)
+|===
 // end::layer-configuration-options[]
 
 // tag::training-configuration-options[]
@@ -298,27 +325,6 @@ The loss function used for training the multilayer perceptron. The following los
 |Negative log likelihood loss.
 |===
 
-* `--layer-weights <value>`
-The generator that is used for initializing the weights of the linear layers. The following weight generators are supported:
-|===
-|Specification |Description
-
-|`Xavier`
-|Xavier weights
-
-|`XavierNormalized`
-|Normalized Xavier weights
-
-|`He`
-|Kaiming He weights
-
-|`Uniform`
-|Uniform weights
-
-|`Zero`
-|All weights are zero (N.B. This usually doesn't work)
-|===
-
 * `--load-weights <value>`
 Load weights and biases from a dictionary in NumPy `.npz` format.
 The weight matrices should be stored with keys `W1,W2,...` and the bias vectors with keys `b1,b2,...`.
@@ -332,12 +338,28 @@ See also
 link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
 // end::training-configuration-options[]
 
+// tag::dataset-options[]
 ===== Dataset options
-* `--cifar10 <value>`
-Specify the location of the binary version of the
-link:https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] dataset. This is a directory with subdirectory `cifar-10-batches-bin`.
-* `--dataset <value>`
-Specify a synthetic dataset to use. The following datasets are supported:
+* `--cifar10 <directory>`
+Specify the directory where the binary version of the
+link:https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] dataset is stored. This is a directory with subdirectory `cifar-10-batches-bin` for the C++ version or `cifar-10-batches-py` for the Python version of the dataset.
+* `--mnist <directory>`
+Specify the directory where the https://en.wikipedia.org/wiki/MNIST_database[MNIST] dataset is stored.
+It should be stored in a file named `mnist.npz`, that can be downloaded https://s3.amazonaws.com/img-datasets/mnist.npz[here].
+
+* `--load-data <value>`
+Load the dataset from a file in NumPy `.npz` format. See
+* `--save-data <value>`
+Save the dataset to a file in NumPy `.npz` format. See
+
+* `--normalize`
+Normalize the dataset.
+* `--preprocessed <value>`
+A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to precompute augmented datasets. A script link:../python/tools/generate_cifar10_augmented_datasets.py[generate_cifar10_augmented_datasets.py] is available for creating augmented CIFAR-10 datasets.
+// end::dataset-options[]
+
+* `--generate-data <name>`
+Specify a synthetic dataset that is generated on the fly. The following datasets are supported:
 |===
 |Specification |Description |Features |Classes
 
@@ -353,15 +375,9 @@ Specify a synthetic dataset to use. The following datasets are supported:
 |===
 
 * `--dataset-size <value>`
-The size of the synthetic dataset (default: 1000).
-* `--load-dataset <value>`
-Load the dataset from a file in NumPy `.npz` format. See `--load-weights` for information about the format.
-* `--save-dataset <value>`
-Save the dataset to a file in NumPy `.npz` format. See `--save-weights` for information about the format.
-* `--normalize`
-Normalize the dataset.
-* `--preprocessed <value>`
-A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to store preprocessed datasets. A script link:../python/tools/create_cifar10_datasets.py[create_cifar10_datasets.py] is available for creating augmented CIFAR-10 datasets.
+The size of the generated dataset (default: 1000).
+`--save-weights` for information about the format.
+`--load-weights` for information about the format.
 
 ===== Miscellaneous options
 * `--precision <value>`
@@ -848,6 +864,13 @@ TIP: In C++23 the implementation of sparse matrices in CSR format can be greatly
 
 NOTE: The sparse CSR matrix functions in the MKL library take an argument of the opaque type `sparse_matrix_t`. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the {library} library recalculates this parameter after every change to a sparse matrix, which may cause some inefficiencies. See also the function `sparse_matrix_csr::construct_csr`.
 
+// tag::io[]
+== I/O
+The default storage format used in the Nerva libraries is the NumPy NPZ format, see link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format]. The reason for choosing this format is portability between C++ and Python implementations. A file in `.npz` format can be used to store a dictionary of arrays.
+
+The `{mlptool}` tool has options `--load-weights` and `--save-weights` for loading and saving the weights and bias vectors of an MLP, and options `--load-data` and `--save-data` for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are `W1, W2, ...` and `b1, b2, ...`. The keys for the training data plus targets are `Xtrain` and `Ttrain`, while for the test data plus targets we use `Xtest` and `Ttest`.
+// end::io[]
+
 == Performance
 This section discusses various aspects that play a role for the performance of a neural network library.
 
@@ -991,6 +1014,34 @@ In the command line tool `mlp` the user can select specific implementations of t
 
 === Experiments with sparse training
 In cite:[wesselink2024nervatrulysparseimplementation] we report on some of our experiments with sparse neural networks.
+
+An example of a dynamic sparse training experiment is
+[.small-code]
+[source,bash]
+----
+include::../examples/cifar10_pruning.sh[tag=doc]
+----
+At the start of every epoch 20% of the weights is pruned, and the same number of weights is added back at different locations.
+The output may look like this:
+[.small-code]
+[listing]
+----
+=== Nerva c++ model ===
+Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
+Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
+Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
+loss = SoftmaxCrossEntropyLoss()
+scheduler = ConstantScheduler(lr=0.01)
+layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
+
+epoch   0 lr: 0.01000000  loss: 2.30284437  train accuracy: 0.07904000  test accuracy: 0.08060000 time: 0.00000000s
+epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test accuracy: 0.21320000 time: 5.48583113s
+pruning + growing 26665/133325 weights
+pruning + growing 13332/66662 weights
+epoch   2 lr: 0.01000000  loss: 1.91203228  train accuracy: 0.30918000  test accuracy: 0.30900000 time: 5.00460376s
+pruning + growing 26665/133325 weights
+pruning + growing 13332/66662 weights
+----
 
 == References
 

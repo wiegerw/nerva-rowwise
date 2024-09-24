@@ -1,4 +1,4 @@
-// Copyright: Wieger Wesselink 2022
+// Copyright: Wieger Wesselink 2022 - 2024
 //
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
@@ -10,7 +10,7 @@
 #include "nerva/datasets/cifar10reader.h"
 #include "nerva/datasets/dataset.h"
 #include "nerva/datasets/mnistreader.h"
-#include "nerva/datasets/make_dataset.h"
+#include "nerva/datasets/generate_dataset.h"
 #include "nerva/neural_networks/layers.h"
 #include "nerva/neural_networks/learning_rate_schedulers.h"
 #include "nerva/neural_networks/loss_functions.h"
@@ -415,7 +415,7 @@ class mlp_tool: public command_line_tool
       else if (!options.dataset.empty())
       {
         NERVA_LOG(log::verbose) << "Generating dataset " << options.dataset << '\n';
-        dataset = datasets::make_dataset(options.dataset, options.dataset_size, rng);
+        dataset = datasets::generate_dataset(options.dataset, options.dataset_size, rng);
       }
       else if (!load_dataset_file.empty())
       {
@@ -428,7 +428,7 @@ class mlp_tool: public command_line_tool
       }
 
       auto layer_specifications = parse_layers(layer_specifications_text);
-      auto linear_layer_sizes = parse_comma_separated_numbers(linear_layer_sizes_text);
+      auto linear_layer_sizes = parse_semicolon_separated_numbers(linear_layer_sizes_text);
       auto linear_layer_count = linear_layer_sizes.size() - 1;
       auto linear_layer_densities = parse_linear_layer_densities(densities_text, overall_density, linear_layer_sizes);
       auto linear_layer_dropouts = parse_linear_layer_dropouts(dropouts_text, linear_layer_count);
