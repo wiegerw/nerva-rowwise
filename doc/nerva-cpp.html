@@ -589,10 +589,9 @@ pre.rouge .gs {
 <li><a href="#_matrix_operations">Matrix operations</a>
 <ul class="sectlevel2">
 <li><a href="#_eigen_library">Eigen library</a></li>
-<li><a href="#_mkl_library">MKL library</a></li>
 </ul>
 </li>
-<li><a href="#_io">I/O</a></li>
+<li><a href="#io">I/O</a></li>
 <li><a href="#_performance">Performance</a>
 <ul class="sectlevel2">
 <li><a href="#_mini_batches">Mini-batches</a></li>
@@ -619,9 +618,6 @@ pre.rouge .gs {
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph">
-<p>Wieger Wesselink &lt;<a href="mailto:j.w.wesselink@tue.nl">j.w.wesselink@tue.nl</a>&gt;</p>
-</div>
 <style>
   .small-code .content pre {
       font-size: 0.7em;
@@ -838,7 +834,7 @@ The number of threads that are used at runtime by the MKL library can be control
     <span class="nt">--batch-size</span><span class="o">=</span>100 <span class="se">\</span>
     <span class="nt">--threads</span><span class="o">=</span>12 <span class="se">\</span>
     <span class="nt">--overall-density</span><span class="o">=</span>0.05 <span class="se">\</span>
-    <span class="nt">--cifar10</span><span class="o">=</span>../data/cifar-10-batches-bin <span class="se">\</span>
+    <span class="nt">--cifar10</span><span class="o">=</span>../data <span class="se">\</span>
     <span class="nt">--seed</span><span class="o">=</span>123</code></pre>
 </div>
 </div>
@@ -893,7 +889,7 @@ Display help information.</p>
 </li>
 <li>
 <p><code>--debug</code>, <code>-d</code>
-Show debug output.</p>
+Show debug output. This prints batches, weight matrices, bias vectors, gradients etc.</p>
 </li>
 <li>
 <p><code>--verbose</code>, <code>-v</code>
@@ -1224,8 +1220,8 @@ Save the dataset to a file in NumPy <code>.npz</code> format. See</p>
 Normalize the dataset.</p>
 </li>
 <li>
-<p><code>--preprocessed &lt;value&gt;</code>
-A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <code>--load-weights</code> for information about the format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
+<p><code>--preprocessed &lt;directory&gt;</code>
+A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <a href="#io">I/O</a> for information about the <code>.npz</code> format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
 </li>
 <li>
 <p><code>--generate-data &lt;name&gt;</code>
@@ -1279,16 +1275,20 @@ The size of the generated dataset (default: 1000).
 <div class="ulist">
 <ul>
 <li>
-<p><code>--precision &lt;value&gt;</code>
-The precision used for printing matrices.</p>
-</li>
-<li>
 <p><code>--info</code>
 Print detailed information about the multilayer perceptron.</p>
 </li>
 <li>
 <p><code>--timer</code>
 Print timer messages.</p>
+</li>
+<li>
+<p><code>--precision &lt;value&gt;</code>
+The precision used for printing matrix elements.</p>
+</li>
+<li>
+<p><code>--edgeitems &lt;value&gt;</code>
+The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.</p>
 </li>
 </ul>
 </div>
@@ -1359,7 +1359,8 @@ The strategy used for growing in sparse weight matrices. The following strategie
 <ul>
 <li>
 <p><code>--grow-weights &lt;value&gt;</code>
-The weight generation function used for growing weights. See <code>--layer-weights</code> for supported values.</p>
+The weight generation function used for growing weights.
+See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.</p>
 </li>
 </ul>
 </div>
@@ -2103,72 +2104,10 @@ the parameters <code>Θ</code>.</p>
 <p>The nerva-rowwise library uses the <a href="https://eigen.tuxfamily.org/">Eigen library</a> for representing matrices. The matrix operations in table <a href="#table_matrix_operations">matrix operations</a> have been implemented using Eigen, see the file <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h">matrix_operations.h</a>.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_mkl_library">MKL library</h3>
-<div class="paragraph">
-<p>Using the Eigen library alone is not sufficient for obtaining high performance. Therefore, the nerva-rowwise library uses the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> as a backend. The Eigen library supports MKL by means of the compiler flag <code>EIGEN_USE_MKL_ALL</code>, see also <a href="https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html">TopicUsingIntelMKL.html</a>.
-Note that the MKL library is included in the <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html">Intel oneAPI base toolkit</a>.</p>
-</div>
-<div class="paragraph">
-<p>The MKL library supports a number of highly efficient, but extremely low-level interfaces for matrix operations. See <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html">blas-and-sparse-blas-routines.html</a> for an overview. The nerva-rowwise library contains matrix classes that hide those low-level details from the user. The table below gives an overview of them.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Header file</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_dense_vector.h">mkl_dense_vector.h</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class <code>dense_vector_view</code> that wraps a raw pointer to a vector.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_dense_matrix.h">mkl_dense_matrix.h</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class <code>dense_matrix_view</code> that wraps a raw pointer to a matrix, and a class
-<code>dense_matrix</code> that stores a dense matrix.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/mkl_sparse_matrix.h">mkl_sparse_matrix.h</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class <code>sparse_matrix_csr</code> <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> that stores a sparse matrix in
-<a href="https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)">compressed sparse row</a> (CSR) format.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-In C++23 the implementation of sparse matrices in CSR format can be greatly simplified, as shown by <a href="https://github.com/BenBrock/matrix-cpos">Ben Brock</a>.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-The sparse CSR matrix functions in the MKL library take an argument of the opaque type <code>sparse_matrix_t</code>. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the nerva-rowwise library recalculates this parameter after every change to a sparse matrix, which may cause some inefficiencies. See also the function <code>sparse_matrix_csr::construct_csr</code>.
-</td>
-</tr>
-</table>
-</div>
-</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_io">I/O</h2>
+<h2 id="io">I/O</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
@@ -2479,15 +2418,9 @@ pruning + growing 13332/66662 weights</pre>
 </div>
 </div>
 </div>
-<div id="footnotes">
-<hr>
-<div class="footnote" id="_footnotedef_1">
-<a href="#_footnoteref_1">1</a>. Note that the name <code>sparse_matrix</code> could not be used due to a conflict with a #define of the same name buried deep inside the MKL library code
-</div>
-</div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-24 10:37:54 UTC
+Last updated 2024-09-24 14:52:32 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

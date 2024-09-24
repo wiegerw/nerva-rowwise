@@ -577,16 +577,19 @@ pre.rouge .gs {
 <li><a href="#_the_tool_mlp_py">The tool mlp.py</a></li>
 </ul>
 </li>
-<li><a href="#_io">I/O</a></li>
+<li><a href="#_overview_of_the_code">Overview of the code</a>
+<ul class="sectlevel2">
+<li><a href="#_number_type">Number type</a></li>
+<li><a href="#_module_contents">Module contents</a></li>
+</ul>
+</li>
+<li><a href="#io">I/O</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph">
-<p>Wieger Wesselink &lt;<a href="mailto:j.w.wesselink@tue.nl">j.w.wesselink@tue.nl</a>&gt;</p>
-</div>
 <style>
   .small-code .content pre {
       font-size: 0.7em;
@@ -598,7 +601,7 @@ pre.rouge .gs {
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document describes the Python bindings of the nerva-rowwise library.</p>
+<p>This document describes the implementation of the <code>nerva</code> Python module, that contains bindings to the nerva-rowwise C++ library.</p>
 </div>
 </div>
 </div>
@@ -734,7 +737,7 @@ Display help information.</p>
 </li>
 <li>
 <p><code>--debug</code>, <code>-d</code>
-Show debug output.</p>
+Show debug output. This prints batches, weight matrices, bias vectors, gradients etc.</p>
 </li>
 </ul>
 </div>
@@ -1100,7 +1103,8 @@ The strategy used for growing in sparse weight matrices. The following strategie
 <ul>
 <li>
 <p><code>--grow-weights &lt;value&gt;</code>
-The weight generation function used for growing weights. See <code>--layer-weights</code> for supported values.</p>
+The weight generation function used for growing weights.
+See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.</p>
 </li>
 </ul>
 </div>
@@ -1189,8 +1193,8 @@ Save the dataset to a file in NumPy <code>.npz</code> format. See</p>
 Normalize the dataset.</p>
 </li>
 <li>
-<p><code>--preprocessed &lt;value&gt;</code>
-A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <code>--load-weights</code> for information about the format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
+<p><code>--preprocessed &lt;directory&gt;</code>
+A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <a href="#io">I/O</a> for information about the <code>.npz</code> format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
 </li>
 </ul>
 </div>
@@ -1200,16 +1204,20 @@ A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz<
 <div class="ulist">
 <ul>
 <li>
-<p><code>--precision &lt;value&gt;</code>
-The precision used for printing matrices.</p>
-</li>
-<li>
 <p><code>--info</code>
 Print detailed information about the multilayer perceptron.</p>
 </li>
 <li>
 <p><code>--timer</code>
 Print timer messages.</p>
+</li>
+<li>
+<p><code>--precision &lt;value&gt;</code>
+The precision used for printing matrix elements.</p>
+</li>
+<li>
+<p><code>--edgeitems &lt;value&gt;</code>
+The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.</p>
 </li>
 </ul>
 </div>
@@ -1219,7 +1227,82 @@ Print timer messages.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_io">I/O</h2>
+<h2 id="_overview_of_the_code">Overview of the code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section gives an overview of the Python code in the
+nerva-rowwise library, and some explanations about the code.</p>
+</div>
+<div class="sect2">
+<h3 id="_number_type">Number type</h3>
+<div class="paragraph">
+<p>The nerva-rowwise library uses 32-bit floats as its number type. The C++ library also supports 64-bit floats.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_module_contents">Module contents</h3>
+<div class="paragraph">
+<p>The most important files in the <code>nerva</code> module are given in the table below.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">File</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/multilayer_perceptron.py">multilayer_perceptron.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A multilayer perceptron class.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/layers.py">layers.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Neural network layers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/activation_functions.py">activation_functions.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Activation functions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/loss_functions.py">loss_functions.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Loss functions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/weights.py">weights.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Weight initialization functions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/optimizers.py">optimizers.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optimizer functions, for updating neural network parameters using their gradients.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/learning_rate_schedulers.py">learning_rate_schedulers.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Learning rate schedulers, for updating the learning rate during training.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/training.py">training.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A stochastic gradient descent algorithm.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/prune.py">prune.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Algorithms for pruning sparse weight matrices. This is used for dynamic sparse training.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/grow.py">grow.py</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Algorithms for (re-)growing sparse weights. This is used for dynamic sparse training.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="io">I/O</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
@@ -1232,7 +1315,7 @@ Print timer messages.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-24 10:37:54 UTC
+Last updated 2024-09-24 14:52:32 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
