@@ -19,6 +19,7 @@
 #include "nerva/neural_networks/parse_layer.h"
 #include "nerva/neural_networks/regrow.h"
 #include "nerva/neural_networks/sgd_options.h"
+#include "nerva/neural_networks/signal_handling.h"
 #include "nerva/neural_networks/training.h"
 #include "nerva/neural_networks/weights.h"
 #include "nerva/utilities/command_line_tool.h"
@@ -229,6 +230,11 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
     void on_end_epoch(unsigned int epoch) override
     {
       // print_srelu_layers(M);
+    }
+
+    void on_start_batch(unsigned int batch_index) override
+    {
+      check_signal();
     }
 };
 
@@ -491,5 +497,6 @@ class mlp_tool: public command_line_tool
 auto main(int argc, const char* argv[]) -> int
 {
   pybind11::scoped_interpreter guard{};
+  initialize_signal_handling();
   return mlp_tool().execute(argc, argv);
 }
