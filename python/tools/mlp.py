@@ -13,7 +13,7 @@ from typing import List, Union
 import torch
 from nerva.activation import parse_activation, Activation
 from nerva.datasets import create_cifar10_augmented_dataloaders, create_cifar10_dataloaders, \
-    create_npz_dataloaders, extract_tensors_from_dataloader
+    create_mnist_dataloaders, create_npz_dataloaders, extract_tensors_from_dataloader
 from nerva.layers import print_model_info, BatchNormalization, Dense, Sparse, Layer, Sequential
 from nerva.learning_rate import LearningRateScheduler, parse_learning_rate
 from nerva.loss import LossFunction, parse_loss_function
@@ -193,8 +193,9 @@ def make_argument_parser():
     cmdline_parser.add_argument("--optimizers", type=str, help="The optimizer (GradientDescent, Momentum(<mu>), Nesterov(<mu>))", default="GradientDescent")
 
     # dataset
-    cmdline_parser.add_argument('--datadir', type=str, default='', help='the data directory')
     cmdline_parser.add_argument('--dataset', type=str, help='An .npz file containing train and test data')
+    cmdline_parser.add_argument('--cifar10', type=str, default='', help='The directory containing the CIFAR-10 dataset')
+    cmdline_parser.add_argument('--mnist', type=str, default='', help='The directory containing the MNIST dataset')
     cmdline_parser.add_argument("--augmented", help="use data loaders with augmentation", action="store_true")
     cmdline_parser.add_argument("--preprocessed", help="folder with preprocessed datasets for each epoch")
 
@@ -234,8 +235,8 @@ def check_command_line_arguments(args):
     if args.densities and args.overall_density:
         raise RuntimeError('the options --densities and --overall-density cannot be used simultaneously')
 
-    if not args.datadir and not args.dataset and not args.preprocessed:
-        raise RuntimeError('at least one of the options --datadir --dataset and --preprocessed must be set')
+    if sum([bool(args.dataset), bool(args.cifar10), bool(args.mnist), bool(args.preprocessed)]) != 1:
+        raise RuntimeError("Exactly one of the options --dataset, --cifar10, --mnist, or --preprocessed must be set.")
 
 
 def quote(text):
@@ -343,18 +344,18 @@ class SGD(StochasticGradientDescentAlgorithm):
 
             lr = self.learning_rate(epoch)  # update the learning at the start of each epoch
 
-            for k in range(K):
-                batch = I[k * batch_size: (k + 1) * batch_size]
+            for batch_index in range(K):
+                batch = I[batch_index * batch_size: (batch_index + 1) * batch_size]
                 X = Xtrain[:, batch]
                 T = Ttrain[batch]
 
-                self.on_start_batch()
+                self.on_start_batch(batch_index)
                 T = to_one_hot(T, num_classes)
                 Y = M.feedforward(X)
                 DY = self.loss.gradient(Y, T) / options.batch_size
 
                 if options.debug:
-                    print(f'epoch: {epoch} batch: {k}')
+                    print(f'epoch: {epoch} batch: {batch_index}')
                     print_model_info(M)
                     pp("X", X)
                     pp("Y", Y)
@@ -363,7 +364,7 @@ class SGD(StochasticGradientDescentAlgorithm):
                 M.backpropagate(Y, DY)
                 M.optimize(lr)
 
-                self.on_end_batch()
+                self.on_end_batch(batch_index)
 
             self.timer.stop(epoch_label)
             seconds = self.timer.seconds(epoch_label)
@@ -386,11 +387,13 @@ def main():
     initialize_frameworks(args)
     set_nerva_computation(args.computation)
 
-    if args.datadir:
+    if args.cifar10:
         if args.augmented:
-            train_loader, test_loader = create_cifar10_augmented_dataloaders(args.batch_size, args.batch_size, args.datadir)
+            train_loader, test_loader = create_cifar10_augmented_dataloaders(args.batch_size, args.batch_size, args.cifar10)
         else:
-            train_loader, test_loader = create_cifar10_dataloaders(args.batch_size, args.batch_size, args.datadir)
+            train_loader, test_loader = create_cifar10_dataloaders(args.batch_size, args.batch_size, args.cifar10)
+    elif args.mnist:
+        train_loader, test_loader = create_mnist_dataloaders(args.batch_size, args.batch_size, args.mnist)
     elif args.dataset:
         train_loader, test_loader = create_npz_dataloaders(args.dataset, batch_size=args.batch_size)
     else:

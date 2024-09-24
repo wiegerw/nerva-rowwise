@@ -23,19 +23,38 @@ bool is_row_major(const pybind11::array_t<Scalar> &x)
   return (x.flags() & py::array::c_style) != 0;
 }
 
+/// Extracts an Eigen matrix from a NumPy array that is stored in a dictionary.
+/// The array will be flattened if needed.
+/// @tparam Scalar The number type
+/// @tparam MatrixLayout Row major or column major
+/// @param data A dictionary
+/// @param key The key in the dictionary corresponding to the NumPy array
+/// @return The extracted matrix.
 template <typename Scalar = scalar, int MatrixLayout = default_matrix_layout>
 Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, MatrixLayout> extract_matrix(const py::dict& data, const std::string& key)
 {
-  const auto& x = data[key.c_str()].cast<py::array_t<Scalar>>();
-  assert(x.ndim() == 2);
-  auto shape = x.shape();
-  if (is_row_major(x))
+  auto array = data[key.c_str()].cast<py::array_t<Scalar>>();
+  auto ndim = array.ndim();
+
+  // Flatten the array if it has more than 2 dimensions
+  if (ndim > 2)
   {
-    return Eigen::Map<const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>>(x.data(), shape[1], shape[0]).transpose();
+    // Flatten all dimensions except for the first one (the batch size)
+    auto shape = array.shape();
+    long new_dim = std::accumulate(shape + 1, shape + ndim, 1, std::multiplies<long>());
+    array = array.reshape({shape[0], new_dim});
+  }
+
+  assert(array.ndim() == 2);
+
+  auto shape = array.shape();
+  if (is_row_major(array))
+  {
+    return Eigen::Map<const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>>(array.data(), shape[1], shape[0]).transpose();
   }
   else
   {
-    return Eigen::Map<const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(x.data(), shape[1], shape[0]).transpose();
+    return Eigen::Map<const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(array.data(), shape[1], shape[0]).transpose();
   }
 }
 
@@ -58,7 +77,7 @@ void print_dict(const py::dict& data)
 {
   for (const auto& item: data)
   {
-    std::string key = item.first.cast<std::string>();
+    auto key = item.first.cast<std::string>();
     if (key[0] == 'W' || key == "Xtrain" || key == "Xtest")
     {
       print_numpy_matrix(key, eigen::extract_matrix<scalar>(data, key));

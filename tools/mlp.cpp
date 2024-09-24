@@ -7,7 +7,9 @@
 /// \file tools/mlp.cpp
 /// \brief add your file description here.
 
+#include "nerva/datasets/cifar10reader.h"
 #include "nerva/datasets/dataset.h"
+#include "nerva/datasets/mnistreader.h"
 #include "nerva/datasets/make_dataset.h"
 #include "nerva/neural_networks/layers.h"
 #include "nerva/neural_networks/learning_rate_schedulers.h"
@@ -233,15 +235,16 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
 struct mlp_options: public sgd_options
 {
   std::string cifar10;
+  std::string mnist;
   std::string dataset;
   std::size_t dataset_size = 2000;
   bool normalize_data = false;
-  std::string learning_rate_scheduler = "constant(0.0001)";
-  std::string loss_function = "squared-error";
+  std::string learning_rate_scheduler = "Constant(0.0001)";
+  std::string loss_function = "SquaredError";
   std::string architecture;
   std::vector<std::size_t> sizes;
   std::string weights_initialization;
-  std::string optimizer = "gradient-descent";
+  std::string optimizer = "GradientDescent";
   scalar overall_density = 1;
   std::vector<double> densities;
   std::size_t seed = std::random_device{}();
@@ -342,8 +345,9 @@ class mlp_tool: public command_line_tool
       cli |= lyra::opt(save_weights_file, "value")["--save-weights"]("Saves the weights and bias to a file in .npz format");
 
       // dataset
-      cli |= lyra::opt(options.cifar10, "value")["--cifar10"]("The location of the CIFAR10 dataset");
-      cli |= lyra::opt(options.dataset, "value")["--dataset"]("The dataset (checkerboard, mini)");
+      cli |= lyra::opt(options.cifar10, "value")["--cifar10"]("The directory of the CIFAR-10 dataset");
+      cli |= lyra::opt(options.mnist, "value")["--mnist"]("The directory of the MNIST dataset");
+      cli |= lyra::opt(options.dataset, "value")["--generate-dataset"]("Use a generated dataset (checkerboard, mini)");
       cli |= lyra::opt(options.dataset_size, "value")["--dataset-size"]("The size of the dataset (default: 1000)");
       cli |= lyra::opt(load_dataset_file, "value")["--load-dataset"]("Loads the dataset from a file in .npz format");
       cli |= lyra::opt(save_dataset_file, "value")["--save-dataset"]("Saves the dataset to a file in .npz format");
@@ -400,16 +404,17 @@ class mlp_tool: public command_line_tool
 
       if (!options.cifar10.empty())
       {
-        NERVA_LOG(log::verbose) << "Loading datset CIFAR10 from folder " << options.cifar10 << '\n';
-        cifar10reader_colwise reader;
-        reader.read(options.cifar10);
-        reader.normalize_data();
-        std::tie(dataset.Xtrain, dataset.Ttrain, dataset.Xtest, dataset.Ttest) = reader.data();
-        dataset.transpose();
+        NERVA_LOG(log::verbose) << "Loading dataset CIFAR-10 from folder " << options.cifar10 << '\n';
+        dataset = datasets::load_cifar10_dataset(options.cifar10, true);
+      }
+      else if (!options.mnist.empty())
+      {
+        NERVA_LOG(log::verbose) << "Loading dataset MNIST from folder " << options.cifar10 << '\n';
+        dataset = datasets::load_mnist_dataset(options.mnist, true);
       }
       else if (!options.dataset.empty())
       {
-        NERVA_LOG(log::verbose) << "Loading dataset " << options.dataset << '\n';
+        NERVA_LOG(log::verbose) << "Generating dataset " << options.dataset << '\n';
         dataset = datasets::make_dataset(options.dataset, options.dataset_size, rng);
       }
       else if (!load_dataset_file.empty())

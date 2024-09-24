@@ -13,10 +13,12 @@
 :library: nerva-rowwise
 :imagesdir: images
 :bibliography: nerva.bib
+:library: nerva-rowwise
+:mlptool: mlp
+
 Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
-:tip-caption: :bulb:
 endif::[]
 
 ++++
@@ -129,7 +131,7 @@ The tool `mlp` can be used for training multilayer perceptrons. An example invoc
 [.small-code]
 [source,bash]
 ----
-include::../examples/doc_mlp.sh[tag=doc]
+include::../examples/cifar10_sparse.sh[tag=doc]
 ----
 This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from https://www.cs.toronto.edu/~kriz/cifar.html.
 
@@ -154,23 +156,30 @@ epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test acc
 epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s
 ----
 
+// tag::mlptool-options[]
 [[mlp_tool]]
-==== mlp command line options
-The `mlp` tool has the following command line options.
-Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].
+==== {mlptool} command line options
+This section gives an overview of the command line interface of the `{mlptool}` tool. It has several options that take a list of items as input. The items of such a list are always separated by semicolons.
+Some values like take parameters. We use named parameters, e.g. `AllReLU(alpha=0.3)`. In case that there is only one parameter, the name may be omitted: `AllReLU(0.3)`. If the parameters have default values, they may be omitted. For example, `TReLU` corresponds to `TReLU(al=0,tl=0,ar=0,tr=1)`.
+// end::mlptool-options[]
 
+// tag::general-options[]
 ===== General options
 * `-?`, `-h`, `--help`
 Display help information.
-* `--verbose`, `-v`
-Show verbose output.
 * `--debug`, `-d`
 Show debug output.
+// end::general-options[]
+* `--verbose`, `-v`
+Show verbose output.
 
+// tag::random-generator-options[]
 ===== Random generator options
 * `--seed <value>`
 A seed value for the random generator.
+// end::random-generator-options[]
 
+// tag::layer-configuration-options[]
 ===== Layer configuration options
 * `--layers <value>`
 A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);Linear` is used to specify a neural network with three layers with an ReLU, AllReLU and no activation function. The following layers are supported:
@@ -218,7 +227,9 @@ A comma-separated list of linear layer densities. By default, all linear layers 
 A comma-separated list of dropout rates of linear layers. By default, all linear layers have no dropout (i.e. dropout rate 0.0).
 * `--overall-density <value>`
 The overall density of the linear layers. This value should be in the interval stem:[[0,1]], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.
+// end::layer-configuration-options[]
 
+// tag::training-configuration-options[]
 ===== Training configuration options
 * `--epochs <value>`
 The number of epochs of the training (default: 100).
@@ -236,11 +247,11 @@ A semicolon-separated list of optimizers used for linear and batch normalization
 |`GradientDescent`
 |Gradient descent optimization
 
-|`Momentum`(stem:[\mu])
-|Momentum optimization with momentum parameter stem:[\mu]
+|`Momentum(mu)`
+|Momentum optimization with momentum parameter `mu`
 
-|`Nesterov`(stem:[\mu])
-|Nesterov optimization with momentum parameter stem:[\mu]
+|`Nesterov(mu)`
+|Nesterov optimization with momentum parameter `mu`
 |===
 
 * `--learning-rate <value>`
@@ -319,6 +330,7 @@ Save weights and biases to a dictionary in NumPy `.npz` format.
 The weight matrices are stored with keys `W1,W2,...` and the bias vectors with keys `b1,b2,...`.
 See also
 link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
+// end::training-configuration-options[]
 
 ===== Dataset options
 * `--cifar10 <value>`
@@ -359,6 +371,7 @@ Print detailed information about the multilayer perceptron.
 * `--timer`
 Print timer messages.
 
+// tag::pruning-options[]
 ===== Pruning and growing options
 * `--prune <strategy>`
 The strategy used for pruning sparse weight matrices. The following strategies are supported:
@@ -386,7 +399,9 @@ The strategy used for growing in sparse weight matrices. The following strategie
 
 * `--grow-weights <value>`
 The weight generation function used for growing weights. See `--layer-weights` for supported values.
+// end::pruning-options[]
 
+// tag::computation-options[]
 ===== Computation options
 * `--computation <value>`
 The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:
@@ -412,13 +427,14 @@ A threshold value used to set small elements of weight matrices to zero.
 The number of threads used by the MKL and OMP libraries.
 * `--gradient-step <value>`
 If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
+// end::computation-options[]
 
 === The tool mkl
 The tool `mkl` is used for benchmarking sparse and dense matrix products. An example of running the `mkl` tool is
 [.small-code]
 [source,bash]
 ----
-include::../examples/doc_mkl.sh[tag=doc]
+include::../examples/mkl_benchmark.sh[tag=doc]
 ----
 This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
 

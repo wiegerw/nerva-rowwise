@@ -12,6 +12,7 @@
 
 #include "nerva/datasets/cifar10reader.h"
 #include "nerva/datasets/dataset.h"
+#include "nerva/utilities/random.h"
 
 namespace nerva::datasets {
 
@@ -89,18 +90,6 @@ dataset make_dataset(const std::string& name, std::size_t n, RandomNumberGenerat
   {
     throw std::runtime_error("unknown dataset " + name);
   }
-  return result;
-}
-
-inline
-dataset load_cifar10_dataset(const std::string& directory)
-{
-  dataset result;
-  cifar10reader_colwise reader;
-  reader.read(directory);
-  reader.normalize_data();
-  std::tie(result.Xtrain, result.Ttrain, result.Xtest, result.Ttest) = reader.data();
-  result.transpose();
   return result;
 }
 

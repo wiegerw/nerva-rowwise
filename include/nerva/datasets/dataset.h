@@ -9,23 +9,17 @@
 
 #pragma once
 
-#include "nerva/datasets/cifar10reader.h"
-#include "nerva/datasets/dataset.h"
 #include "nerva/neural_networks/eigen.h"
 #include "nerva/neural_networks/numpy_eigen.h"
-#include "nerva/utilities/random.h"
 #include <pybind11/embed.h>
 #include <pybind11/numpy.h>
 #include <algorithm>
-#include <cmath>
-#include <ctime>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <utility>
 #include <vector>
 #include <string>
-#include <random>
 
 namespace nerva::datasets {
 
@@ -43,9 +37,18 @@ void dataset_info(const Matrix& Xtrain, const Matrix& Ttrain, const Matrix& Xtes
 }
 
 // Precondition: the python interpreter must be running.
-// This can be enforced using `py::scoped_interpreter guard{};`
+// This can be enforced using `pybind11::scoped_interpreter guard{};`
 template <typename Matrix>
-void dataset_load(const std::string& filename, Matrix& Xtrain, Matrix& Ttrain, Matrix& Xtest, Matrix& Ttest)
+void dataset_load(const std::string& filename,
+                  Matrix& Xtrain,
+                  Matrix& Ttrain,
+                  Matrix& Xtest,
+                  Matrix& Ttest,
+                  const std::string& Xtrain_key = "Xtrain",
+                  const std::string& Ttrain_key = "Ttrain",
+                  const std::string& Xtest_key = "Xtest",
+                  const std::string& Ttest_key = "Ttest"
+                 )
 {
   std::cout << "Loading dataset from file " << filename << std::endl;
 
@@ -56,10 +59,10 @@ void dataset_load(const std::string& filename, Matrix& Xtrain, Matrix& Ttrain, M
 
   pybind11::dict data = pybind11::module::import("numpy").attr("load")(filename);
 
-  Xtrain = eigen::extract_matrix<scalar>(data, "Xtrain");
-  Xtest = eigen::extract_matrix<scalar>(data, "Xtest");
-  auto Ttrain_ = eigen::extract_row_vector<long>(data, "Ttrain");
-  auto Ttest_ = eigen::extract_row_vector<long>(data, "Ttest");
+  Xtrain = eigen::extract_matrix<scalar>(data, Xtrain_key);
+  Xtest = eigen::extract_matrix<scalar>(data, Xtest_key);
+  auto Ttrain_ = eigen::extract_row_vector<long>(data, Ttrain_key);
+  auto Ttest_ = eigen::extract_row_vector<long>(data, Ttest_key);
   long num_classes = Ttrain_.maxCoeff() + 1;
   Ttrain = eigen::to_one_hot_rowwise(Ttrain_, num_classes);
   Ttest = eigen::to_one_hot_rowwise(Ttest_, num_classes);
@@ -112,7 +115,7 @@ struct dataset
   }
 
   // Precondition: the python interpreter must be running.
-  // This can be enforced using `py::scoped_interpreter guard{};`
+  // This can be enforced using `pybind11::scoped_interpreter guard{};`
   void load(const std::string& filename)
   {
     dataset_load(filename, Xtrain, Ttrain, Xtest, Ttest);

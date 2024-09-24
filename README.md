@@ -20,7 +20,7 @@ The `nerva-rowwise` library has the following features:
 
 ### Documentation
 The documentation consists of three parts:
-* A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) that explains the implementation.
+* A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html) that explains the implementation.
 * A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains the Python interface.
 * A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of key components of neural networks.
 
@@ -56,7 +56,7 @@ By this we mean that if you want to know precisely what a component of a neural 
 
 ### Installation
 C++ users can use `CMake` to install the library in a standard manner. Python users can install the library via `pip`. 
-See the [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-c++.html) and/or the
+See the [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html) and/or the
 [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) for more details about this.
 
 ### Command line interface

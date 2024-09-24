@@ -10,13 +10,14 @@
 :stem: latexmath
 :icons: font
 :description: Documentation for the nerva-rowwise repository.
-:library: nerva-rowwise
 :imagesdir: images
 :bibliography: nerva.bib
+:library: nerva-rowwise
+:mlptool: mlp.py
+
 Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
-:tip-caption: :bulb:
 endif::[]
 
 ++++
@@ -45,7 +46,7 @@ To resolve the FMT, Eigen and pybind11 dependencies, the environment variables
 `EIGEN_INCLUDE_DIR`, `FMT_INCLUDE_DIR` and `PYBIND11_INCLUDE_DIR` can be set.
 
 An alternative solution is to use CMake to resolve these three dependencies, see also the
-link:nerva-c%2B%2B.adoc#cmake-build[CMake install] section in the C++ documentation. The `cmake` command causes the three libraries to be downloaded in the `_deps` subdirectories of the CMake build directory. After that only the environment variable `CMAKE_DEPS_DIR` needs to be set.
+link:nerva-cpp.adoc#cmake-build[CMake install] section in the C++ documentation. The `cmake` command causes the three libraries to be downloaded in the `_deps` subdirectory of the CMake build directory. After that only the environment variable `CMAKE_DEPS_DIR` needs to be set.
 
 The `nerva` Python module can then be installed using
 [source]
@@ -62,11 +63,12 @@ An example invocation of the `mlp.py` tool is
 
 [source]
 ----
-include::../examples/doc_mlp_python.sh[tag=doc]
+include::../examples/cifar10_sparse_python.sh[tag=doc]
 ----
 This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that installs the CIFAR-10 dataset in the folder `../data` if it doesn't yet exist.
 
 The output may look like this:
+[.small-code]
 [source]
 ----
 === Nerva python model ===
@@ -90,3 +92,56 @@ epoch   5  lr: 0.01000000  loss: 1.36875251  train accuracy: 0.51380000  test ac
 epoch   6  lr: 0.01000000  loss: 1.29761993  train accuracy: 0.54106000  test accuracy: 0.50710000  time: 3.59350869s
 epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test accuracy: 0.51690000  time: 3.96624650s
 ----
+
+include::nerva-cpp.adoc[tags=mlptool-options]
+
+include::nerva-cpp.adoc[tags=general-options]
+
+include::nerva-cpp.adoc[tags=random-generator-options]
+
+include::nerva-cpp.adoc[tags=layer-configuration-options]
+
+include::nerva-cpp.adoc[tags=training-configuration-options]
+
+include::nerva-cpp.adoc[tags=pruning-options]
+
+include::nerva-cpp.adoc[tags=computation-options]
+
+===== Dataset options
+* `--cifar10 <value>`
+Specify the location of the binary version of the
+link:https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] dataset. This is a directory with subdirectory `cifar-10-batches-bin`.
+* `--dataset <value>`
+Specify a synthetic dataset to use. The following datasets are supported:
+|===
+|Specification |Description |Features |Classes
+
+|`checkerboard`
+|A checkerboard pattern, see also link:https://kaifishr.github.io/2021/01/14/micro-mlp.html#checkerboard[checkerboard].
+|2
+|2
+
+|`mini`
+|A dataset with random values.
+|3
+|2
+|===
+
+* `--dataset-size <value>`
+The size of the synthetic dataset (default: 1000).
+* `--load-dataset <value>`
+Load the dataset from a file in NumPy `.npz` format. See `--load-weights` for information about the format.
+* `--save-dataset <value>`
+Save the dataset to a file in NumPy `.npz` format. See `--save-weights` for information about the format.
+* `--normalize`
+Normalize the dataset.
+* `--preprocessed <value>`
+A directory containing datasets named `epoch0.npz`, `epoch1.npz`, ... See `--load-weights` for information about the format. This can for example be used to store preprocessed datasets. A script link:../python/tools/create_cifar10_datasets.py[create_cifar10_datasets.py] is available for creating augmented CIFAR-10 datasets.
+
+===== Miscellaneous options
+* `--precision <value>`
+The precision used for printing matrices.
+* `--info`
+Print detailed information about the multilayer perceptron.
+* `--timer`
+Print timer messages.

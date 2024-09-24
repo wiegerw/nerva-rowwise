@@ -7,9 +7,9 @@
 /// \file nerva/datasets/cifar10reader.h
 /// \brief add your file description here.
 
-#ifndef NERVA_DATASETS_CIFAR10READER_H
-#define NERVA_DATASETS_CIFAR10READER_H
+#pragma once
 
+#include "nerva/datasets/dataset.h"
 #include "nerva/neural_networks/eigen.h"
 #include "nerva/utilities/logger.h"
 #include "nerva/utilities/text_utility.h"
@@ -17,148 +17,81 @@
 #include <random>
 #include <numeric>
 
-namespace nerva {
+namespace nerva::datasets {
 
-class cifar10reader_colwise
+/**
+ * Reads a slice of the CIFAR-10 dataset
+ * @param filename The name of the file containing the slice
+ * @param X The matrix in which the examples are stored
+ * @param T The matrix in which the corresponding targets are stored
+ * @param start The start row of `X` and `T` where the data is stored
+ */
+inline
+void read_cifar10_slice(const std::string& filename, eigen::matrix& X, eigen::matrix& T, long start)
 {
-  protected:
-    eigen::matrix Xtrain;
-    eigen::matrix Ttrain;
-    eigen::matrix Xvalid;
-    eigen::matrix Tvalid;
+  auto to_scalar = [](std::byte x)
+  {
+    return static_cast<scalar>(std::to_integer<std::uint8_t>(x));
+  };
 
-    static void read_slice(const std::string& filename, eigen::matrix& X, eigen::matrix& T, long start)
+  auto bytes = read_binary_file(filename);
+  if (bytes.size() != 30730000)
+  {
+    throw std::runtime_error("The size of the file " + filename + " is not equal to 3073000");
+  }
+
+  NERVA_LOG(log::verbose) << ".";
+
+  for (long i = 0; i < 10000; i++)
+  {
+    auto first = bytes.begin() + i * 3073;
+    auto class_ = std::to_integer<int>(*first++);
+    if (class_ > 9)
     {
-      auto to_double = [](std::byte x)
-      {
-        return static_cast<scalar>(std::to_integer<std::uint8_t>(x));
-      };
-
-      auto bytes = read_binary_file(filename);
-      if (bytes.size() != 30730000)
-      {
-        throw std::runtime_error("The size of the file " + filename + " is not equal to 3073000");
-      }
-
-      NERVA_LOG(log::verbose) << ".";
-
-      for (long j = 0; j < 10000; j++)
-      {
-        auto first = bytes.begin() + j * 3073;
-        auto class_ = std::to_integer<int>(*first++);
-        if (class_ > 9)
-        {
-          throw std::runtime_error("Invalid class " + std::to_string(class_) + " encountered");
-        }
-        T(class_, start + j) = 1;
-        for (long i = 0; i < 3072; i++)
-        {
-          // store the data as R1 G1 B1 R2 G2 B2 ...
-          auto row = 3 * (i % 1024) + (i / 1024);
-          X(row, start + j) = to_double(*first++);
-        }
-      }
+      throw std::runtime_error("Invalid class " + std::to_string(class_) + " encountered");
     }
-
-    template <typename Vector>
-    std::pair<scalar, scalar> mean_stddev(const Vector& x)
+    T(start + i, class_) = 1;
+    for (long j = 0; j < 3072; j++)
     {
-      scalar mu = x.mean();
-      scalar sigma = std::sqrt((x.array() - mu).square().sum() / x.size());
-      if (std::fabs(sigma) < scalar(1e-10))
-      {
-        sigma = 1; // do not scale for very small values
-      }
-      return {mu, sigma};
+      // store the data as R1 G1 B1 R2 G2 B2 ...
+      auto col = 3 * (j % 1024) + (j / 1024);
+      X(start + i, col) = to_scalar(*first++);
     }
+  }
+}
 
-  public:
-    cifar10reader_colwise()
-        : Xtrain(3072, 50000), Xvalid(3072, 10000)
-    {
-      Ttrain = eigen::matrix::Zero(10, 50000);
-      Tvalid = eigen::matrix::Zero(10, 10000);
-    }
+inline
+datasets::dataset load_cifar10_dataset(const std::string& directory, bool normalize=true)
+{
+  datasets::dataset result;
+  result.Xtrain = eigen::matrix(50000, 3072);
+  result.Xtest = eigen::matrix(10000, 3072);
+  result.Ttrain = eigen::matrix::Zero(50000, 10);
+  result.Ttest = eigen::matrix::Zero(10000, 10);
 
-    void read(const std::string& directory)
-    {
-      namespace fs = std::filesystem;
-      for (int i = 0; i < 5; i++)
-      {
-        auto path = fs::path(directory) / fs::path("data_batch_" + std::to_string(i + 1) + ".bin");
-        read_slice(path.string(), Xtrain, Ttrain, i * 10000);
-      }
-      auto path = fs::path(directory) / fs::path("test_batch.bin");
-      read_slice(path.string(), Xvalid, Tvalid, 0);
-      NERVA_LOG(log::verbose) << std::endl;
-    }
+  auto normalize_data = [](eigen::matrix& X)
+  {
+    X = X.unaryExpr([](scalar t) { return scalar(2) * ((t / scalar(255)) - scalar(0.5)); });
+  };
 
-    void normalize_data()
-    {
-      auto normalize = [](eigen::matrix& X)
-      {
-        X = X.unaryExpr([](scalar t) { return scalar(2) * ((t / scalar(255)) - scalar(0.5)); });
-      };
+  namespace fs = std::filesystem;
+  for (int i = 0; i < 5; i++)
+  {
+    auto path = fs::path(directory) / fs::path("data_batch_" + std::to_string(i + 1) + ".bin");
+    read_cifar10_slice(path.string(), result.Xtrain, result.Ttrain, i * 10000);
+  }
+  auto path = fs::path(directory) / fs::path("test_batch.bin");
+  read_cifar10_slice(path.string(), result.Xtest, result.Ttest, 0);
+  NERVA_LOG(log::verbose) << std::endl;
 
-      NERVA_LOG(log::verbose) << "Normalizing data" << std::endl;
-      normalize(Xtrain);
-      normalize(Xvalid);
-    }
+  if (normalize)
+  {
+    NERVA_LOG(log::verbose) << "Normalizing data" << std::endl;
+    normalize_data(result.Xtrain);
+    normalize_data(result.Xtest);
+  }
 
-    std::tuple<eigen::matrix, eigen::matrix, eigen::matrix, eigen::matrix> random_subset(long ntrain, long nvalid, std::mt19937& rng)
-    {
-      eigen::matrix Xtrain_subset(Xtrain.rows(), ntrain);
-      eigen::matrix Ttrain_subset(Ttrain.rows(), ntrain);
-      eigen::matrix Xvalid_subset(Xvalid.rows(), nvalid);
-      eigen::matrix Tvalid_subset(Tvalid.rows(), nvalid);
+  return result;
+}
 
-      auto make_subset = [&](const eigen::matrix& X, const eigen::matrix& T, eigen::matrix& Xsubset, eigen::matrix& Tsubset)
-      {
-        std::size_t N = X.cols(); // the number of examples
-        std::vector<long> I(N);
-        std::iota(I.begin(), I.end(), 0);
-        std::shuffle(I.begin(), I.end(), rng);
-
-        for (auto i = 0; i < Xsubset.cols(); i++)
-        {
-          Xsubset.col(i) = X.col(I[i]);
-          Tsubset.col(i) = T.col(I[i]);
-        }
-      };
-
-      make_subset(Xtrain, Ttrain, Xtrain_subset, Ttrain_subset);
-      make_subset(Xvalid, Tvalid, Xvalid_subset, Tvalid_subset);
-      NERVA_LOG(log::verbose) << "created random subsets" << std::endl;
-
-      return { Xtrain_subset, Ttrain_subset, Xvalid_subset, Tvalid_subset };
-    }
-
-    [[nodiscard]] std::tuple<eigen::matrix, eigen::matrix, eigen::matrix, eigen::matrix> data() const
-    {
-      return { Xtrain, Ttrain, Xvalid, Tvalid };
-    }
-
-    [[nodiscard]] const eigen::matrix& xtrain() const
-    {
-      return Xtrain;
-    }
-
-    [[nodiscard]] const eigen::matrix& ttrain() const
-    {
-      return Ttrain;
-    }
-
-    [[nodiscard]] const eigen::matrix& xvalid() const
-    {
-      return Xvalid;
-    }
-
-    [[nodiscard]] const eigen::matrix& tvalid() const
-    {
-      return Tvalid;
-    }
-};
-
-} // namespace nerva
-
-#endif // NERVA_DATASETS_CIFAR10READER_H
+} // namespace nerva::datasets
