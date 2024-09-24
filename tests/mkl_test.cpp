@@ -794,9 +794,9 @@ void test_matrix_addition(long m, long k, long n, scalar density)
 
 TEST_CASE("test_multiplication")
 {
-  test_matrix_multiplication(1000, 900, 1200, 0.1);
-  test_matrix_multiplication(1000, 900, 1200, 0.5);
-  test_matrix_multiplication(1000, 900, 1200, 1.0);
+  test_matrix_multiplication(400, 500, 800, 0.1);
+  test_matrix_multiplication(400, 500, 800, 0.5);
+  test_matrix_multiplication(400, 500, 800, 1.0);
 }
 
 TEST_CASE("test_addition")

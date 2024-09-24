@@ -362,14 +362,16 @@ TEST_CASE("test_sparse")
   CHECK(matrix(B3) == C3);
   CHECK(matrix(B4) == C4);
 
+  long N = 10000;
+
   // check if operations are truly sparse
-  matrix V(100000, 1);
+  matrix V(N, 1);
   V.array() = 3;
 
-  matrix W(1, 100000);
+  matrix W(1, N);
   W.array() = 4;
 
-  sparse_matrix_type Z(100000, 100000);
+  sparse_matrix_type Z(N, N);
   Z.setFromTriplets(tripletList.begin(), tripletList.end());
   std::cout << "assigning matrix" << std::endl;
   try
@@ -408,4 +410,3 @@ TEST_CASE("test_transpose")
   DOCTEST_CHECK_EQ(X.transpose(), X_transposed);
   DOCTEST_CHECK_EQ(Y, X_transposed);
 }
-

@@ -91,7 +91,7 @@ std::vector<T> filter_sequence(const std::vector<T>& items, Predicate pred)
 
 bool is_linear_layer(const std::string& layer_description)
 {
-  return layer_description != "BatchNorm";
+  return layer_description != "BatchNormalization";
 }
 
 inline

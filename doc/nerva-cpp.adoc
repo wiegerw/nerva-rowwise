@@ -221,7 +221,7 @@ A semicolon separated list of layers. For example, `--layers=ReLU;AllReLU(0.3);L
 |`TReLU(<epsilon>)`
 |Linear layer with trimmed ReLU activation
 
-|`BatchNorm`
+|`BatchNormalization`
 |Batch normalization layer
 |===
 

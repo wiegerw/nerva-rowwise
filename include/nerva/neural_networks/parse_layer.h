@@ -445,7 +445,7 @@ std::vector<std::shared_ptr<neural_network_layer>> make_layers(const std::vector
 
   for (const std::string& layer: layer_specifications)
   {
-    if (layer == "BatchNorm")
+    if (layer == "BatchNormalization")
     {
       auto D = input_size;
       const std::string& optimizer = optimizers[optimizer_index++];

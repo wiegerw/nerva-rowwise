@@ -460,7 +460,7 @@ TEST_CASE("test_batch_normalization1")
   long K = linear_layer_sizes.back();
 
   construct_mlp(M,
-                {"BatchNorm", "ReLU", "ReLU", "Linear"},
+                {"BatchNormalization", "ReLU", "ReLU", "Linear"},
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.0, 0.0, 0.0},
@@ -493,7 +493,7 @@ TEST_CASE("test_batch_normalization2")
 
   // TODO: with ReLU instead of Sigmoid this testcase sometimes fails. Most likely this is caused by the discontinuity at 0.
   construct_mlp(M,
-                {"Sigmoid", "BatchNorm", "Sigmoid", "Linear"},
+                {"Sigmoid", "BatchNormalization", "Sigmoid", "Linear"},
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.0, 0.0, 0.0},

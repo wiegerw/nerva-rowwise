@@ -321,7 +321,7 @@ class mlp_tool: public command_line_tool
       cli |= lyra::opt(dropouts_text, "value")["--dropouts"]("A comma separated list of dropout rates");
       cli |= lyra::opt(overall_density, "value")["--overall-density"]("The overall density level of the sparse layers");
       cli |= lyra::opt(layer_specifications_text, "value")["--layers"]("A semi-colon separated lists of layers. The following layers are supported: "
-                                                                  "Linear, ReLU, Sigmoid, Softmax, LogSoftmax, HyperbolicTangent, BatchNorm, "
+                                                                  "Linear, ReLU, Sigmoid, Softmax, LogSoftmax, HyperbolicTangent, BatchNormalization, "
                                                                   "AllRelu(<alpha>), TReLU(<epsilon>)");
 
       // training

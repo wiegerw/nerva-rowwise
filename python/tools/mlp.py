@@ -67,7 +67,7 @@ def make_layers(layer_specifications: list[str],
     input_size = linear_layer_sizes[0]
 
     for spec in layer_specifications:
-        if spec == "BatchNorm":
+        if spec == "BatchNormalization":
             output_size = input_size
             optimizer = optimizers[optimizer_index]
             optimizer_index += 1
