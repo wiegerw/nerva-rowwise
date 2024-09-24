@@ -618,6 +618,9 @@ pre.rouge .gs {
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
+<div class="paragraph">
+<p>Wieger Wesselink &lt;<a href="mailto:j.w.wesselink@tue.nl">j.w.wesselink@tue.nl</a>&gt;</p>
+</div>
 <style>
   .small-code .content pre {
       font-size: 0.7em;
@@ -865,8 +868,8 @@ epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test acc
 <div class="sect3">
 <h4 id="mlp_tool">mlp command line options</h4>
 <div class="paragraph">
-<p>The <code>mlp</code> tool has the following command line options.
-Note that mathematical descriptions of the layers, activation functions, loss functions, and weight initialization functions can be found in [TODO].</p>
+<p>This section gives an overview of the command line interface of the <code>mlp</code> tool. It has several options that take a list of items as input. The items of such a list are always separated by semicolons.
+Some values like take parameters. We use named parameters, e.g. <code>AllReLU(alpha=0.3)</code>. In case that there is only one parameter, the name may be omitted: <code>AllReLU(0.3)</code>. If the parameters have default values, they may be omitted. For example, <code>TReLU</code> corresponds to <code>TReLU(al=0,tl=0,ar=0,tr=1)</code>.</p>
 </div>
 <div class="sect4">
 <h5 id="_general_options">General options</h5>
@@ -877,12 +880,12 @@ Note that mathematical descriptions of the layers, activation functions, loss fu
 Display help information.</p>
 </li>
 <li>
-<p><code>--verbose</code>, <code>-v</code>
-Show verbose output.</p>
-</li>
-<li>
 <p><code>--debug</code>, <code>-d</code>
 Show debug output.</p>
+</li>
+<li>
+<p><code>--verbose</code>, <code>-v</code>
+Show verbose output.</p>
 </li>
 </ul>
 </div>
@@ -1027,12 +1030,12 @@ A semicolon-separated list of optimizers used for linear and batch normalization
 <td class="tableblock halign-left valign-top"><p class="tableblock">Gradient descent optimization</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Momentum</code>(\(\mu\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Momentum optimization with momentum parameter \(\mu\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Momentum(mu)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Momentum optimization with momentum parameter <code>mu</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Nesterov</code>(\(\mu\))</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Nesterov optimization with momentum parameter \(\mu\)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Nesterov(mu)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nesterov optimization with momentum parameter <code>mu</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -2426,7 +2429,7 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-19 11:48:10 UTC
+Last updated 2024-09-24 07:13:38 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
