@@ -351,6 +351,7 @@ std::shared_ptr<neural_network_layer> make_dense_linear_dropout_layer(std::size_
   return make_dense_linear_dropout_layer(D, K, N, dropout, activation, parse_weight_initialization(weights), optimizer, rng);
 }
 
+inline
 std::shared_ptr<neural_network_layer> make_linear_layer(std::size_t input_size,
                                                         std::size_t output_size,
                                                         long batch_size,
