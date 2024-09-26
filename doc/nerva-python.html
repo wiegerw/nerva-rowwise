@@ -581,6 +581,7 @@ pre.rouge .gs {
 <ul class="sectlevel2">
 <li><a href="#_number_type">Number type</a></li>
 <li><a href="#_module_contents">Module contents</a></li>
+<li><a href="#_classes">Classes</a></li>
 </ul>
 </li>
 <li><a href="#io">I/O</a></li>
@@ -601,7 +602,7 @@ pre.rouge .gs {
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document describes the implementation of the <code>nerva</code> Python module, that contains bindings to the nerva-rowwise C++ library.</p>
+<p>This document describes the implementation of the <code>nerva</code> Python module, that contains bindings to the nerva-rowwise C++ library. Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>.</p>
 </div>
 </div>
 </div>
@@ -1299,6 +1300,72 @@ nerva-rowwise library, and some explanations about the code.</p>
 </tbody>
 </table>
 </div>
+<div class="sect2">
+<h3 id="_classes">Classes</h3>
+<div class="sect3">
+<h4 id="_class_multilayerperceptron">Class MultilayerPerceptron</h4>
+<div class="paragraph">
+<p>A multilayer perceptron (MLP) is modeled using the class <code>MultilayerPerceptron</code>. It contains a list of layers, and has member functions <code>feedforward</code>, <code>backpropagate</code> and <code>optimize</code> that can be used for training the neural network. Constructing an MLP can be done as follows:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp1</span><span class="p">(</span><span class="n">sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="n">layer1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                   <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                   <span class="n">activation</span><span class="o">=</span><span class="n">ReLU</span><span class="p">(),</span>
+                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
+
+    <span class="n">layer2</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                   <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                   <span class="n">activation</span><span class="o">=</span><span class="n">ReLU</span><span class="p">(),</span>
+                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
+
+    <span class="n">layer3</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                   <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                   <span class="n">activation</span><span class="o">=</span><span class="n">NoActivation</span><span class="p">(),</span>
+                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
+
+    <span class="n">M</span> <span class="o">=</span> <span class="n">MultilayerPerceptron</span><span class="p">()</span>
+    <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer1</span><span class="p">,</span> <span class="n">layer2</span><span class="p">,</span> <span class="n">layer3</span><span class="p">]</span>
+    <span class="n">M</span><span class="p">.</span><span class="n">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="err">#</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">C</span><span class="o">++</span> <span class="n">data</span> <span class="n">structures</span>
+
+    <span class="k">return</span> <span class="n">M</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This creates an MLP with three linear layers. The parameter <code>sizes</code> contains the input and output sizes of the three layers. The weights are initialized using Xavier.</p>
+</div>
+<div class="paragraph">
+<p>Another way to construct MLPs is provided by the function <code>make_layers</code>, that offers a string based interface. An example is given in the code below:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp2</span><span class="p">(</span><span class="n">linear_layer_sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
+
+    <span class="n">layer_specifications</span> <span class="o">=</span> <span class="p">[</span><span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"Linear"</span><span class="p">]</span>
+    <span class="n">linear_layer_densities</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+    <span class="n">linear_layer_dropouts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+    <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">]</span>
+    <span class="n">optimizers</span> <span class="o">=</span> <span class="p">[</span><span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">]</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="n">make_layers</span><span class="p">(</span><span class="n">layer_specifications</span><span class="p">,</span>
+                         <span class="n">linear_layer_sizes</span><span class="p">,</span>
+                         <span class="n">linear_layer_densities</span><span class="p">,</span>
+                         <span class="n">linear_layer_dropouts</span><span class="p">,</span>
+                         <span class="n">linear_layer_weights</span><span class="p">,</span>
+                         <span class="n">optimizers</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">MultilayerPerceptron</span><span class="p">()</span>
+    <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span>
+    <span class="n">M</span><span class="p">.</span><span class="n">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="err">#</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">C</span><span class="o">++</span> <span class="n">data</span> <span class="n">structures</span>
+
+    <span class="k">return</span> <span class="n">M</span></code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1315,7 +1382,7 @@ nerva-rowwise library, and some explanations about the code.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-26 14:42:20 UTC
+Last updated 2024-09-26 16:45:30 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
