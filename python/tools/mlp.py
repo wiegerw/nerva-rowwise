@@ -19,13 +19,12 @@ from nerva.layers import Dense, Sparse, make_layers
 from nerva.learning_rate_schedulers import LearningRateScheduler, parse_learning_rate
 from nerva.loss_functions import LossFunction, parse_loss_function
 from nerva.multilayer_perceptron import print_model_info, MultilayerPerceptron
-from nerva.optimizers import Optimizer, GradientDescent, parse_optimizer
 from nerva.prune import PruneFunction, parse_prune_function
 from nerva.regrow import PruneGrow
 from nerva.training import StochasticGradientDescentAlgorithm, SGDOptions, compute_sparse_layer_densities, \
     to_one_hot, compute_statistics
 from nerva.utilities import manual_seed, nerva_timer_enable, pp, set_nerva_computation
-from nerva.weights import WeightInitializer, parse_weight_initializer
+from nerva.weights import parse_weight_initializer
 
 
 class MLPNerva(MultilayerPerceptron):
@@ -34,8 +33,8 @@ class MLPNerva(MultilayerPerceptron):
     def __init__(self,
                  linear_layer_sizes: List[int],
                  linear_layer_densities: List[float],
-                 optimizers: List[Optimizer],
-                 linear_layer_weights: List[WeightInitializer],
+                 optimizers: List[str],
+                 linear_layer_weights: List[str],
                  layer_specifications: List[str],
                  linear_layer_dropouts: List[float],
                  loss,
@@ -72,36 +71,33 @@ def parse_dropouts(text: str, linear_layer_count: int) -> List[float]:
     return dropouts
 
 
-def parse_init_weights(text: str, linear_layer_count: int) -> List[WeightInitializer]:
+def parse_init_weights(text: str, linear_layer_count: int) -> List[str]:
     words = text.strip().split(';')
     n = linear_layer_count
 
     if len(words) == 1:
-        init = parse_weight_initializer(words[0])
-        return [init] * n
+        return [words[0]] * n
 
     if len(words) != n:
         raise RuntimeError(f'the number of weight initializers ({len(words)}) does not match with the number of linear layers ({n})')
 
-    return [parse_weight_initializer(word) for word in words]
+    return words
 
 
-def parse_optimizers(text: str, layer_count: int) -> List[Optimizer]:
+def parse_optimizers(text: str, layer_count: int) -> List[str]:
     words = text.strip().split(';')
     n = layer_count
 
     if len(words) == 0:
-        optimizer = GradientDescent()
-        return [optimizer] * n
+        return ['GradientDescent'] * n
 
     if len(words) == 1:
-        optimizer = parse_optimizer(words[0])
-        return [optimizer] * n
+        return [words[0]] * n
 
     if len(words) != n:
         raise RuntimeError(f'the number of weight initializers ({len(words)}) does not match with the number of linear layers ({n})')
 
-    return [parse_optimizer(word) for word in words]
+    return words
 
 
 def make_argument_parser():

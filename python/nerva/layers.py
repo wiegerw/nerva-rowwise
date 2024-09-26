@@ -7,8 +7,8 @@ from typing import List, Union
 import nervalibrowwise
 
 from nerva.activation_functions import Activation, NoActivation, parse_activation
-from nerva.optimizers import Optimizer, GradientDescent
-from nerva.weights import WeightInitializer, Xavier
+from nerva.optimizers import Optimizer, GradientDescent, parse_optimizer
+from nerva.weights import WeightInitializer, Xavier, parse_weight_initializer
 
 
 class Layer(object):
@@ -199,12 +199,15 @@ def make_layers(layer_specifications: list[str],
                 linear_layer_sizes: list[int],
                 linear_layer_densities: list[float],
                 linear_layer_dropouts: list[float],
-                linear_layer_weights: list[WeightInitializer],
-                optimizers: list[Optimizer]
+                linear_layer_weights: list[str],
+                optimizers: list[str]
                ) -> List[Layer]:
 
     assert len(linear_layer_densities) == len(linear_layer_dropouts) == len(linear_layer_weights) == len(linear_layer_sizes) - 1
     assert len(optimizers) == len(layer_specifications)
+
+    linear_layer_weights = [parse_weight_initializer(x) for x in linear_layer_weights]
+    optimizers = [parse_optimizer(x) for x in optimizers]
 
     result = []
 
