@@ -1713,6 +1713,28 @@ nerva-rowwise library, and some information that is needed for understanding the
 <div class="paragraph">
 <p>So instead of the names <code>feedforward</code> and <code>backpropagate</code>, we use <code>value</code> and <code>gradient</code>.</p>
 </div>
+<div class="paragraph">
+<p>There are five loss functions available:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>squared_error_loss</code></p>
+</li>
+<li>
+<p><code>cross_entropy_loss</code></p>
+</li>
+<li>
+<p><code>logistic_cross_entropy_loss</code></p>
+</li>
+<li>
+<p><code>softmax_cross_entropy_loss</code></p>
+</li>
+<li>
+<p><code>negative_log_likelihood_loss</code></p>
+</li>
+</ul>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_activation_functions">Activation functions</h4>
@@ -2096,7 +2118,7 @@ the parameters <code>Θ</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>See the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf">Nerva library specifications</a> for an overview of how these matrix operations are used.</p>
+<p>See the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> for an overview of how these matrix operations are used.</p>
 </div>
 <div class="sect2">
 <h3 id="_eigen_library">Eigen library</h3>
@@ -2136,7 +2158,7 @@ the parameters <code>Θ</code>.</p>
 </blockquote>
 </div>
 <div class="paragraph">
-<p>To support mini-batches, the nerva-rowwise library defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf">Nerva library specifications</a>. For the latter, many neural network frameworks rely on <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a>, see also <span class="citation">[<a href="#DBLP_BaydinPRS17">1</a>]</span>. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.</p>
+<p>To support mini-batches, the nerva-rowwise library defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a>. For the latter, many neural network frameworks rely on <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a>, see also <span class="citation">[<a href="#DBLP_journals_jmlr_BaydinPRS17">1</a>]</span>. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2240,7 +2262,7 @@ time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41</pre>
 </div>
 <div class="paragraph">
 <p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the nerva-rowwise library different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
-In <span class="citation">[<a href="#DBLP_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.</p>
+In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.</p>
 </div>
 </div>
 </div>
@@ -2249,7 +2271,7 @@ In <span class="citation">[<a href="#DBLP_HighamM22">2</a>]</span> the problem o
 <h2 id="_sparse_neural_networks">Sparse neural networks</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The nerva-rowwise library supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_NikdanPIKA23">4</a>]</span>.</p>
+<p>Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_journals_corr_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The nerva-rowwise library supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_conf_icml_NikdanPIKA23">4</a>]</span>.</p>
 </div>
 <div class="sect2">
 <h3 id="_sparse_matrices">Sparse matrices</h3>
@@ -2259,20 +2281,20 @@ In <span class="citation">[<a href="#DBLP_HighamM22">2</a>]</span> the problem o
 <div class="paragraph">
 <p>Sparse matrices in the nerva-rowwise library are stored in
 <a href="https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)">CSR</a> format.
-This matrix representation stores arrays of column and row indices to define the support, plus an array of the corresponding values. CSR matrices are <em>unstructured</em> sparse matrices, meaning they have non-zero elements located at arbitrary positions. Alternatively, there are <em>structured</em> sparse matrices, take for example butterfly matrices <span class="citation">[<a href="#DBLP_abs-2405-15013">5</a>]</span>.</p>
+This matrix representation stores arrays of column and row indices to define the support, plus an array of the corresponding values. CSR matrices are <em>unstructured</em> sparse matrices, meaning they have non-zero elements located at arbitrary positions. Alternatively, there are <em>structured</em> sparse matrices, take for example butterfly matrices <span class="citation">[<a href="#DBLP_journals_corr_abs-2405-15013">5</a>]</span>.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_sparse_evolutionary_training">Sparse evolutionary training</h3>
 <div class="paragraph">
-<p>Sparse evolutionary training (SET) is a method for efficiently training sparse neural networks, see e.g. <span class="citation">[<a href="#DBLP_LiuMMPP21">6</a>]</span>. The idea behind this method is to start the training with a random sparse topology, and to periodically prune and regrow some of the weights.</p>
+<p>Sparse evolutionary training (SET) is a method for efficiently training sparse neural networks, see e.g. <span class="citation">[<a href="#DBLP_journals_nca_LiuMMPP21">6</a>]</span>. The idea behind this method is to start the training with a random sparse topology, and to periodically prune and regrow some of the weights.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_sparse_initialization">Sparse initialization</h3>
 <div class="paragraph">
 <p>In SET, the sparsity is not divided evenly over the sparse layers. Instead, small layers are assigned a higher density than larger ones.
- In <span class="citation">[<a href="#DBLP_LiuMMPP21">6</a>]</span> formula (3), <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model">Erdős–Rényi graph topology</a>
+ In <span class="citation">[<a href="#DBLP_journals_nca_LiuMMPP21">6</a>]</span> formula (3), <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model">Erdős–Rényi graph topology</a>
  is suggested to calculate the densities of the sparse layers given a desired overall density of the sparse layers combined.
 In nerva-rowwise this is implemented in the function <code>compute_sparse_layer_densities</code>, see <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/layer_algorithms.h">layer_algorithms.h</a></code>. The original Python implementation can be found
 <a href="https://github.com/VITA-Group/Random_Pruning/blob/871077f1d10f9bc44941b093fd5ccbc4ec3984fa/CIFAR/sparselearning/core.py#L155">here</a>, along with several other sparse initialization strategies.
@@ -2395,22 +2417,22 @@ pruning + growing 13332/66662 weights</pre>
 <h2 id="_references">References</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a id="DBLP_BaydinPRS17"></a>[1] A. G. Baydin, B. A. Pearlmutter, A. A. Radul, and J. M. Siskind, “Automatic Differentiation in Machine Learning: a Survey,” <em>J. Mach. Learn. Res.</em>, vol. 18, pp. 153:1–153:43, 2017, [Online]. Available: <a href="https://jmlr.org/papers/v18/17-468.html" class="bare">https://jmlr.org/papers/v18/17-468.html</a>.</p>
+<p><a id="DBLP_journals_jmlr_BaydinPRS17"></a>[1] A. G. Baydin, B. A. Pearlmutter, A. A. Radul, and J. M. Siskind, “Automatic Differentiation in Machine Learning: a Survey,” <em>J. Mach. Learn. Res.</em>, vol. 18, pp. 153:1–153:43, 2017, [Online]. Available: <a href="https://jmlr.org/papers/v18/17-468.html" class="bare">https://jmlr.org/papers/v18/17-468.html</a>.</p>
 </div>
 <div class="paragraph">
-<p><a id="DBLP_HighamM22"></a>[2] N. J. Higham and T. Mary, “Mixed precision algorithms in numerical linear algebra,” <em>Acta Numer.</em>, vol. 31, pp. 347–414, 2022, [Online]. Available: <a href="https://doi.org/10.1017/S0962492922000022" class="bare">https://doi.org/10.1017/S0962492922000022</a>.</p>
+<p><a id="DBLP_journals_actanum_HighamM22"></a>[2] N. J. Higham and T. Mary, “Mixed precision algorithms in numerical linear algebra,” <em>Acta Numer.</em>, vol. 31, pp. 347–414, 2022, [Online]. Available: <a href="https://doi.org/10.1017/S0962492922000022" class="bare">https://doi.org/10.1017/S0962492922000022</a>.</p>
 </div>
 <div class="paragraph">
-<p><a id="DBLP_abs-2102-01732"></a>[3] S. Curci, D. C. Mocanu, and M. Pechenizkiy, “Truly Sparse Neural Networks at Scale,” <em>CoRR</em>, vol. abs/2102.01732, 2021, [Online]. Available: <a href="https://arxiv.org/abs/2102.01732" class="bare">https://arxiv.org/abs/2102.01732</a>.</p>
+<p><a id="DBLP_journals_corr_abs-2102-01732"></a>[3] S. Curci, D. C. Mocanu, and M. Pechenizkiy, “Truly Sparse Neural Networks at Scale,” <em>CoRR</em>, vol. abs/2102.01732, 2021, [Online]. Available: <a href="https://arxiv.org/abs/2102.01732" class="bare">https://arxiv.org/abs/2102.01732</a>.</p>
 </div>
 <div class="paragraph">
-<p><a id="DBLP_NikdanPIKA23"></a>[4] M. Nikdan, T. Pegolotti, E. Iofinova, E. Kurtic, and D. Alistarh, “SparseProp: Efficient Sparse Backpropagation for Faster Training of Neural Networks at the Edge,” in <em>International Conference on Machine Learning, ICML 2023, 23-29 July 2023, Honolulu, Hawaii, USA</em>, 2023, vol. 202, pp. 26215–26227, [Online]. Available: <a href="https://proceedings.mlr.press/v202/nikdan23a.html" class="bare">https://proceedings.mlr.press/v202/nikdan23a.html</a>.</p>
+<p><a id="DBLP_conf_icml_NikdanPIKA23"></a>[4] M. Nikdan, T. Pegolotti, E. Iofinova, E. Kurtic, and D. Alistarh, “SparseProp: Efficient Sparse Backpropagation for Faster Training of Neural Networks at the Edge,” in <em>International Conference on Machine Learning, ICML 2023, 23-29 July 2023, Honolulu, Hawaii, USA</em>, 2023, vol. 202, pp. 26215–26227, [Online]. Available: <a href="https://proceedings.mlr.press/v202/nikdan23a.html" class="bare">https://proceedings.mlr.press/v202/nikdan23a.html</a>.</p>
 </div>
 <div class="paragraph">
-<p><a id="DBLP_abs-2405-15013"></a>[5] A. Gonon, L. Zheng, P. Carrivain, and Q.-T. Le, “Make Inference Faster: Efficient GPU Memory Management for Butterfly Sparse Matrix Multiplication,” <em>CoRR</em>, vol. abs/2405.15013, 2024, doi: 10.48550/ARXIV.2405.15013.</p>
+<p><a id="DBLP_journals_corr_abs-2405-15013"></a>[5] A. Gonon, L. Zheng, P. Carrivain, and Q.-T. Le, “Make Inference Faster: Efficient GPU Memory Management for Butterfly Sparse Matrix Multiplication,” <em>CoRR</em>, vol. abs/2405.15013, 2024, [Online]. Available: <a href="https://doi.org/10.48550/arXiv.2405.15013" class="bare">https://doi.org/10.48550/arXiv.2405.15013</a>.</p>
 </div>
 <div class="paragraph">
-<p><a id="DBLP_LiuMMPP21"></a>[6] S. Liu, D. C. Mocanu, A. R. R. Matavalam, Y. Pei, and M. Pechenizkiy, “Sparse evolutionary deep learning with over one million artificial neurons on commodity hardware,” <em>Neural Comput. Appl.</em>, vol. 33, no. 7, pp. 2589–2604, 2021, doi: 10.1007/S00521-020-05136-7.</p>
+<p><a id="DBLP_journals_nca_LiuMMPP21"></a>[6] S. Liu, D. C. Mocanu, A. R. R. Matavalam, Y. Pei, and M. Pechenizkiy, “Sparse evolutionary deep learning with over one million artificial neurons on commodity hardware,” <em>Neural Comput. Appl.</em>, vol. 33, no. 7, pp. 2589–2604, 2021, [Online]. Available: <a href="https://doi.org/10.1007/s00521-020-05136-7" class="bare">https://doi.org/10.1007/s00521-020-05136-7</a>.</p>
 </div>
 <div class="paragraph">
 <p><a id="wesselink2024nervatrulysparseimplementation"></a>[7] W. Wesselink, B. Grooten, Q. Xiao, C. de Campos, and M. Pechenizkiy, “Nerva: a Truly Sparse Implementation of Neural Networks.” 2024, [Online]. Available: <a href="https://arxiv.org/abs/2407.17437" class="bare">https://arxiv.org/abs/2407.17437</a>.</p>
@@ -2420,7 +2442,7 @@ pruning + growing 13332/66662 weights</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-26 16:45:30 UTC
+Last updated 2024-09-30 16:14:05 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

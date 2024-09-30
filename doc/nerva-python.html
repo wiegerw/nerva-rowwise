@@ -582,6 +582,7 @@ pre.rouge .gs {
 <li><a href="#_number_type">Number type</a></li>
 <li><a href="#_module_contents">Module contents</a></li>
 <li><a href="#_classes">Classes</a></li>
+<li><a href="#_training_a_neural_network">Training a neural network</a></li>
 </ul>
 </li>
 <li><a href="#io">I/O</a></li>
@@ -1307,7 +1308,7 @@ nerva-rowwise library, and some explanations about the code.</p>
 <div class="paragraph">
 <p>A multilayer perceptron (MLP) is modeled using the class <code>MultilayerPerceptron</code>. It contains a list of layers, and has member functions <code>feedforward</code>, <code>backpropagate</code> and <code>optimize</code> that can be used for training the neural network. Constructing an MLP can be done as follows:</p>
 </div>
-<div class="listingblock small-code">
+<div id="construct_mlp1" class="listingblock small-code">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp1</span><span class="p">(</span><span class="n">sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
 
@@ -1342,7 +1343,7 @@ nerva-rowwise library, and some explanations about the code.</p>
 <div class="paragraph">
 <p>Another way to construct MLPs is provided by the function <code>make_layers</code>, that offers a string based interface. An example is given in the code below:</p>
 </div>
-<div class="listingblock small-code">
+<div id="construct_mlp2" class="listingblock small-code">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp2</span><span class="p">(</span><span class="n">linear_layer_sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
 
@@ -1350,13 +1351,13 @@ nerva-rowwise library, and some explanations about the code.</p>
     <span class="n">linear_layer_densities</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
     <span class="n">linear_layer_dropouts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
     <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">]</span>
-    <span class="n">optimizers</span> <span class="o">=</span> <span class="p">[</span><span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">]</span>
+    <span class="n">layer_optimizers</span> <span class="o">=</span> <span class="p">[</span><span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">]</span>
     <span class="n">layers</span> <span class="o">=</span> <span class="n">make_layers</span><span class="p">(</span><span class="n">layer_specifications</span><span class="p">,</span>
                          <span class="n">linear_layer_sizes</span><span class="p">,</span>
                          <span class="n">linear_layer_densities</span><span class="p">,</span>
                          <span class="n">linear_layer_dropouts</span><span class="p">,</span>
                          <span class="n">linear_layer_weights</span><span class="p">,</span>
-                         <span class="n">optimizers</span><span class="p">)</span>
+                         <span class="n">layer_optimizers</span><span class="p">)</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">MultilayerPerceptron</span><span class="p">()</span>
     <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span>
     <span class="n">M</span><span class="p">.</span><span class="n">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="err">#</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">C</span><span class="o">++</span> <span class="n">data</span> <span class="n">structures</span>
@@ -1364,6 +1365,335 @@ nerva-rowwise library, and some explanations about the code.</p>
     <span class="k">return</span> <span class="n">M</span></code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Note that optimizers should be specified for linear layers, but also for batch normalization layers.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. This is done by calling <code>M.compile(batch_size)</code>. As a result of this call, a C++ object is created that contains the actual model. A reference to this object is stored in the attribute <code>_model</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_class_layer">Class Layer</h4>
+<div class="paragraph">
+<p>The class <code>Layer</code> is the base class of all neural network layers. There are three different types of layers:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Layer</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Dense</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A dense linear layer.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Sparse</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A sparse linear layer.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BatchNormalization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A batch normalization layer.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>A <code>Dense</code> layer has a constructor with the following parameters:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span>
+                 <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">activation</span><span class="p">:</span> <span class="n">Activation</span><span class="o">=</span><span class="nc">NoActivation</span><span class="p">(),</span>
+                 <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
+                 <span class="n">weight_initializer</span><span class="p">:</span> <span class="n">WeightInitializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">(),</span>
+                 <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">):</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This only sets a number of attributes of the layer. Before using the layer the <code>compile</code> function must be called:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sh">"""</span><span class="s">
+        Creates a C++ object for the layer.
+
+        :param batch_size: the batch size
+        :return:
+        </span><span class="sh">"""</span>
+        <span class="n">activation</span> <span class="o">=</span> <span class="nf">print_activation</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">activation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">dropout_rate</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">nervalibrowwise</span><span class="p">.</span><span class="nf">make_dense_linear_layer</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">input_size</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">activation</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">weight_initializer</span><span class="p">),</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">optimizer</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">nervalibrowwise</span><span class="p">.</span><span class="nf">make_dense_linear_dropout_layer</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">input_size</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">dropout_rate</span><span class="p">,</span> <span class="n">activation</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">weight_initializer</span><span class="p">),</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">optimizer</span><span class="p">))</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">_layer</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="k">return</span> <span class="n">layer</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As a result of this call a C++ object is created that contains the actual layer. It is stored in the attribute <code>_layer</code>. The normal workflow is to call the <code>compile</code> method of the multilayer perceptron, which will also compile the layers, as illustrated in
+<a href="#construct_mlp1">[construct_mlp1]</a> and <a href="#construct_mlp2">[construct_mlp2]</a>.</p>
+</div>
+<div class="paragraph">
+<p>A <code>Sparse</code> layer has an additional parameter <code>density</code> in the interval \([0,1]\), that determines the fraction of weights that are in the support. Sparse layers do not support dropout.</p>
+</div>
+<div class="paragraph">
+<p>A <code>BatchNormalization</code> layer has the following constructor:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span>
+                 <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">output_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+                 <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span> <span class="o">=</span> <span class="nc">GradientDescent</span><span class="p">()</span>
+                <span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="n">input_size</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">input_size</span>
+        <span class="k">assert</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="o">==</span> <span class="n">self</span><span class="p">.</span><span class="n">input_size</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output size may be omitted, since by definition it is the same as the input size.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_class_lossfunction">Class LossFunction</h4>
+<div class="paragraph">
+<p>The class <code>LossFunction</code> is the base class of all loss functions. There are five loss functions available:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>SquaredErrorLoss</code></p>
+</li>
+<li>
+<p><code>CrossEntropyLoss</code></p>
+</li>
+<li>
+<p><code>LogisticCrossEntropyLoss</code></p>
+</li>
+<li>
+<p><code>NegativeLogLikelihoodLoss</code></p>
+</li>
+<li>
+<p><code>SoftmaxCrossEntropyLoss</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> for precise definitions of these loss functions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_activation_functions">Activation functions</h4>
+<div class="paragraph">
+<p>The class <code>ActivationFunction</code> is the base class of all activation functions. The following activation functions are available:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ReLU</code></p>
+</li>
+<li>
+<p><code>Sigmoid</code></p>
+</li>
+<li>
+<p><code>Softmax</code></p>
+</li>
+<li>
+<p><code>LogSoftmax</code></p>
+</li>
+<li>
+<p><code>TReLU</code></p>
+</li>
+<li>
+<p><code>LeakyReLU</code></p>
+</li>
+<li>
+<p><code>AllReLU</code></p>
+</li>
+<li>
+<p><code>SReLU</code></p>
+</li>
+<li>
+<p><code>HyperbolicTangent</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> for precise definitions of these activation functions.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_training_a_neural_network">Training a neural network</h3>
+<div class="paragraph">
+<p>The class <code>StochasticGradientDescentAlgorithm</code> can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="python"><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">options</span><span class="p">.</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="n">self</span><span class="p">.</span><span class="nf">on_start_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
+
+    <span class="n">lr</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">learning_rate</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>  <span class="c1"># update the learning rate
+</span>
+    <span class="k">for</span> <span class="n">batch_index</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">train_loader</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="nf">on_start_batch</span><span class="p">(</span><span class="n">batch_index</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="nf">to_one_hot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">M</span><span class="p">.</span><span class="nf">feedforward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">DY</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">loss</span><span class="p">.</span><span class="nf">gradient</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span>
+        <span class="n">M</span><span class="p">.</span><span class="nf">backpropagate</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">DY</span><span class="p">)</span>
+        <span class="n">M</span><span class="p">.</span><span class="nf">optimize</span><span class="p">(</span><span class="n">lr</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="nf">on_end_batch</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="n">self</span><span class="p">.</span><span class="nf">on_end_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
+
+<span class="n">self</span><span class="p">.</span><span class="nf">on_end_training</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+We follow the PyTorch convention that the targets used for classification are provided as a one dimensional vector of integers. Using a call to <code>to_one_hot</code> this vector is transformed in to a one hot encoded boolean matrix of the same dimensions as the output <code>Y</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In every epoch, the dataset is divided into a number of batches. This is handled by the <code>DataLoader</code>, that creates batches <code>X</code> of a given batch size, with corresponding targets <code>T</code> (i.e. the expected outputs). Each batch goes through the three steps of stochastic gradient descent:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>feedforward:</strong> Given an input batch <code>X</code> and
+the neural network parameters <code>Θ</code>, compute the
+output <code>Y</code>.</p>
+</li>
+<li>
+<p><strong>backpropagation:</strong> Given output <code>Y</code> corresponding to input <code>X</code> and targets <code>T</code>, compute the gradient  <code>DY</code> of <code>Y</code> with respect to the loss function. Then from <code>Y</code> and <code>DY</code>, compute the gradient <code>DΘ</code> of the parameters <code>Θ</code>.</p>
+</li>
+<li>
+<p><strong>optimization:</strong> Given the gradient <code>DΘ</code>, update
+the parameters <code>Θ</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Note that the algorithm uses a number of event functions:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Event</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_start_training</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the start of the training</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_end_training</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the end of the training</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_start_epoch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the start of each epoch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_end_epoch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the end of each epoch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_start_batch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the start of each batch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>on_end_batch</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is called at the end of each batch</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The user can respond to these events by deriving from the class <code>StochasticGgradientDescentAlgorithm</code>. Typical use cases for these event functions are the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When using dropout layers, periodically the dropout masks should be renewed. This is typically done after each epoch or after a given number of batches.</p>
+</li>
+<li>
+<p>When doing dynamic sparse training, periodically a number of small weights is pruned, and new weights are added back (regrown). This is also typically done after each epoch or after a given number of batches.</p>
+</li>
+</ul>
+</div>
+<div id="on_start_epoch" class="paragraph">
+<p>An example can be found in the tool <code>mlp</code>:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">on_start_epoch</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="nf">reload_data</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">M</span><span class="p">.</span><span class="nf">renew_dropout_masks</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">self</span><span class="p">.</span><span class="n">regrow</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="nf">regrow</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">M</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">self</span><span class="p">.</span><span class="n">clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">M</span><span class="p">.</span><span class="n">_model</span><span class="p">.</span><span class="nf">clip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">clip</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Four actions take place at the start of every epoch.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.</p>
+</li>
+<li>
+<p>Dropout masks are renewed.</p>
+</li>
+<li>
+<p>Sparse weight matrices are pruned and regrown if a regrow function is specified.</p>
+</li>
+<li>
+<p>Small weights in the subnormal range are clipped to zero if the corresponding option is set.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1382,7 +1712,7 @@ nerva-rowwise library, and some explanations about the code.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-26 16:45:30 UTC
+Last updated 2024-09-30 16:14:05 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
