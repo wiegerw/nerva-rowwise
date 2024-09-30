@@ -24,6 +24,11 @@ class LogisticCrossEntropyLoss(nervalibrowwise.logistic_cross_entropy_loss):
         return 'LogisticCrossEntropyLoss()'
 
 
+class NegativeLogLikelihoodLoss(nervalibrowwise.negative_log_likelihood_loss):
+    def __str__(self):
+        return 'NegativeLoglikelihoodLoss()'
+
+
 class SoftmaxCrossEntropyLoss(nervalibrowwise.softmax_cross_entropy_loss):
     def __str__(self):
         return 'SoftmaxCrossEntropyLoss()'

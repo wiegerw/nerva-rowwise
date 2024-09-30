@@ -15,6 +15,7 @@
 :bibliography: nerva.bib
 :library: nerva-rowwise
 :mlptool: mlp
+:sgd_algorithm: stochastic_gradient_descent_algorithm
 
 // Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
@@ -613,6 +614,18 @@ include::../include/nerva/neural_networks/loss_functions.h[tag=doc]
 ----
 So instead of the names `feedforward` and `backpropagate`, we use `value` and `gradient`.
 
+There are five loss functions available:
+
+* `squared_error_loss`
+
+* `cross_entropy_loss`
+
+* `logistic_cross_entropy_loss`
+
+* `softmax_cross_entropy_loss`
+
+* `negative_log_likelihood_loss`
+
 ==== Activation functions
 Currently, there is no common base class for activation functions. For example, the ReLU activation function is implemented like this:
 [.small-code]
@@ -663,6 +676,7 @@ output `Y`.
 . *optimization:* Given the gradient `DΘ`, update
 the parameters `Θ`.
 
+// tag::event-functions[]
 Note that the algorithm uses a number of event functions:
 |===
 |Event |Description
@@ -685,10 +699,11 @@ Note that the algorithm uses a number of event functions:
 |`on_end_batch`
 |Is called at the end of each batch
 |===
-The user can respond to these events by deriving from the class `stochastic_gradient_descent_algorithm`. Typical use cases for these event functions are the following:
+The user can respond to these events by deriving from the class `{sgd_algorithm}`. Typical use cases for these event functions are the following:
 
 - When using dropout layers, periodically the dropout masks should be renewed. This is typically done after each epoch or after a given number of batches.
 - When doing dynamic sparse training, periodically a number of small weights is pruned, and new weights are added back (regrown). This is also typically done after each epoch or after a given number of batches.
+// end::event-functions[]
 
 [[on_start_epoch]]
 An example can be found in the tool `mlp`:
@@ -839,7 +854,7 @@ Using this table leads to concise and uniform code. For example, the backpropaga
 ----
 include::../include/nerva/neural_networks/layers.h[tag=matrix_operations]
 ----
-See the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf[Nerva library specifications] for an overview of how these matrix operations are used.
+See the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] for an overview of how these matrix operations are used.
 
 === Eigen library
 The {library} library uses the https://eigen.tuxfamily.org/[Eigen library] for representing matrices. The matrix operations in table <<table_matrix_operations>> have been implemented using Eigen, see the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h[matrix_operations.h].
@@ -862,7 +877,7 @@ ____
 A compromise between computing the true gradient and the gradient at a single sample is to compute the gradient against more than one training sample (called a "mini-batch") at each step. This can perform significantly better than "true" stochastic gradient descent described, because the code can make use of vectorization libraries rather than computing each step separately.
 ____
 
-To support mini-batches, the {library} library defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf[Nerva library specifications]. For the latter, many neural network frameworks rely on https://en.wikipedia.org/wiki/Automatic_differentiation[Automatic differentiation], see also cite:[DBLP_BaydinPRS17]. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.
+To support mini-batches, the {library} library defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications]. For the latter, many neural network frameworks rely on https://en.wikipedia.org/wiki/Automatic_differentiation[Automatic differentiation], see also cite:[DBLP_journals_jmlr_BaydinPRS17]. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.
 
 === Matrix products
 The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] is used. Currently, this dependency is hard coded, but there are plans to make this optional. To experiment with other implementations, like SYCL or BLAS, a global setting is used that is discussed in the next section.
@@ -933,24 +948,24 @@ time =   0.370065 | value = 9.8e-45    | sum = -4.97559e-41
 time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41
 ----
 On https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ[Google Groups] this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn't seem to be a portable way to achieve this. In the {library} library different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the `--clip` command line option of the `mlp` tool.
-In cite:[DBLP_HighamM22] the problem of subnormal numbers is discussed.
+In cite:[DBLP_journals_actanum_HighamM22] the problem of subnormal numbers is discussed.
 
 == Sparse neural networks
-Sparse neural network layers are often simulated using binary masks, see cite:[DBLP_abs-2102-01732]. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing https://pytorch.org/docs/stable/sparse.html[sparse tensors]. The {library} library supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by cite:[DBLP_NikdanPIKA23].
+Sparse neural network layers are often simulated using binary masks, see cite:[DBLP_journals_corr_abs-2102-01732]. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing https://pytorch.org/docs/stable/sparse.html[sparse tensors]. The {library} library supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by cite:[DBLP_conf_icml_NikdanPIKA23].
 
 === Sparse matrices
 Since we are dealing with a programming context, we say that the _support_ of a sparse matrix refers to the set of positions (or indices) in the matrix that are explicitly stored. Elements inside the support can have a non-zero value. Elements outside the support have the value zero by definition.
 
 Sparse matrices in the {library} library are stored in
 link:++https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)++[CSR] format.
-This matrix representation stores arrays of column and row indices to define the support, plus an array of the corresponding values. CSR matrices are _unstructured_ sparse matrices, meaning they have non-zero elements located at arbitrary positions. Alternatively, there are _structured_ sparse matrices, take for example butterfly matrices cite:[DBLP_abs-2405-15013].
+This matrix representation stores arrays of column and row indices to define the support, plus an array of the corresponding values. CSR matrices are _unstructured_ sparse matrices, meaning they have non-zero elements located at arbitrary positions. Alternatively, there are _structured_ sparse matrices, take for example butterfly matrices cite:[DBLP_journals_corr_abs-2405-15013].
 
 === Sparse evolutionary training
-Sparse evolutionary training (SET) is a method for efficiently training sparse neural networks, see e.g. cite:[DBLP_LiuMMPP21]. The idea behind this method is to start the training with a random sparse topology, and to periodically prune and regrow some of the weights.
+Sparse evolutionary training (SET) is a method for efficiently training sparse neural networks, see e.g. cite:[DBLP_journals_nca_LiuMMPP21]. The idea behind this method is to start the training with a random sparse topology, and to periodically prune and regrow some of the weights.
 
 === Sparse initialization
 In SET, the sparsity is not divided evenly over the sparse layers. Instead, small layers are assigned a higher density than larger ones.
- In cite:[DBLP_LiuMMPP21] formula (3), https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model[Erdős–Rényi graph topology]
+ In cite:[DBLP_journals_nca_LiuMMPP21] formula (3), https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model[Erdős–Rényi graph topology]
  is suggested to calculate the densities of the sparse layers given a desired overall density of the sparse layers combined.
 In {library} this is implemented in the function `compute_sparse_layer_densities`, see `link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/layer_algorithms.h[layer_algorithms.h]`. The original Python implementation can be found
 https://github.com/VITA-Group/Random_Pruning/blob/871077f1d10f9bc44941b093fd5ccbc4ec3984fa/CIFAR/sparselearning/core.py#L155[here], along with several other sparse initialization strategies.

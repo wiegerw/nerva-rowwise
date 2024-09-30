@@ -26,11 +26,11 @@ jobs:
         run: |
           mkdir -p output_directory
           cd doc
-          pdflatex nerva-libraries-implementation.tex
-          bibtex nerva-libraries-implementation
-          pdflatex nerva-libraries-implementation.tex
-          pdflatex nerva-libraries-implementation.tex
-          cp nerva-libraries-implementation.pdf ../output_directory
+          pdflatex nerva-library-specifications.tex
+          bibtex nerva-library-specifications
+          pdflatex nerva-library-specifications.tex
+          pdflatex nerva-library-specifications.tex
+          cp nerva-library-specifications.pdf ../output_directory
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

@@ -95,6 +95,10 @@ PYBIND11_MODULE(nervalibrowwise, m)
     .def(py::init<>(), py::return_value_policy::copy)
     ;
 
+  py::class_<negative_log_likelihood_loss, loss_function, std::shared_ptr<negative_log_likelihood_loss>>(m, "negative_log_likelihood_loss")
+    .def(py::init<>(), py::return_value_policy::copy)
+    ;
+
   py::class_<softmax_cross_entropy_loss, loss_function, std::shared_ptr<softmax_cross_entropy_loss>>(m, "softmax_cross_entropy_loss")
     .def(py::init<>(), py::return_value_policy::copy)
     ;

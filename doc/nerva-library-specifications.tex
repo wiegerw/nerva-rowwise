@@ -84,7 +84,7 @@
 
 \title{\centering Batch Matrix-form Equations and Implementation \\ of Multilayer Perceptrons}
 
-\title{Nerva Libraries Implementation}
+\title{Nerva Library Specifications}
 \author{Wieger Wesselink}
 \date{\today}
 
@@ -93,16 +93,16 @@
 \tableofcontents
 
 \section{Introduction}
-This document contains algorithm specifications and implementation details of the Nerva Libraries \url{https://github.com/wiegerw/nerva}. The goal of this document is to provide precise mathematical specifications of key parts of the implementation. The code in the repository \url{https://github.com/wiegerw/nerva-rowwise} closely matches the equations in this document.
+This document contains algorithm specifications for the Nerva Libraries \url{https://github.com/wiegerw/nerva}. The goal of this document is to provide precise mathematical specifications of key parts of the implementation. The code in the repository \url{https://github.com/wiegerw/nerva-rowwise} closely matches the equations in this document.
 
 \section{Mathematical background} \label{section:mathematical-background}
 In this section we provide notational conventions, we provide definitions for the gradient and the Jacobian, and a comprehensive table with matrix operations that are necessary for the execution of multilayer perceptrons.
 
-In the rest of this document we use the following notation. Vectors are denoted using lowercase symbols $x, y, z$, and matrices using uppercase symbols $X, Y, Z$. The columns of a matrix $X \in \Reals^{m \times n}$ are denoted as $x^1, \ldots, x^n$, while the rows are denoted as $x_1, \ldots, x_m$. Occasionally, the subscript notation $x_i$ is also used to denote the $i^\text{th}$ element of the vector $x$, but this will be clear from context.
-To distinguish between row and column vectors, we denote their domains as $\Reals^{1 \times n}$ and $\Reals^{m \times 1}$, respectively. We use the dot symbol $\cdot$ for matrix multiplication, and not for the dot product. This notation is used primarily to enhance the readability of expressions.
+In the rest of this document we use the following notation. Vectors are denoted using lowercase symbols $x, y, z$, and matrices using uppercase symbols $X, Y, Z$. The columns of a matrix $X \in \Reals^{m \times n}$ are denoted as $x^1, \ldots, x^n$, while the rows are denoted as $x_1, \ldots, x_m$. Occasionally, the subscript notation $x_i$ is also used to denote element $i$ of the vector $x$, but this will be made clear from the context.
+To distinguish between row and column vectors, we denote their domains as $\Reals^{1 \times n}$ and $\Reals^{m \times 1}$, respectively. We use the dot symbol $\cdot$ for matrix multiplication and not for the dot product. This notation is used primarily to enhance the readability of expressions.
 
 In the context of neural networks, we typically use $x, X$ for inputs, $y, Y$ for outputs, $z, Z$ for intermediate values, and $t, T$ for targets. The number of inputs of a layer is denoted by $\const{D}$ and the number of outputs by $\const{K}$. The number of examples in a mini-batch is denoted by $\const{N}$.
-We follow the convention of the major neural network frameworks where data is stored using a row layout. This means that by default $x$, $y$, and $z$ are considered row vectors, and each row of an input matrix $X$ represents an example of a dataset. For example, if $X \in \Reals^{\const{N} \times \const{D}}$, then $x_i \in \Reals^{1 \times \const{D}}$ represents the $i$-th example.
+We follow the convention of the major neural network frameworks where data is stored using a row layout. This means that by default $x$, $y$, and $z$ are considered row vectors, and each row of an input matrix $X$ represents an example of a data set. For example, if $X \in \Reals^{\const{N} \times \const{D}}$, then $x_i \in \Reals^{1 \times \const{D}}$ represents the $i$-th example.
 
 \begin{definition}[Gradient]
 Let $f: \Reals^{m \times n} \rightarrow \Reals$ be a function with input $X$ that has elements $x_{ij}$, with $m, n \in \mathbb{\const{N}}^{+}$. Then the gradient $\nabla_X f$ is defined as
@@ -988,7 +988,7 @@ In this section we give an overview of some commonly used univariate activation 
   \\
   \addlinespace[1ex]
 
-  \text{All-ReLU (\cite{DBLP:journals/corr/abs-2102-01732})}
+  \text{All-ReLU (\cite{DBLP_journals_corr_abs-2102-01732})}
   &
   \func{all-relu}(x) =
   \begin{cases*}
@@ -1275,7 +1275,7 @@ Using property \eqref{eq:matrix-property7} we can generalize equation \eqref{eq:
 where we used the well known fact that in the univariate case $\frac{d}{dt} \log(\sigma(t)) = 1 - \log(\sigma(t))$.
 
 \section{Weight initialization} \label{section:weight-initialization}
-The initial values of the weights in linear layers must be carefully chosen, as they may have a large impact on the performance of a neural network \cite{DBLP:journals/air/NarkhedeBS22}.
+The initial values of the weights in linear layers must be carefully chosen, as they may have a large impact on the performance of a neural network \cite{DBLP_journals_air_NarkhedeBS22}.
 Typically, these values are randomly generated on the basis of specific probability distributions. In this section, we give a few commonly used distributions.
 
 \[

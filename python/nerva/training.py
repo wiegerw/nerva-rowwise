@@ -168,16 +168,16 @@ class StochasticGradientDescentAlgorithm(object):
             epoch_label = "epoch{}".format(epoch)
             self.timer.start(epoch_label)
 
-            lr = self.learning_rate(epoch)  # update the learning at the start of each epoch
+            lr = self.learning_rate(epoch)  # update the learning rate
 
-            for k, (X, T) in enumerate(self.train_loader):
-                self.on_start_batch(k)
+            for batch_index, (X, T) in enumerate(self.train_loader):
+                self.on_start_batch(batch_index)
                 T = to_one_hot(T, num_classes)
                 Y = M.feedforward(X)
                 DY = self.loss.gradient(Y, T) / options.batch_size
 
                 if options.debug:
-                    print(f'epoch: {epoch} batch: {k}')
+                    print(f'epoch: {epoch} batch: {batch_index}')
                     print_model_info(M)
                     pp("X", X)
                     pp("Y", Y)
@@ -186,7 +186,7 @@ class StochasticGradientDescentAlgorithm(object):
                 M.backpropagate(Y, DY)
                 M.optimize(lr)
 
-                self.on_end_batch(k)
+                self.on_end_batch(batch_index)
 
             self.timer.stop(epoch_label)
             seconds = self.timer.seconds(epoch_label)

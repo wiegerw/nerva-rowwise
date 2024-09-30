@@ -241,6 +241,7 @@ class SGD(StochasticGradientDescentAlgorithm):
     def on_start_training(self) -> None:
         self.reload_data(0)
 
+    # tag::event[]
     def on_start_epoch(self, epoch):
         if epoch > 0:
             self.reload_data(epoch)
@@ -252,7 +253,8 @@ class SGD(StochasticGradientDescentAlgorithm):
             self.regrow(self.M)
 
         if epoch > 0 and self.clip > 0:
-            self.M.compiled_model.clip(self.clip)
+            self.M._model.clip(self.clip)
+    # end::event[]
 
     # This is faster than using the DataLoader interface
     def run_manual(self):

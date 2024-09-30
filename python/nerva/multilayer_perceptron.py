@@ -13,7 +13,7 @@ from nerva.weights import WeightInitializer
 class MultilayerPerceptron(object):
     def __init__(self, layers: Optional[Union[List[Layer], Tuple[Layer]]]=None):
         self.layers = []
-        self.compiled_model = None
+        self._model = None
         if layers:
             for layer in layers:
                 self.add(layer)
@@ -40,19 +40,19 @@ class MultilayerPerceptron(object):
         for i, layer in enumerate(self.layers):
             cpp_layer = layer.compile(batch_size)
             M.append_layer(cpp_layer)
-        self.compiled_model = M
+        self._model = M
 
     def feedforward(self, X):
-        return self.compiled_model.feedforward(X)
+        return self._model.feedforward(X)
 
     def backpropagate(self, Y, dY):
-        return self.compiled_model.backpropagate(Y, dY)
+        return self._model.backpropagate(Y, dY)
 
     def optimize(self, eta):
-        self.compiled_model.optimize(eta)
+        self._model.optimize(eta)
 
     def renew_dropout_masks(self):
-        nervalibrowwise.renew_dropout_masks(self.compiled_model)
+        nervalibrowwise.renew_dropout_masks(self._model)
 
     def __str__(self):
         layers = ',\n  '.join([str(layer) for layer in self.layers])
@@ -65,7 +65,7 @@ class MultilayerPerceptron(object):
 
     def set_weights_and_bias(self, weight_initializers: List[WeightInitializer]):
         print(f'Initializing weights using {", ".join(str(w) for w in weight_initializers)}')
-        self.compiled_model.set_weights_and_bias([str(w) for w in weight_initializers])
+        self._model.set_weights_and_bias([str(w) for w in weight_initializers])
 
     def load_weights_and_bias(self, filename: str):
         """
@@ -75,7 +75,7 @@ class MultilayerPerceptron(object):
         :param filename: the name of the file
         """
         print(f'Loading weights and bias from {filename}')
-        self.compiled_model.load_weights_and_bias(filename)
+        self._model.load_weights_and_bias(filename)
 
     def save_weights_and_bias(self, filename: str):
         """
@@ -85,10 +85,10 @@ class MultilayerPerceptron(object):
         :param filename: the name of the file
         """
         print(f'Saving weights and bias to {filename}')
-        self.compiled_model.save_weights_and_bias(filename)
+        self._model.save_weights_and_bias(filename)
 
     def info(self, msg):
-        self.compiled_model.info(msg)
+        self._model.info(msg)
 
 
 def compute_sparse_layer_densities(overall_density: float, layer_sizes: List[int], erk_power_scale: float=1) -> List[float]:
@@ -100,4 +100,4 @@ def print_model_info(M: MultilayerPerceptron) -> None:
     Prints detailed information about a multilayer perceptron
     :param M: a multilayer perceptron
     """
-    nervalibrowwise.print_model_info(M.compiled_model)
+    nervalibrowwise.print_model_info(M._model)

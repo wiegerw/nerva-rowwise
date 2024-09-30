@@ -2,7 +2,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE or http://www.boost.org/LICENSE_1_0.txt)
 
-from typing import List, Union
+from typing import List, Union, Optional
 
 import nervalibrowwise
 
@@ -22,6 +22,7 @@ def print_activation(activation: Activation) -> str:
 
 
 class Dense(Layer):
+    # tag::dense_constructor[]
     def __init__(self,
                  input_size: int,
                  output_size: int,
@@ -30,6 +31,7 @@ class Dense(Layer):
                  weight_initializer: WeightInitializer=Xavier(),
                  dropout_rate: float=0
                 ):
+     # end::dense_constructor[]
         """
         A dense layer.
 
@@ -58,9 +60,10 @@ class Dense(Layer):
     def set_weights_and_bias(self, init: WeightInitializer) -> None:
         self._layer.set_weights_and_bias(str(init))
 
+    # tag::dense_compile[]
     def compile(self, batch_size: int):
         """
-        Compiles the model into a C++ object
+        Creates a C++ object for the layer.
 
         :param batch_size: the batch size
         :return:
@@ -72,7 +75,7 @@ class Dense(Layer):
             layer = nervalibrowwise.make_dense_linear_dropout_layer(self.input_size, self.output_size, batch_size, self.dropout_rate, activation, str(self.weight_initializer), str(self.optimizer))
         self._layer = layer
         return layer
-
+    # end::dense_compile[]
 
 class Sparse(Layer):
     def __init__(self,
@@ -152,15 +155,19 @@ class Sparse(Layer):
 
 
 class BatchNormalization(Layer):
+    # tag::batchnormalization_constructor[]
     def __init__(self,
                  input_size: int,
-                 output_size: int,
-                 optimizer: Optimizer
+                 output_size: Optional[int] = None,
+                 optimizer: Optimizer = GradientDescent()
                 ):
-        assert input_size == output_size
         self.input_size = input_size
         self.output_size = output_size
         self.optimizer = optimizer
+        if self.output_size is None:
+            self.output_size = self.input_size
+        assert self.output_size == self.input_size
+    # end::batchnormalization_constructor[]
 
     def compile(self, batch_size: int):
         layer = nervalibrowwise.make_batch_normalization_layer(self.input_size, batch_size, str(self.optimizer))

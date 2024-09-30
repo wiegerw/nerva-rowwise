@@ -67,13 +67,13 @@ def construct_mlp2(linear_layer_sizes: List[int], batch_size: int):
     linear_layer_densities = [1.0, 1.0, 1.0]
     linear_layer_dropouts = [0.0, 0.0, 0.0]
     linear_layer_weights = ["Xavier", "Xavier", "Xavier"]
-    optimizers = ["GradientDescent", "GradientDescent", "GradientDescent"]
+    layer_optimizers = ["GradientDescent", "GradientDescent", "GradientDescent"]
     layers = make_layers(layer_specifications,
                          linear_layer_sizes,
                          linear_layer_densities,
                          linear_layer_dropouts,
                          linear_layer_weights,
-                         optimizers)
+                         layer_optimizers)
     M = MultilayerPerceptron()
     M.layers = layers
     M.compile(batch_size)  # Initialize the C++ data structures

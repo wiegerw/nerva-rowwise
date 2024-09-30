@@ -712,7 +712,7 @@ struct negative_log_likelihood_loss: public loss_function
 
   [[nodiscard]] auto to_string() const -> std::string override
   {
-    return "LogisticCrossEntropyLoss()";
+    return "NegativeLogLikelihoodLoss()";
   }
 };
 
