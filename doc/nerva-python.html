@@ -587,7 +587,7 @@ pre.rouge .gs {
 </ul>
 </li>
 <li><a href="#io">I/O</a></li>
-<li><a href="#extending">Extending the library</a>
+<li><a href="#_extending_the_library">Extending the library</a>
 <ul class="sectlevel2">
 <li><a href="#_adding_a_loss_function">Adding a loss function</a></li>
 </ul>
@@ -680,7 +680,7 @@ pip install .</code></pre>
     --layer-weights=Xavier \
     --optimizers="Nesterov(0.9)" \
     --loss=SoftmaxCrossEntropy \
-    --learning-rate="Constant(0.01)" \
+    --learning-rate=0.01 \
     --epochs=100 \
     --batch-size=100 \
     --threads=12 \
@@ -1583,15 +1583,13 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 <pre class="rouge highlight"><code data-lang="python"><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">options</span><span class="p">.</span><span class="n">epochs</span><span class="p">):</span>
     <span class="n">self</span><span class="p">.</span><span class="nf">on_start_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
 
-    <span class="n">lr</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">learning_rate</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>  <span class="c1"># update the learning rate
-</span>
     <span class="k">for</span> <span class="n">batch_index</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">train_loader</span><span class="p">):</span>
         <span class="n">self</span><span class="p">.</span><span class="nf">on_start_batch</span><span class="p">(</span><span class="n">batch_index</span><span class="p">)</span>
         <span class="n">T</span> <span class="o">=</span> <span class="nf">to_one_hot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
         <span class="n">Y</span> <span class="o">=</span> <span class="n">M</span><span class="p">.</span><span class="nf">feedforward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="n">DY</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">loss</span><span class="p">.</span><span class="nf">gradient</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span>
         <span class="n">M</span><span class="p">.</span><span class="nf">backpropagate</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">DY</span><span class="p">)</span>
-        <span class="n">M</span><span class="p">.</span><span class="nf">optimize</span><span class="p">(</span><span class="n">lr</span><span class="p">)</span>
+        <span class="n">M</span><span class="p">.</span><span class="nf">optimize</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span>
         <span class="n">self</span><span class="p">.</span><span class="nf">on_end_batch</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
     <span class="n">self</span><span class="p">.</span><span class="nf">on_end_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
@@ -1677,12 +1675,18 @@ the parameters <code>Θ</code>.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>When using dropout layers, periodically the dropout masks should be renewed. This is typically done after each epoch or after a given number of batches.</p>
+<p>Update the learning rate.</p>
 </li>
 <li>
-<p>When doing dynamic sparse training, periodically a number of small weights is pruned, and new weights are added back (regrown). This is also typically done after each epoch or after a given number of batches.</p>
+<p>Renew dropout masks.</p>
+</li>
+<li>
+<p>Prune and grow sparse weights.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Such operations are typically done after each epoch or after a given number of batches.</p>
 </div>
 <div id="on_start_epoch" class="paragraph">
 <p>An example can be found in the tool <code>mlp</code>:</p>
@@ -1690,8 +1694,11 @@ the parameters <code>Θ</code>.</p>
 <div class="listingblock small-code">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">on_start_epoch</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">self</span><span class="p">.</span><span class="n">reload_data_directory</span><span class="p">:</span>
             <span class="n">self</span><span class="p">.</span><span class="nf">reload_data</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">lr_scheduler</span><span class="p">:</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">lr_scheduler</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">self</span><span class="p">.</span><span class="n">M</span><span class="p">.</span><span class="nf">renew_dropout_masks</span><span class="p">()</span>
@@ -1704,12 +1711,15 @@ the parameters <code>Θ</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Four actions take place at the start of every epoch.</p>
+<p>Five actions take place at the start of every epoch:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
 <p>A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.</p>
+</li>
+<li>
+<p>The learning rate is updated if a learning rate scheduler is set.</p>
 </li>
 <li>
 <p>Dropout masks are renewed.</p>
@@ -1718,7 +1728,7 @@ the parameters <code>Θ</code>.</p>
 <p>Sparse weight matrices are pruned and regrown if a regrow function is specified.</p>
 </li>
 <li>
-<p>Small weights in the subnormal range are clipped to zero if the corresponding option is set.</p>
+<p>Small weights in the subnormal range are clipped to zero if the <code>clip</code> option is set.</p>
 </li>
 </ul>
 </div>
@@ -1737,10 +1747,10 @@ the parameters <code>Θ</code>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="extending">Extending the library</h2>
+<h2 id="_extending_the_library">Extending the library</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <em>Nerva-Rowwise Python Library</em> Python library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
+<p>The <em>Nerva-Rowwise Python Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
 <a href="nerva-cpp.adoc#extending">Extending the library</a> of the C&#43;&#43; manual.
 After adding these components to C&#43;&#43;, they can be integrated in the <code>nerva</code> Python module.</p>
 </div>
@@ -1797,7 +1807,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-01 13:23:38 UTC
+Last updated 2024-10-01 16:06:35 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

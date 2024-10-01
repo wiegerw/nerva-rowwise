@@ -831,7 +831,7 @@ The number of threads that are used at runtime by the MKL library can be control
     <span class="nt">--layer-weights</span><span class="o">=</span>Xavier <span class="se">\</span>
     <span class="nt">--optimizers</span><span class="o">=</span><span class="s2">"Nesterov(0.9)"</span> <span class="se">\</span>
     <span class="nt">--loss</span><span class="o">=</span>SoftmaxCrossEntropy <span class="se">\</span>
-    <span class="nt">--learning-rate</span><span class="o">=</span><span class="s2">"Constant(0.01)"</span> <span class="se">\</span>
+    <span class="nt">--learning-rate</span><span class="o">=</span>0.01 <span class="se">\</span>
     <span class="nt">--epochs</span><span class="o">=</span>100 <span class="se">\</span>
     <span class="nt">--batch-size</span><span class="o">=</span>100 <span class="se">\</span>
     <span class="nt">--threads</span><span class="o">=</span>12 <span class="se">\</span>
@@ -1792,7 +1792,6 @@ interfaces of layers, loss functions and activation functions. This may be chang
 <span class="p">{</span>
   <span class="n">on_start_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">);</span>
 
-  <span class="n">eta</span> <span class="o">=</span> <span class="n">learning_rate</span><span class="o">-&gt;</span><span class="k">operator</span><span class="p">()(</span><span class="n">epoch</span><span class="p">);</span>
   <span class="n">eigen</span><span class="o">::</span><span class="n">matrix</span> <span class="n">DY</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span><span class="p">);</span>
 
   <span class="k">for</span> <span class="p">(</span><span class="kt">long</span> <span class="n">batch_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">batch_index</span> <span class="o">&lt;</span> <span class="n">K</span><span class="p">;</span> <span class="n">batch_index</span><span class="o">++</span><span class="p">)</span>
@@ -1806,7 +1805,7 @@ interfaces of layers, loss functions and activation functions. This may be chang
     <span class="n">M</span><span class="p">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">);</span>
     <span class="n">DY</span> <span class="o">=</span> <span class="n">loss</span><span class="o">-&gt;</span><span class="n">gradient</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span><span class="p">;</span>
     <span class="n">M</span><span class="p">.</span><span class="n">backpropagate</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">DY</span><span class="p">);</span>
-    <span class="n">M</span><span class="p">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">eta</span><span class="p">);</span>
+    <span class="n">M</span><span class="p">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">);</span>
 
     <span class="n">on_end_batch</span><span class="p">(</span><span class="n">batch_index</span><span class="p">);</span>
   <span class="p">}</span>
@@ -1880,12 +1879,18 @@ the parameters <code>Θ</code>.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>When using dropout layers, periodically the dropout masks should be renewed. This is typically done after each epoch or after a given number of batches.</p>
+<p>Update the learning rate.</p>
 </li>
 <li>
-<p>When doing dynamic sparse training, periodically a number of small weights is pruned, and new weights are added back (regrown). This is also typically done after each epoch or after a given number of batches.</p>
+<p>Renew dropout masks.</p>
+</li>
+<li>
+<p>Prune and grow sparse weights.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Such operations are typically done after each epoch or after a given number of batches.</p>
 </div>
 <div id="on_start_epoch" class="paragraph">
 <p>An example can be found in the tool <code>mlp</code>:</p>
@@ -1899,7 +1904,15 @@ the parameters <code>Θ</code>.</p>
         <span class="n">reload_data</span><span class="p">(</span><span class="n">epoch</span><span class="p">);</span>
       <span class="p">}</span>
 
-      <span class="n">renew_dropout_masks</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">rng</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">lr_scheduler</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">lr_scheduler</span><span class="o">-&gt;</span><span class="k">operator</span><span class="p">()(</span><span class="n">epoch</span><span class="p">);</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="p">{</span>
+        <span class="n">renew_dropout_masks</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">rng</span><span class="p">);</span>
+      <span class="p">}</span>
 
       <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">regrow_function</span><span class="p">)</span>
       <span class="p">{</span>
@@ -1914,12 +1927,15 @@ the parameters <code>Θ</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Four actions take place at the start of every epoch.</p>
+<p>Five actions take place at the start of every epoch:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
 <p>A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.</p>
+</li>
+<li>
+<p>The learning rate is updated if a learning rate scheduler is set.</p>
 </li>
 <li>
 <p>Dropout masks are renewed.</p>
@@ -1928,7 +1944,7 @@ the parameters <code>Θ</code>.</p>
 <p>Sparse weight matrices are pruned and regrown if a regrow function is specified.</p>
 </li>
 <li>
-<p>Small weights in the subnormal range are clipped to zero if the corresponding option is set.</p>
+<p>Small weights in the subnormal range are clipped to zero if the <code>clip</code> option is set.</p>
 </li>
 </ul>
 </div>
@@ -2482,7 +2498,7 @@ pruning + growing 13332/66662 weights</pre>
 <h2 id="extending">Extending the library</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Nerva library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. This can be done by inheriting from the appropriate base class and implementing the required virtual functions. The table below provides an overview:</p>
+<p>The <em>Nerva-Rowwise C++ Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers and pruning or growing functions. This can be done by inheriting from the appropriate base class and implementing the required virtual functions. The table below provides an overview:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2509,6 +2525,10 @@ pruning + growing 13332/66662 weights</pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>loss_function</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A learning rate scheduler</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>learning_rate_scheduler</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A pruning function</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>prune_function</code></p></td>
 </tr>
@@ -2527,7 +2547,7 @@ After defining the mathematical equations, you can use the table of <a href="#ta
 <p>Another crucial step is validation and testing. The symbolic mathematics library
 <a href="https://docs.sympy.org/latest/index.html">SymPy</a>
 can be used to validate the equations.
-The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository contains test cases for activation functions, loss functions, layers, and even for the derivation of equations.</p>
+The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository contains <a href="https://github.com/wiegerw/nerva-sympy/tree/main/tests">test cases</a> for activation functions, loss functions, layers, and even for the derivation of equations.</p>
 </div>
 </div>
 </div>
@@ -2566,7 +2586,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-01 13:23:38 UTC
+Last updated 2024-10-01 16:06:35 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
