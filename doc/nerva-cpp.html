@@ -612,6 +612,7 @@ pre.rouge .gs {
 <li><a href="#_experiments_with_sparse_training">Experiments with sparse training</a></li>
 </ul>
 </li>
+<li><a href="#extending">Extending the library</a></li>
 <li><a href="#_references">References</a></li>
 </ul>
 </div>
@@ -630,7 +631,7 @@ pre.rouge .gs {
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document describes the implementation of the nerva-rowwise library.</p>
+<p>This document describes the implementation of the nerva-rowwise library. In earlier versions, I relied heavily on lecture notes from <a href="https://www.cs.toronto.edu/~rgrosse/teaching.html">machine learning courses by Roger Grosse</a>, which I highly recommend. This influence may still be evident in the naming of symbols.</p>
 </div>
 <div class="sect2">
 <h3 id="_installation">Installation</h3>
@@ -2478,6 +2479,59 @@ pruning + growing 13332/66662 weights</pre>
 </div>
 </div>
 <div class="sect1">
+<h2 id="extending">Extending the library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Nerva library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. This can be done by inheriting from the appropriate base class and implementing the required virtual functions. The table below provides an overview:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Functionality</th>
+<th class="tableblock halign-left valign-top">Base class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A layer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>neural_network_layer</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An activation function</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>activation_function</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A loss function</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>loss_function</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A pruning function</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>prune_function</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A growing function</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grow_function</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>It is recommended to follow the approach advocated in the Nerva libraries. Each implementation should be based on a mathematical specification, as shown in the
+<a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> document.
+After defining the mathematical equations, you can use the table of <a href="#table_matrix_operations">matrix operations</a> to convert the equations into code.</p>
+</div>
+<div class="paragraph">
+<p>Another crucial step is validation and testing. The symbolic mathematics library
+<a href="https://docs.sympy.org/latest/index.html">SymPy</a>
+can be used to validate the equations.
+The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository contains test cases for activation functions, loss functions, layers, and even for the derivation of equations.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_references">References</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -2512,7 +2566,7 @@ pruning + growing 13332/66662 weights</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-30 17:12:47 UTC
+Last updated 2024-10-01 07:33:49 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
