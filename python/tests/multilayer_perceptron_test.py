@@ -106,12 +106,14 @@ class TestMLPExecution(unittest.TestCase):
         M = construct_mlp1(sizes, batch_size) if construct1 else construct_mlp2(sizes, batch_size)
 
         # Set weights + bias manually
+        # tag::layer-access[]
         M.layers[0]._layer.W = W1
         M.layers[0]._layer.b = b1
         M.layers[1]._layer.W = W2
         M.layers[1]._layer.b = b2
         M.layers[2]._layer.W = W3
         M.layers[2]._layer.b = b3
+        # end::layer-access[]
 
         loss = SoftmaxCrossEntropyLoss()
         Y = M.feedforward(X)

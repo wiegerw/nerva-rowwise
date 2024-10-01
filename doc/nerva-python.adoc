@@ -253,6 +253,16 @@ The class `ActivationFunction` is the base class of all activation functions. Th
 
 See the https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] document for precise definitions of these activation functions.
 
+=== Accessing C++ data structures
+To a limited extent, the C++ data structures can be accessed in Python. In the file
+`link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/tests/loss_test.py[loss_test.py]` it is demonstrated how to modify the weight matrices and bias vectors of dense layers via the `_layer` attribute:
+[.small-code]
+[source,python]
+----
+include::../python/tests/multilayer_perceptron_test.py[tag=layer-access]
+----
+The weight matrices of sparse layers are not yet fully exposed to Python.
+
 === Training a neural network
 The class `StochasticGradientDescentAlgorithm` can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:
 [.small-code]
@@ -312,6 +322,7 @@ The {library} Python library can be extended in several obvious ways, such as ad
 link:nerva-cpp.adoc#extending[Extending the library] of the {cpp} manual.
 After adding these components to {cpp}, they can be integrated in the `nerva` Python module.
 
+=== Adding a loss function
 As an example, we will explain how the loss function `SoftmaxCrossEntropyLoss` is added to the `nerva` Python module.
 
 * The first step is to define a C++ class `softmax_cross_entropy_loss` in the header file
