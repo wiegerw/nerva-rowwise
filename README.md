@@ -21,8 +21,8 @@ The `nerva-rowwise` library has the following features:
 ### Documentation
 The documentation consists of three parts:
 * A [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html) that explains the implementation.
-* A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains the Python interface.
-* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of key components of neural networks.
+* A [Python manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) that explains the `nerva` Python module.
+* A PDF with [mathematical specifications](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-libraries-implementation.pdf) of key components of the Nerva Library.
 
 The following papers about Nerva are available:
 
@@ -98,10 +98,10 @@ epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test acc
 ```
 
 # Design philosophy
-In the first place, the `nerva-rowwise` library is intended to support research with sparse neural networks. For that purpose, it contains algorithms for dynamic sparse training. Another goal of the library is to offer a completely transparent and accessible implementation of neural networks. The `nerva-rowwise` library contains explicit formulations of backpropagation, and can thus be used to study in detail of how the execution of neural networks works. Instead, many other frameworks rely on auto differentation, which effectively hides the backpropagation from the user. The implementation of multilayer perceptrons is expressed in a small number of primitive matrix operations, that are given in this table: [TODO]. This helps to keep the implementation clean and maintainable. Furthermore, the idea is that a well-structured implementation can serve as the basis for doing performance experiments.
+In the first place, the `nerva-rowwise` library is intended to support research with sparse neural networks. For that purpose, it contains algorithms for dynamic sparse training. Another goal of the library is to offer a completely transparent and accessible implementation of neural networks. The `nerva-rowwise` library contains explicit formulations of backpropagation, and can thus be used to study in detail of how the execution of neural networks works. Instead, many other frameworks rely on auto differentation, which effectively hides the backpropagation from the user. The implementation of multilayer perceptrons is expressed in a small number of primitive [matrix operations](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html#_matrix_operations). This helps to keep the implementation clean and maintainable. Furthermore, the idea is that a well-structured implementation can serve as the basis for doing performance experiments.
 
 ### Other frameworks
-There are many popular neural network frameworks available like PyTorch, Tensorflow and JAX. For those who just want to train a neural network, these frameworks are perfectly adequate, and the Nerva libraries are not meant to compete with those. The Nerva libraries are better suited to be used in a research environment, or for people who want to learn the details of neural networks.
+There are many popular neural network frameworks available like [PyTorch](https://pytorch.org/), [TensorFlow](https://www.tensorflow.org/) and [JAX](https://jax.readthedocs.io/). For those who just want to train a neural network, these frameworks are perfectly adequate, and the Nerva libraries are not meant to compete with those. The Nerva libraries are better suited to be used in a research environment, or for people who want to learn about the details of neural networks.
 
 ### Performance
 The `nerva-rowwise` library uses a pragmatic approach with respect to performance. Our observation is that the performance of neural networks mostly relies on the performance of matrix multiplications, and for that we rely as much as possible on existing library solutions. For the CPU implementation we have opted for the Intel MKL library. But our implementation is modular, and this makes it relatively easy to add implementations based on other matrix libraries.

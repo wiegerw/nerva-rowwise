@@ -1,4 +1,4 @@
-= Nerva-rowwise Python manual
+= The Nerva-Rowwise Python manual
 :copyright: Copyright 2024 Wieger Wesselink
 :author: Wieger Wesselink
 :email: j.w.wesselink@tue.nl
@@ -12,7 +12,7 @@
 :description: Documentation for the nerva-rowwise repository.
 :imagesdir: images
 :bibliography: nerva.bib
-:library: nerva-rowwise
+:library: pass:q[_Nerva-Rowwise Python Library_]
 :mlptool: mlp.py
 :sgd_algorithm: StochasticGgradientDescentAlgorithm
 :cpp: C&#43;&#43;
@@ -31,7 +31,8 @@ endif::[]
 ++++
 
 == Introduction
-This document describes the implementation of the `nerva` Python module, that contains bindings to the {library} C++ library. Note that the matrix type used internally in the `nerva` module is `torch.Tensor`.
+This document describes the implementation of the {library}. This library features a Python module named `nerva`, that is built using Python bindings to the
+https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html[Nerva-Rowwise C++ Library]. Note that the matrix type used internally in the `nerva` module is `torch.Tensor`, to ensure an easy integration with PyTorch.
 
 == Installation
 The {library} Python bindings can be installed via `pip`. The installation is done via a https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py[setup.py] script. The script has several dependencies, that need to be resolved using environment variables.
@@ -116,10 +117,10 @@ include::nerva-cpp.adoc[tags=miscellaneous-options]
 
 == Overview of the code
 This section gives an overview of the Python code in the
-{library} library, and some explanations about the code.
+{library}, and some explanations about the code.
 
 === Number type
-The {library} library uses 32-bit floats as its number type. The C++ library also supports 64-bit floats.
+The {library} uses 32-bit floats as its number type. The C++ library also supports 64-bit floats.
 
 === Module contents
 The most important files in the `nerva` module are given in the table below.
