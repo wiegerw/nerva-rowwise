@@ -586,6 +586,7 @@ pre.rouge .gs {
 </ul>
 </li>
 <li><a href="#io">I/O</a></li>
+<li><a href="#extending">Extending the library</a></li>
 </ul>
 </div>
 </div>
@@ -642,7 +643,7 @@ pre.rouge .gs {
 <p>An alternative solution is to use CMake to resolve these three dependencies, see also the
 <a href="nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded automatically in the <code>_deps</code> subdirectory of the CMake build directory. After that it is sufficient to set the environment variable <code>CMAKE_DEPS_DIR</code>.</p>
 </div>
-<div class="paragraph">
+<div id="pip-install" class="paragraph">
 <p>The <code>nerva</code> Python module can then be installed using</p>
 </div>
 <div class="listingblock">
@@ -1502,7 +1503,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 </ul>
 </div>
 <div class="paragraph">
-<p>See <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> for precise definitions of these loss functions.</p>
+<p>See the <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> document for precise definitions of these loss functions.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1542,7 +1543,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 </ul>
 </div>
 <div class="paragraph">
-<p>See <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> for precise definitions of these activation functions.</p>
+<p>See the <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> document for precise definitions of these activation functions.</p>
 </div>
 </div>
 </div>
@@ -1709,10 +1710,65 @@ the parameters <code>Θ</code>.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="extending">Extending the library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The nerva-rowwise Python library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
+<a href="nerva-cpp.adoc#extending">Extending the library</a> of the C&#43;&#43; manual.
+After adding these components to C&#43;&#43;, they can be integrated in the <code>nerva</code> Python module.</p>
+</div>
+<div class="paragraph">
+<p>As an example, we will explain how the loss function <code>SoftmaxCrossEntropyLoss</code> is added to the <code>nerva</code> Python module.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The first step is to define a C++ class <code>softmax_cross_entropy_loss</code> in the header file
+<code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/loss_functions.h">loss_functions.h</a></code>.</p>
+</li>
+<li>
+<p>The next step is to add the class <code>softmax_cross_entropy_loss</code> to the Python bindings in the file <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/src/python-bindings.cpp">python-bindings.cpp</a></code>:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>  py::class_&lt;softmax_cross_entropy_loss, loss_function, std::shared_ptr&lt;softmax_cross_entropy_loss&gt;&gt;(m, "softmax_cross_entropy_loss")
+    .def(py::init&lt;&gt;(), py::return_value_policy::copy)
+    ;</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The third step is to define a Python class <code>SoftmaxCrossEntropyLoss</code> in the file <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/loss-functions.py">loss-functions.py</a></code>:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>class SoftmaxCrossEntropyLoss(nervalibrowwise.softmax_cross_entropy_loss):
+    def __str__(self):
+        return 'SoftmaxCrossEntropyLoss()'</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the Python class derives from the C++ class. In the same file, an entry to the function <code>parse_loss_function</code> should be added.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The last step is to reinstall the <code>nerva</code> Python module via <code>pip</code>, see <a href="#pip-install">[pip-install]</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-01 07:33:49 UTC
+Last updated 2024-10-01 08:48:21 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
