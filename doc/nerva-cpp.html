@@ -631,7 +631,7 @@ pre.rouge .gs {
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document describes the implementation of the nerva-rowwise library. In earlier versions, I relied heavily on lecture notes from <a href="https://www.cs.toronto.edu/~rgrosse/teaching.html">machine learning courses by Roger Grosse</a>, which I highly recommend. This influence may still be evident in the naming of symbols.</p>
+<p>This document describes the implementation of the <em>Nerva-Rowwise C++ Library</em>. In earlier versions, I relied heavily on lecture notes from <a href="https://www.cs.toronto.edu/~rgrosse/teaching.html">machine learning courses by Roger Grosse</a>, which I highly recommend. This influence may still be evident in the naming of symbols.</p>
 </div>
 <div class="sect2">
 <h3 id="_installation">Installation</h3>
@@ -649,7 +649,7 @@ pre.rouge .gs {
 </ul>
 </div>
 <div class="paragraph">
-<p>Using CMake, the nerva-rowwise library can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable <code>ONEAPI_ROOT</code> should point to the OneAPI installation directory, and the variable <code>MKL_DIR</code> to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using <code>FetchContent</code> commands.</p>
+<p>Using CMake, the <em>Nerva-Rowwise C++ Library</em> can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable <code>ONEAPI_ROOT</code> should point to the OneAPI installation directory, and the variable <code>MKL_DIR</code> to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using <code>FetchContent</code> commands.</p>
 </div>
 <div class="sect3">
 <h4 id="_linux_install">Linux install</h4>
@@ -1521,12 +1521,12 @@ b3= (10)
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section gives an overview of the C++ code in the
-nerva-rowwise library, and some information that is needed for understanding the code.</p>
+<em>Nerva-Rowwise C++ Library</em>, and some information that is needed for understanding the code.</p>
 </div>
 <div class="sect2">
 <h3 id="_number_type">Number type</h3>
 <div class="paragraph">
-<p>The nerva-rowwise library uses a type called <code>scalar</code> as its number type. By default, it is defined as a 32-bit float. It is possible to change this by defining the symbol <code>NERVA_USE_DOUBLE</code>, in which case 64 bit doubles are used. The corresponding code is</p>
+<p>The <em>Nerva-Rowwise C++ Library</em> uses a type called <code>scalar</code> as its number type. By default, it is defined as a 32-bit float. It is possible to change this by defining the symbol <code>NERVA_USE_DOUBLE</code>, in which case 64 bit doubles are used. The corresponding code is</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
@@ -2125,17 +2125,17 @@ the parameters <code>Θ</code>.</p>
 <div class="sect2">
 <h3 id="_eigen_library">Eigen library</h3>
 <div class="paragraph">
-<p>The nerva-rowwise library uses the <a href="https://eigen.tuxfamily.org/">Eigen library</a> for representing matrices. The matrix operations in table <a href="#table_matrix_operations">matrix operations</a> have been implemented using Eigen, see the file <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h">matrix_operations.h</a>.</p>
+<p>The <em>Nerva-Rowwise C++ Library</em> uses the <a href="https://eigen.tuxfamily.org/">Eigen library</a> for representing matrices. The matrix operations in table <a href="#table_matrix_operations">matrix operations</a> have been implemented using Eigen, see the file <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h">matrix_operations.h</a>.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_mkl_library">MKL library</h3>
 <div class="paragraph">
-<p>Using the Eigen library alone is not sufficient for obtaining high performance. Therefore, the nerva-rowwise library uses the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> as a backend. The Eigen library supports MKL by means of the compiler flag <code>EIGEN_USE_MKL_ALL</code>, see also <a href="https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html">TopicUsingIntelMKL.html</a>.
+<p>Using the Eigen library alone is not sufficient for obtaining high performance. Therefore, the <em>Nerva-Rowwise C++ Library</em> uses the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> as a backend. The Eigen library supports MKL by means of the compiler flag <code>EIGEN_USE_MKL_ALL</code>, see also <a href="https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html">TopicUsingIntelMKL.html</a>.
 Note that the MKL library is included in the <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html">Intel oneAPI base toolkit</a>.</p>
 </div>
 <div class="paragraph">
-<p>The MKL library supports a number of highly efficient, but extremely low-level interfaces for matrix operations. See <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html">blas-and-sparse-blas-routines.html</a> for an overview. The nerva-rowwise library contains matrix classes that hide those low-level details from the user. The table below gives an overview of them.</p>
+<p>The MKL library supports a number of highly efficient, but extremely low-level interfaces for matrix operations. See <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-2/blas-and-sparse-blas-routines.html">blas-and-sparse-blas-routines.html</a> for an overview. The <em>Nerva-Rowwise C++ Library</em> contains matrix classes that hide those low-level details from the user. The table below gives an overview of them.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2184,7 +2184,7 @@ In C++23 the implementation of sparse matrices in CSR format can be greatly simp
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The sparse CSR matrix functions in the MKL library take an argument of the opaque type <code>sparse_matrix_t</code>. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the nerva-rowwise library recalculates this parameter after every change to a sparse matrix, which may cause some inefficiencies. See also the function <code>sparse_matrix_csr::construct_csr</code> and
+The sparse CSR matrix functions in the MKL library take an argument of the opaque type <code>sparse_matrix_t</code>. It stores unspecified properties of a sparse matrix. This parameter is poorly documented, and it is unknown when this parameter should be recalculated. For safety reasons, the <em>Nerva-Rowwise C++ Library</em> recalculates this parameter after every change to a sparse matrix, which may cause some inefficiencies. See also the function <code>sparse_matrix_csr::construct_csr</code> and
 <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2024-1/mkl-sparse-create-csr.html">mkl_sparse_?_create_csr</a>.
 </td>
 </tr>
@@ -2223,7 +2223,7 @@ The sparse CSR matrix functions in the MKL library take an argument of the opaqu
 </blockquote>
 </div>
 <div class="paragraph">
-<p>To support mini-batches, the nerva-rowwise library defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a>. For the latter, many neural network frameworks rely on <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a>, see also <span class="citation">[<a href="#DBLP_journals_jmlr_BaydinPRS17">1</a>]</span>. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.</p>
+<p>To support mini-batches, the <em>Nerva-Rowwise C++ Library</em> defines all equations that play a role in the execution of a neural network in matrix form, including the backpropagation equations, see the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a>. For the latter, many neural network frameworks rely on <a href="https://en.wikipedia.org/wiki/Automatic_differentiation">Automatic differentiation</a>, see also <span class="citation">[<a href="#DBLP_journals_jmlr_BaydinPRS17">1</a>]</span>. We use explicit backpropagation equations to implement truly sparse layers and to provide an instructive resource for those studying neural network execution.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2235,7 +2235,7 @@ The sparse CSR matrix functions in the MKL library take an argument of the opaqu
 <div class="sect2">
 <h3 id="_nerva_computation_mode">Nerva computation mode</h3>
 <div class="paragraph">
-<p>In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The nerva-rowwise library uses a global setting <code>NervaComputation</code> to experiment with other implementations. For example, the function <code>softmax_layer::feedforward</code> contains this:</p>
+<p>In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The <em>Nerva-Rowwise C++ Library</em> uses a global setting <code>NervaComputation</code> to experiment with other implementations. For example, the function <code>softmax_layer::feedforward</code> contains this:</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
@@ -2326,7 +2326,7 @@ time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the nerva-rowwise library different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
+<p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the <em>Nerva-Rowwise C++ Library</em> different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
 In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.</p>
 </div>
 </div>
@@ -2336,7 +2336,7 @@ In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</sp
 <h2 id="_sparse_neural_networks">Sparse neural networks</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_journals_corr_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The nerva-rowwise library supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_conf_icml_NikdanPIKA23">4</a>]</span>.</p>
+<p>Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_journals_corr_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The <em>Nerva-Rowwise C++ Library</em> supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_conf_icml_NikdanPIKA23">4</a>]</span>.</p>
 </div>
 <div class="sect2">
 <h3 id="_sparse_matrices">Sparse matrices</h3>
@@ -2344,7 +2344,7 @@ In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</sp
 <p>Since we are dealing with a programming context, we say that the <em>support</em> of a sparse matrix refers to the set of positions (or indices) in the matrix that are explicitly stored. Elements inside the support can have a non-zero value. Elements outside the support have the value zero by definition.</p>
 </div>
 <div class="paragraph">
-<p>Sparse matrices in the nerva-rowwise library are stored in
+<p>Sparse matrices in the <em>Nerva-Rowwise C++ Library</em> are stored in
 <a href="https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format)">CSR</a> format.
 This matrix representation stores arrays of column and row indices to define the support, plus an array of the corresponding values. CSR matrices are <em>unstructured</em> sparse matrices, meaning they have non-zero elements located at arbitrary positions. Alternatively, there are <em>structured</em> sparse matrices, take for example butterfly matrices <span class="citation">[<a href="#DBLP_journals_corr_abs-2405-15013">5</a>]</span>.</p>
 </div>
@@ -2361,7 +2361,7 @@ This matrix representation stores arrays of column and row indices to define the
 <p>In SET, the sparsity is not divided evenly over the sparse layers. Instead, small layers are assigned a higher density than larger ones.
  In <span class="citation">[<a href="#DBLP_journals_nca_LiuMMPP21">6</a>]</span> formula (3), <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model">Erdős–Rényi graph topology</a>
  is suggested to calculate the densities of the sparse layers given a desired overall density of the sparse layers combined.
-In nerva-rowwise this is implemented in the function <code>compute_sparse_layer_densities</code>, see <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/layer_algorithms.h">layer_algorithms.h</a></code>. The original Python implementation can be found
+In the <em>Nerva-Rowwise C++ Library</em> this is implemented in the function <code>compute_sparse_layer_densities</code>, see <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/layer_algorithms.h">layer_algorithms.h</a></code>. The original Python implementation can be found
 <a href="https://github.com/VITA-Group/Random_Pruning/blob/871077f1d10f9bc44941b093fd5ccbc4ec3984fa/CIFAR/sparselearning/core.py#L155">here</a>, along with several other sparse initialization strategies.
 In the tool <code>mlp</code> the option <code>--overall-density</code> is used for assigning Erdős–Rényi densities to the sparse layers. See <a href="#mlp_output">[mlp_output]</a> for an example of this. The overall density of <code>0.05</code> is converted into densities <code>[0.042382877, 0.06357384, 1.0]</code> for the individual layers.</p>
 </div>
@@ -2409,7 +2409,7 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 <div class="sect2">
 <h3 id="_classes_for_pruning_and_growing">Classes for pruning and growing</h3>
 <div class="paragraph">
-<p>In the nerva-rowwise library, the classes <code>prune_function</code> and <code>grow_function</code> are used to represent generic pruning and growing strategies:</p>
+<p>In the <em>Nerva-Rowwise C++ Library</em>, the classes <code>prune_function</code> and <code>grow_function</code> are used to represent generic pruning and growing strategies:</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
@@ -2566,7 +2566,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-01 08:48:21 UTC
+Last updated 2024-10-01 13:02:16 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
