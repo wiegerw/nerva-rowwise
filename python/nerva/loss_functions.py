@@ -26,12 +26,14 @@ class LogisticCrossEntropyLoss(nervalibrowwise.logistic_cross_entropy_loss):
 
 class NegativeLogLikelihoodLoss(nervalibrowwise.negative_log_likelihood_loss):
     def __str__(self):
-        return 'NegativeLoglikelihoodLoss()'
+        return 'NegativeLogLikelihoodLoss()'
 
 
+# tag::softmax_cross_entropy_loss[]
 class SoftmaxCrossEntropyLoss(nervalibrowwise.softmax_cross_entropy_loss):
     def __str__(self):
         return 'SoftmaxCrossEntropyLoss()'
+# end::softmax_cross_entropy_loss[]
 
 
 def parse_loss_function(text: str) -> LossFunction:
@@ -43,5 +45,7 @@ def parse_loss_function(text: str) -> LossFunction:
         return LogisticCrossEntropyLoss()
     elif text == "SoftmaxCrossEntropy":
         return SoftmaxCrossEntropyLoss()
+    elif text == "NegativeLoglikelihood":
+        return NegativeLogLikelihoodLoss()
     else:
         raise RuntimeError(f"unknown loss function '{text}'")

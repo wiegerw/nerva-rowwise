@@ -99,9 +99,11 @@ PYBIND11_MODULE(nervalibrowwise, m)
     .def(py::init<>(), py::return_value_policy::copy)
     ;
 
+  // tag::softmax_cross_entropy_loss[]
   py::class_<softmax_cross_entropy_loss, loss_function, std::shared_ptr<softmax_cross_entropy_loss>>(m, "softmax_cross_entropy_loss")
     .def(py::init<>(), py::return_value_policy::copy)
     ;
+  // end::softmax_cross_entropy_loss[]
 
   /////////////////////////////////////////////////////////////////////////
   //                       learning rate schedulers

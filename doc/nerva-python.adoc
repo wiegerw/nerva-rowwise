@@ -15,6 +15,7 @@
 :library: nerva-rowwise
 :mlptool: mlp.py
 :sgd_algorithm: StochasticGgradientDescentAlgorithm
+:cpp: C&#43;&#43;
 
 // Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
@@ -49,6 +50,7 @@ To resolve the FMT, Eigen and pybind11 dependencies, the environment variables
 An alternative solution is to use CMake to resolve these three dependencies, see also the
 link:nerva-cpp.adoc#cmake-build[CMake install] section in the C++ documentation. The `cmake` command causes the three libraries to be downloaded automatically in the `_deps` subdirectory of the CMake build directory. After that it is sufficient to set the environment variable `CMAKE_DEPS_DIR`.
 
+[[pip-install]]
 The `nerva` Python module can then be installed using
 [source]
 ----
@@ -233,7 +235,7 @@ The class `LossFunction` is the base class of all loss functions. There are five
 
 * `SoftmaxCrossEntropyLoss`
 
-See https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] for precise definitions of these loss functions.
+See the https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] document for precise definitions of these loss functions.
 
 ==== Activation functions
 The class `ActivationFunction` is the base class of all activation functions. The following activation functions are available:
@@ -248,7 +250,7 @@ The class `ActivationFunction` is the base class of all activation functions. Th
 * `SReLU`
 * `HyperbolicTangent`
 
-See https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] for precise definitions of these activation functions.
+See the https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] document for precise definitions of these activation functions.
 
 === Training a neural network
 The class `StochasticGradientDescentAlgorithm` can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:
@@ -302,3 +304,31 @@ Four actions take place at the start of every epoch.
 - Small weights in the subnormal range are clipped to zero if the corresponding option is set.
 
 include::nerva-cpp.adoc[tags=io]
+
+[[extending]]
+== Extending the library
+The {library} Python library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. However, the implementation of those extensions must be done in {cpp}, as documented in the section
+link:nerva-cpp.adoc#extending[Extending the library] of the {cpp} manual.
+After adding these components to {cpp}, they can be integrated in the `nerva` Python module.
+
+As an example, we will explain how the loss function `SoftmaxCrossEntropyLoss` is added to the `nerva` Python module.
+
+* The first step is to define a C++ class `softmax_cross_entropy_loss` in the header file
+`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/loss_functions.h[loss_functions.h]`.
+
+* The next step is to add the class `softmax_cross_entropy_loss` to the Python bindings in the file `link:https://github.com/wiegerw/nerva-rowwise/blob/main/src/python-bindings.cpp[python-bindings.cpp]`:
+[.small-code]
+[source,python]
+----
+include::../src/python-bindings.cpp[tag=softmax_cross_entropy_loss]
+----
+
+* The third step is to define a Python class `SoftmaxCrossEntropyLoss` in the file `link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/loss-functions.py[loss-functions.py]`:
+[.small-code]
+[source,python]
+----
+include::../python/nerva/loss_functions.py[tag=softmax_cross_entropy_loss]
+----
+Note that the Python class derives from the C++ class. In the same file, an entry to the function `parse_loss_function` should be added.
+
+* The last step is to reinstall the `nerva` Python module via `pip`, see <<pip-install>>.
