@@ -31,7 +31,7 @@ endif::[]
 ++++
 
 == Introduction
-This document describes the implementation of the {library} library.
+This document describes the implementation of the {library} library. In earlier versions, I relied heavily on lecture notes from https://www.cs.toronto.edu/~rgrosse/teaching.html[machine learning courses by Roger Grosse], which I highly recommend. This influence may still be evident in the naming of symbols.
 
 === Installation
 The following build systems are supported:
@@ -1065,6 +1065,38 @@ epoch   2 lr: 0.01000000  loss: 1.91203228  train accuracy: 0.30918000  test acc
 pruning + growing 26665/133325 weights
 pruning + growing 13332/66662 weights
 ----
+
+[[extending]]
+== Extending the library
+The Nerva library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. This can be done by inheriting from the appropriate base class and implementing the required virtual functions. The table below provides an overview:
+
+|===
+|Functionality |Base class
+
+|A layer
+|`neural_network_layer`
+
+|An activation function
+|`activation_function`
+
+|A loss function
+|`loss_function`
+
+|A pruning function
+|`prune_function`
+
+|A growing function
+|`grow_function`
+|===
+
+It is recommended to follow the approach advocated in the Nerva libraries. Each implementation should be based on a mathematical specification, as shown in the
+https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] document.
+After defining the mathematical equations, you can use the table of <<table_matrix_operations>> to convert the equations into code.
+
+Another crucial step is validation and testing. The symbolic mathematics library
+https://docs.sympy.org/latest/index.html[SymPy]
+can be used to validate the equations.
+The https://github.com/wiegerw/nerva-sympy[nerva-sympy] repository contains test cases for activation functions, loss functions, layers, and even for the derivation of equations.
 
 == References
 
