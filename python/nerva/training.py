@@ -98,7 +98,7 @@ class StochasticGradientDescentAlgorithm(object):
                  test_loader: DataLoader,
                  options: SGDOptions,
                  loss: LossFunction,
-                 learning_rate: LearningRateScheduler
+                 learning_rate: float
                 ):
         self.M = M
         self.train_loader = train_loader
@@ -160,15 +160,12 @@ class StochasticGradientDescentAlgorithm(object):
 
         self.on_start_training()
 
-        lr = self.learning_rate(0)
-        compute_statistics(M, lr, self.loss, self.train_loader, self.test_loader, 0, 0.0, options.statistics)
+        compute_statistics(M, self.learning_rate, self.loss, self.train_loader, self.test_loader, 0, 0.0, options.statistics)
 
         for epoch in range(self.options.epochs):
             self.on_start_epoch(epoch)
             epoch_label = "epoch{}".format(epoch)
             self.timer.start(epoch_label)
-
-            lr = self.learning_rate(epoch)  # update the learning rate
 
             for batch_index, (X, T) in enumerate(self.train_loader):
                 self.on_start_batch(batch_index)
@@ -184,13 +181,13 @@ class StochasticGradientDescentAlgorithm(object):
                     pp("DY", DY)
 
                 M.backpropagate(Y, DY)
-                M.optimize(lr)
+                M.optimize(self.learning_rate)
 
                 self.on_end_batch(batch_index)
 
             self.timer.stop(epoch_label)
             seconds = self.timer.seconds(epoch_label)
-            compute_statistics(M, lr, self.loss, self.train_loader, self.test_loader, epoch + 1, seconds, options.statistics)
+            compute_statistics(M, self.learning_rate, self.loss, self.train_loader, self.test_loader, epoch + 1, seconds, options.statistics)
 
             self.on_end_epoch(epoch)
 

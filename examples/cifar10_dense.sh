@@ -7,7 +7,7 @@
     --layer-weights=Xavier \
     --optimizers="Nesterov(0.9)" \
     --loss=SoftmaxCrossEntropy \
-    --learning-rate="Constant(0.01)" \
+    --learning-rate=0.01 \
     --epochs=100 \
     --batch-size=100 \
     --threads=12 \

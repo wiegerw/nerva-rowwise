@@ -16,7 +16,7 @@ from nerva.datasets import create_cifar10_augmented_dataloaders, create_cifar10_
     create_mnist_dataloaders, create_npz_dataloaders, extract_tensors_from_dataloader
 from nerva.grow import GrowFunction, parse_grow_function
 from nerva.layers import Dense, Sparse, make_layers
-from nerva.learning_rate_schedulers import LearningRateScheduler, parse_learning_rate
+from nerva.learning_rate_schedulers import LearningRateScheduler, parse_learning_rate_scheduler
 from nerva.loss_functions import LossFunction, parse_loss_function
 from nerva.multilayer_perceptron import print_model_info, MultilayerPerceptron
 from nerva.prune import PruneFunction, parse_prune_function
@@ -37,15 +37,17 @@ class MLPNerva(MultilayerPerceptron):
                  linear_layer_weights: List[str],
                  layer_specifications: List[str],
                  linear_layer_dropouts: List[float],
-                 loss,
-                 learning_rate,
-                 batch_size
+                 loss: LossFunction,
+                 learning_rate: float,
+                 lr_scheduler: LearningRateScheduler,
+                 batch_size: int
                 ):
         super().__init__()
         self.layer_sizes = linear_layer_sizes
         self.layer_densities = linear_layer_densities
         self.loss = loss
         self.learning_rate = learning_rate
+        self.lr_scheduler = lr_scheduler
         self.layers = make_layers(layer_specifications, linear_layer_sizes, linear_layer_densities, linear_layer_dropouts, linear_layer_weights, optimizers)
         self.compile(batch_size)
 
@@ -109,12 +111,13 @@ def make_argument_parser():
     # model parameters
     cmdline_parser.add_argument('--layer-sizes', type=str, default='3072,128,64,10', help='A comma separated list of layer sizes, e.g. "3072,128,64,10".')
     cmdline_parser.add_argument('--densities', type=str, help='A comma separated list of layer densities, e.g. "0.05,0.05,1.0".')
-    cmdline_parser.add_argument('--overall-density', type=float, default=1.0, help='The overall density of the layers.')
+    cmdline_parser.add_argument('--overall-density', type=float, help='The overall density of the layers.')
     cmdline_parser.add_argument('--dropouts', help='A comma separated list of dropout rates')
     cmdline_parser.add_argument('--layers', type=str, help='A semi-colon separated lists of layers.')
 
     # learning rate
-    cmdline_parser.add_argument("--learning-rate", type=str, help="The learning rate scheduler")
+    cmdline_parser.add_argument("--learning-rate", type=float, help="The learning rate (default: 0.01)", default=0.01)
+    cmdline_parser.add_argument("--learning-rate-scheduler", type=str, help="The learning rate scheduler")
 
     # loss function
     cmdline_parser.add_argument('--loss', type=str, help='The loss function')
@@ -218,33 +221,38 @@ class SGD(StochasticGradientDescentAlgorithm):
                  test_loader,
                  options: SGDOptions,
                  loss: LossFunction,
-                 learning_rate: LearningRateScheduler,
+                 learning_rate: float,
+                 lr_scheduler: LearningRateScheduler,
                  preprocessed_dir: str,
                  prune: PruneFunction,
                  grow: GrowFunction
-                ):
+                 ):
         super().__init__(M, train_loader, test_loader, options, loss, learning_rate)
-        self.preprocessed_dir = preprocessed_dir
-        self.regrow = PruneGrow(prune, grow) if prune else None
-        self.clip = options.clip
         self.train_loader = train_loader
         self.test_loader = test_loader
+        self.lr_scheduler = lr_scheduler
+        self.reload_data_directory = preprocessed_dir
+        self.regrow = PruneGrow(prune, grow) if prune else None
+        self.clip = options.clip
 
     def reload_data(self, epoch) -> None:
         """
         Reloads the dataset if a directory with preprocessed data was specified.
         """
-        if self.preprocessed_dir:
-            path = Path(self.preprocessed_dir) / f'epoch{epoch}.npz'
-            self.train_loader, self.test_loader = create_npz_dataloaders(str(path), self.options.batch_size)
+        path = Path(self.reload_data_directory) / f'epoch{epoch}.npz'
+        self.train_loader, self.test_loader = create_npz_dataloaders(str(path), self.options.batch_size)
 
     def on_start_training(self) -> None:
-        self.reload_data(0)
+        if self.reload_data_directory:
+            self.reload_data(0)
 
     # tag::event[]
     def on_start_epoch(self, epoch):
-        if epoch > 0:
+        if epoch > 0 and self.reload_data_directory:
             self.reload_data(epoch)
+
+        if self.lr_scheduler:
+            self.learning_rate = self.lr_scheduler(epoch)
 
         if epoch > 0:
             self.M.renew_dropout_masks()
@@ -271,15 +279,12 @@ class SGD(StochasticGradientDescentAlgorithm):
         I = list(range(N))
         K = N // batch_size  # the number of batches
 
-        lr = self.learning_rate(0)
-        compute_statistics(M, lr, self.loss, self.train_loader, self.test_loader, 0, 0.0, options.statistics)
+        compute_statistics(M, self.learning_rate, self.loss, self.train_loader, self.test_loader, 0, 0.0, options.statistics)
 
         for epoch in range(self.options.epochs):
             self.on_start_epoch(epoch)
             epoch_label = "epoch{}".format(epoch)
             self.timer.start(epoch_label)
-
-            lr = self.learning_rate(epoch)  # update the learning at the start of each epoch
 
             for batch_index in range(K):
                 batch = I[batch_index * batch_size: (batch_index + 1) * batch_size]
@@ -299,13 +304,13 @@ class SGD(StochasticGradientDescentAlgorithm):
                     pp("DY", DY)
 
                 M.backpropagate(Y, DY)
-                M.optimize(lr)
+                M.optimize(self.learning_rate)
 
                 self.on_end_batch(batch_index)
 
             self.timer.stop(epoch_label)
             seconds = self.timer.seconds(epoch_label)
-            compute_statistics(M, lr, self.loss, self.train_loader, self.test_loader, epoch + 1, seconds, options.statistics)
+            compute_statistics(M, self.learning_rate, self.loss, self.train_loader, self.test_loader, epoch + 1, seconds, options.statistics)
 
             self.on_end_epoch(epoch)
 
@@ -351,7 +356,7 @@ def main():
     layer_optimizers = parse_optimizers(args.optimizers, len(layer_specifications))
     linear_layer_dropouts = parse_dropouts(args.dropouts, linear_layer_count)
     loss = parse_loss_function(args.loss)
-    learning_rate = parse_learning_rate(args.learning_rate)
+    lr_scheduler = parse_learning_rate_scheduler(args.learning_rate_scheduler)
 
     M = MLPNerva(linear_layer_sizes,
                  linear_layer_densities,
@@ -360,7 +365,8 @@ def main():
                  layer_specifications,
                  linear_layer_dropouts,
                  loss,
-                 learning_rate,
+                 args.learning_rate,
+                 lr_scheduler,
                  args.batch_size
                 )
 
@@ -388,7 +394,7 @@ def main():
         options.gradient_step = 0
         prune = parse_prune_function(args.prune) if args.prune else None
         grow = parse_grow_function(args.grow, parse_weight_initializer(args.grow_weights)) if args.grow else None
-        algorithm = SGD(M, train_loader, test_loader, options, M.loss, M.learning_rate, args.preprocessed, prune, grow)
+        algorithm = SGD(M, train_loader, test_loader, options, M.loss, M.learning_rate, M.lr_scheduler, args.preprocessed, prune, grow)
         if args.manual:
             algorithm.run_manual()
         else:

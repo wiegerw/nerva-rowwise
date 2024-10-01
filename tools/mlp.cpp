@@ -162,6 +162,7 @@ void set_optimizers(multilayer_perceptron& M, const std::string& optimizer)
 class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::dataset>
 {
   protected:
+    std::shared_ptr<learning_rate_scheduler> lr_scheduler;
     std::filesystem::path reload_data_directory;
     std::shared_ptr<prune_and_grow> regrow_function;
 
@@ -170,19 +171,22 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
     using super::M;
     using super::rng;
     using super::timer;
+    using super::learning_rate;
 
   public:
     sgd_algorithm(multilayer_perceptron& M,
                   datasets::dataset& data,
                   const sgd_options& options,
                   const std::shared_ptr<loss_function>& loss,
-                  const std::shared_ptr<learning_rate_scheduler>& learning_rate,
+                  scalar learning_rate,
+                  const std::shared_ptr<learning_rate_scheduler>& lr_scheduler_,
                   std::mt19937& rng,
                   const std::string& preprocessed_dir_,
                   const std::shared_ptr<prune_function>& prune,
                   const std::shared_ptr<grow_function>& grow
     )
       : super(M, data, options, loss, learning_rate, rng),
+        lr_scheduler(lr_scheduler_),
         reload_data_directory(preprocessed_dir_)
     {
       if (prune)
@@ -203,6 +207,11 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
       {
         reload_data(0);
       }
+
+      if (lr_scheduler)
+      {
+        learning_rate = lr_scheduler->operator()(0);
+      }
     }
 
     // tag::event[]
@@ -213,7 +222,15 @@ class sgd_algorithm: public stochastic_gradient_descent_algorithm<datasets::data
         reload_data(epoch);
       }
 
-      renew_dropout_masks(M, rng);
+      if (lr_scheduler)
+      {
+        learning_rate = lr_scheduler->operator()(epoch);
+      }
+
+      if (epoch > 0)
+      {
+        renew_dropout_masks(M, rng);
+      }
 
       if (epoch > 0 && regrow_function)
       {
@@ -245,7 +262,8 @@ struct mlp_options: public sgd_options
   std::string dataset;
   std::size_t dataset_size = 2000;
   bool normalize_data = false;
-  std::string learning_rate_scheduler = "Constant(0.0001)";
+  scalar learning_rate = 0.01;
+  std::string learning_rate_scheduler;
   std::string loss_function = "SquaredError";
   std::string architecture;
   std::vector<std::size_t> sizes;
@@ -275,7 +293,11 @@ struct mlp_options: public sgd_options
       out << "dataset size = " << options.dataset_size << std::endl;
       out << "normalize data = " << std::boolalpha << options.normalize_data << std::endl;
     }
-    out << "learning rate scheduler = " << options.learning_rate_scheduler << std::endl;
+    out << "learning rate = " << options.learning_rate << std::endl;
+    if (!options.learning_rate_scheduler.empty())
+    {
+      out << "learning rate scheduler = " << options.learning_rate_scheduler << std::endl;
+    }
     out << "loss function = " << options.loss_function << std::endl;
     out << "architecture = " << options.architecture << std::endl;
     out << "sizes = " << print_list(options.sizes) << std::endl;
@@ -340,7 +362,8 @@ class mlp_tool: public command_line_tool
       cli |= lyra::opt(options.optimizer, "value")["--optimizers"]("The optimizer (GradientDescent, Momentum(<mu>), Nesterov(<mu>))");
 
       // learning rate
-      cli |= lyra::opt(options.learning_rate_scheduler, "value")["--learning-rate"]("The learning rate scheduler (default: constant(0.0001))");
+      cli |= lyra::opt(options.learning_rate, "value")["--learning-rate"]("The learning rate (default: 0.01)");
+      cli |= lyra::opt(options.learning_rate_scheduler, "value")["--learning-rate-scheduler"]("The learning rate scheduler");
 
       // loss function
       cli |= lyra::opt(options.loss_function, "value")["--loss"]("The loss function (squared-error, cross-entropy, logistic-cross-entropy)");
@@ -456,7 +479,7 @@ class mlp_tool: public command_line_tool
       }
 
       std::shared_ptr<loss_function> loss = parse_loss_function(options.loss_function);
-      std::shared_ptr<learning_rate_scheduler> learning_rate = parse_learning_rate_scheduler(options.learning_rate_scheduler);
+      std::shared_ptr<learning_rate_scheduler> lr_scheduler = parse_learning_rate_scheduler(options.learning_rate_scheduler);
       std::shared_ptr<prune_function> prune = parse_prune_function(prune_strategy);
       std::shared_ptr<grow_function> grow = parse_grow_function(grow_strategy, parse_weight_initialization(grow_weights), rng);
 
@@ -469,10 +492,13 @@ class mlp_tool: public command_line_tool
       std::cout << "=== Nerva c++ model ===" << "\n";
       std::cout << M.to_string();
       std::cout << "loss = " << loss->to_string() << "\n";
-      std::cout << "scheduler = " << learning_rate->to_string() << "\n";
+      if (lr_scheduler)
+      {
+        std::cout << "learning rate scheduler = " << lr_scheduler->to_string() << "\n";
+      }
       std::cout << "layer densities: " << layer_density_info(M) << "\n\n";
 
-      sgd_algorithm algorithm(M, dataset, options, loss, learning_rate, rng, preprocessed_dir, prune, grow);
+      sgd_algorithm algorithm(M, dataset, options, loss, options.learning_rate, lr_scheduler, rng, preprocessed_dir, prune, grow);
 
 #ifdef NERVA_ENABLE_PROFILING
       CALLGRIND_START_INSTRUMENTATION;

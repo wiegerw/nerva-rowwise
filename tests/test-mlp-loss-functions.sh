@@ -7,15 +7,15 @@ do
     echo "======================================="
     ../install/bin/mlp \
     --layers="ReLU;ReLU;Softmax" \
-    --layer-sizes=3072,128,128,10 \
+    --layer-sizes="3072;128;128;10" \
     --layer-weights="Xavier" \
     --densities="1" \
     --optimizers="GradientDescent" \
     --loss=$loss \
-    --learning-rate="Constant(0.01)" \
+    --learning-rate=0.01 \
     --epochs=2 \
     --batch-size=100 \
-    --cifar10=../data/cifar-10-batches-bin \
+    --cifar10=../data \
     --threads=12 \
     --verbose \
     --no-shuffle \

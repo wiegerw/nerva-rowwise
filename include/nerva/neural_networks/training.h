@@ -144,7 +144,7 @@ class stochastic_gradient_descent_algorithm
     DataSet& data;
     const sgd_options& options;
     const std::shared_ptr<loss_function>& loss;
-    const std::shared_ptr<learning_rate_scheduler>& learning_rate;
+    scalar learning_rate;
     std::mt19937& rng;
     utilities::map_timer timer;
 
@@ -153,7 +153,7 @@ class stochastic_gradient_descent_algorithm
                                           DataSet& data_,
                                           const sgd_options& options_,
                                           const std::shared_ptr<loss_function>& loss_,
-                                          const std::shared_ptr<learning_rate_scheduler>& learning_rate_,
+                                          scalar learning_rate_,
                                           std::mt19937& rng_
     )
       : M(M_),
@@ -200,9 +200,8 @@ class stochastic_gradient_descent_algorithm
       std::iota(I.begin(), I.end(), 0);
       eigen::matrix Y(options.batch_size, L);
       long K = N / options.batch_size; // the number of batches
-      scalar eta = learning_rate->operator()(0);
 
-      compute_statistics(M, eta, loss, data, options.batch_size, -1, options.statistics, 0.0);
+      compute_statistics(M, learning_rate, loss, data, options.batch_size, -1, options.statistics, 0.0);
 
       for (unsigned int epoch = 0; epoch < options.epochs; ++epoch)
       {
@@ -213,8 +212,6 @@ class stochastic_gradient_descent_algorithm
         {
           std::shuffle(I.begin(), I.end(), rng);      // shuffle the examples at the start of each epoch
         }
-
-        eta = learning_rate->operator()(epoch);       // update the learning at the start of each epoch
 
         eigen::matrix DY(L, options.batch_size);
 
@@ -266,13 +263,13 @@ class stochastic_gradient_descent_algorithm
             M.check_gradients(loss, T, options.gradient_step);
           }
 
-          M.optimize(eta);
+          M.optimize(learning_rate);
 
           on_end_batch(batch_index);
         }
 
         double seconds = timer.stop("epoch");
-        compute_statistics(M, eta, loss, data, options.batch_size, epoch, options.statistics, seconds);
+        compute_statistics(M, learning_rate, loss, data, options.batch_size, epoch, options.statistics, seconds);
 
         on_end_epoch(epoch);
       }

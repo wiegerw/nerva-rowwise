@@ -271,15 +271,13 @@ The class `StochasticGradientDescentAlgorithm` can be used to train a neural net
 for epoch in range(self.options.epochs):
     self.on_start_epoch(epoch)
 
-    lr = self.learning_rate(epoch)  # update the learning rate
-
     for batch_index, (X, T) in enumerate(self.train_loader):
         self.on_start_batch(batch_index)
         T = to_one_hot(T, num_classes)
         Y = M.feedforward(X)
         DY = self.loss.gradient(Y, T) / options.batch_size
         M.backpropagate(Y, DY)
-        M.optimize(lr)
+        M.optimize(learning_rate)
         self.on_end_batch(k)
 
     self.on_end_epoch(epoch)
@@ -307,18 +305,13 @@ An example can be found in the tool `mlp`:
 ----
 include::../python/tools/mlp.py[tag=event]
 ----
-Four actions take place at the start of every epoch.
 
-- A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.
-- Dropout masks are renewed.
-- Sparse weight matrices are pruned and regrown if a regrow function is specified.
-- Small weights in the subnormal range are clipped to zero if the corresponding option is set.
+include::nerva-cpp.adoc[tags=event-actions]
 
 include::nerva-cpp.adoc[tags=io]
 
-[[extending]]
 == Extending the library
-The {library} Python library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. However, the implementation of those extensions must be done in {cpp}, as documented in the section
+The {library} can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in {cpp}, as documented in the section
 link:nerva-cpp.adoc#extending[Extending the library] of the {cpp} manual.
 After adding these components to {cpp}, they can be integrated in the `nerva` Python module.
 

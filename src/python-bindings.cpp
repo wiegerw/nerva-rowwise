@@ -462,7 +462,7 @@ PYBIND11_MODULE(nervalibrowwise, m)
             datasets::dataset_view& data,
             const sgd_options& options,
             const std::shared_ptr<loss_function>& loss,
-            const std::shared_ptr<learning_rate_scheduler>& learning_rate
+            scalar learning_rate
          )
          {
            return new stochastic_gradient_descent_algorithm<datasets::dataset_view>(M, data, options, loss, learning_rate, nerva_rng);

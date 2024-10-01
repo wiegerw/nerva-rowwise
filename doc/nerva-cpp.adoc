@@ -644,7 +644,6 @@ for (unsigned int epoch = 0; epoch < options.epochs; ++epoch)
 {
   on_start_epoch(epoch);
 
-  eta = learning_rate->operator()(epoch);
   eigen::matrix DY(L, options.batch_size);
 
   for (long batch_index = 0; batch_index < K; batch_index++)
@@ -658,7 +657,7 @@ for (unsigned int epoch = 0; epoch < options.epochs; ++epoch)
     M.feedforward(X, Y);
     DY = loss->gradient(Y, T) / options.batch_size;
     M.backpropagate(Y, DY);
-    M.optimize(eta);
+    M.optimize(learning_rate);
 
     on_end_batch(batch_index);
   }
@@ -699,8 +698,11 @@ Note that the algorithm uses a number of event functions:
 |===
 The user can respond to these events by deriving from the class `{sgd_algorithm}`. Typical use cases for these event functions are the following:
 
-- When using dropout layers, periodically the dropout masks should be renewed. This is typically done after each epoch or after a given number of batches.
-- When doing dynamic sparse training, periodically a number of small weights is pruned, and new weights are added back (regrown). This is also typically done after each epoch or after a given number of batches.
+- Update the learning rate.
+- Renew dropout masks.
+- Prune and grow sparse weights.
+
+Such operations are typically done after each epoch or after a given number of batches.
 // end::event-functions[]
 
 [[on_start_epoch]]
@@ -710,12 +712,16 @@ An example can be found in the tool `mlp`:
 ----
 include::../tools/mlp.cpp[tag=event]
 ----
-Four actions take place at the start of every epoch.
+
+// tag::event-actions[]
+Five actions take place at the start of every epoch:
 
 - A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.
+- The learning rate is updated if a learning rate scheduler is set.
 - Dropout masks are renewed.
 - Sparse weight matrices are pruned and regrown if a regrow function is specified.
-- Small weights in the subnormal range are clipped to zero if the corresponding option is set.
+- Small weights in the subnormal range are clipped to zero if the `clip` option is set.
+// end::event-actions[]
 
 == Matrix operations
 The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.
@@ -1066,7 +1072,7 @@ pruning + growing 13332/66662 weights
 
 [[extending]]
 == Extending the library
-The Nerva library can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, and pruning or growing functions. This can be done by inheriting from the appropriate base class and implementing the required virtual functions. The table below provides an overview:
+The {library} can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers and pruning or growing functions. This can be done by inheriting from the appropriate base class and implementing the required virtual functions. The table below provides an overview:
 
 |===
 |Functionality |Base class
@@ -1079,6 +1085,9 @@ The Nerva library can be extended in several obvious ways, such as adding new la
 
 |A loss function
 |`loss_function`
+
+|A learning rate scheduler
+|`learning_rate_scheduler`
 
 |A pruning function
 |`prune_function`
@@ -1094,7 +1103,7 @@ After defining the mathematical equations, you can use the table of <<table_matr
 Another crucial step is validation and testing. The symbolic mathematics library
 https://docs.sympy.org/latest/index.html[SymPy]
 can be used to validate the equations.
-The https://github.com/wiegerw/nerva-sympy[nerva-sympy] repository contains test cases for activation functions, loss functions, layers, and even for the derivation of equations.
+The https://github.com/wiegerw/nerva-sympy[nerva-sympy] repository contains https://github.com/wiegerw/nerva-sympy/tree/main/tests[test cases] for activation functions, loss functions, layers, and even for the derivation of equations.
 
 == References
 

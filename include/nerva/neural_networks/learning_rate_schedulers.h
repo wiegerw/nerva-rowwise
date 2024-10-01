@@ -150,14 +150,14 @@ struct exponential_scheduler: public learning_rate_scheduler
 inline
 std::shared_ptr<learning_rate_scheduler> parse_learning_rate_scheduler(const std::string& text)
 {
+  if (text.empty())
+  {
+    return nullptr;
+  }
+
   auto func = utilities::parse_function_call(text);
 
-  if (func.name == "Constant")
-  {
-    auto lr = func.as_scalar("lr");
-    return std::make_shared<constant_scheduler>(lr);
-  }
-  else if (func.name == "TimeBased")
+  if (func.name == "TimeBased")
   {
     auto lr = func.as_scalar("lr");
     auto decay = func.as_scalar("decay");
