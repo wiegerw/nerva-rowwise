@@ -23,7 +23,8 @@ from nerva.prune import PruneFunction, parse_prune_function
 from nerva.regrow import PruneGrow
 from nerva.training import StochasticGradientDescentAlgorithm, SGDOptions, compute_sparse_layer_densities, \
     to_one_hot, compute_statistics
-from nerva.utilities import manual_seed, nerva_timer_enable, pp, set_nerva_computation
+from nerva.utilities import manual_seed, nerva_timer_enable, pp, set_nerva_computation, nerva_timer_print_report, \
+    nerva_timer_set_verbose
 from nerva.weights import parse_weight_initializer
 
 
@@ -157,7 +158,7 @@ def make_argument_parser():
     cmdline_parser.add_argument("--threads", help="The number of threads being used", type=int)
 
     # timer
-    cmdline_parser.add_argument("--timer", help="Enable timer messages", action="store_true")
+    cmdline_parser.add_argument("--timer", choices=["disabled", "brief", "full"], default="disabled", help="Set timer mode: 'disabled', 'brief', or 'full'")
 
     # computation
     cmdline_parser.add_argument('--computation', type=str, default='eigen', help='The computation mode (eigen, mkl, blas)')
@@ -205,8 +206,11 @@ def initialize_frameworks(args):
     if args.seed:
         manual_seed(args.seed)
 
-    if args.timer:
+    if args.timer != "disabled":
         nerva_timer_enable()
+
+    if args.timer == "full":
+        nerva_timer_set_verbose(True)
 
     torch.set_printoptions(precision=args.precision, edgeitems=args.edgeitems, threshold=5, sci_mode=False, linewidth=160)
 
@@ -399,6 +403,9 @@ def main():
             algorithm.run_manual()
         else:
             algorithm.run()
+
+        if args.timer in ["brief", "full"]:
+            nerva_timer_print_report()
 
 
 if __name__ == '__main__':

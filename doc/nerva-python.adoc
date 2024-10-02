@@ -17,7 +17,6 @@
 :sgd_algorithm: StochasticGgradientDescentAlgorithm
 :cpp: C&#43;&#43;
 
-// Wieger Wesselink <j.w.wesselink@tue.nl>
 ifdef::env-github[]
 :note-caption: :information_source:
 endif::[]

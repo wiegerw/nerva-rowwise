@@ -12,11 +12,9 @@
 #include "nerva/neural_networks/check_gradients.h"
 #include "nerva/datasets/dataset.h"
 #include "nerva/neural_networks/eigen.h"
-#include "nerva/neural_networks/learning_rate_schedulers.h"
 #include "nerva/neural_networks/loss_functions.h"
 #include "nerva/neural_networks/mlp_algorithms.h"
 #include "nerva/neural_networks/nerva_timer.h"
-#include "nerva/neural_networks/regrow.h"
 #include "nerva/neural_networks/sgd_options.h"
 #include "nerva/neural_networks/weights.h"
 #include "nerva/utilities/logger.h"
@@ -24,7 +22,6 @@
 #include "nerva/utilities/timer.h"
 #include <algorithm>
 #include "fmt/format.h"
-#include <iomanip>
 
 namespace nerva {
 
@@ -43,7 +40,7 @@ long output_count(const Matrix& T)
 template <typename EigenMatrix>
 auto compute_accuracy(multilayer_perceptron& M, const EigenMatrix& Xtest, const EigenMatrix& Ttest, long Q) -> double
 {
-  nerva_timer_suspend();
+  nerva_timer.suspend();
 
   auto is_correct = [](const auto& y, const auto& t)
   {
@@ -74,7 +71,7 @@ auto compute_accuracy(multilayer_perceptron& M, const EigenMatrix& Xtest, const 
     }
   }
 
-  nerva_timer_resume();
+  nerva_timer.resume();
 
   return static_cast<double>(total_correct) / N;
 }
@@ -82,7 +79,7 @@ auto compute_accuracy(multilayer_perceptron& M, const EigenMatrix& Xtest, const 
 inline
 auto compute_loss(multilayer_perceptron& M, const std::shared_ptr<loss_function>& loss, const eigen::matrix& X, const eigen::matrix& T, long Q) -> double
 {
-  nerva_timer_suspend();
+  nerva_timer.suspend();
 
   if (has_nan(M))
   {
@@ -105,7 +102,7 @@ auto compute_loss(multilayer_perceptron& M, const std::shared_ptr<loss_function>
     total_loss += loss->value(Ybatch, Tbatch);
   }
 
-  nerva_timer_resume();
+  nerva_timer.resume();
 
   return total_loss / N; // return the average loss
 }
@@ -244,13 +241,13 @@ class stochastic_gradient_descent_algorithm
             print_numpy_matrix("DY", DY);
           }
 
-          if (nerva::has_nan(Y))
+          if (has_nan(Y))
           {
             print_numpy_matrix("Y", Y);
             throw std::runtime_error("the output Y contains NaN values");
           }
 
-          if (nerva::has_nan(DY))
+          if (has_nan(DY))
           {
             print_numpy_matrix("DY", DY);
             throw std::runtime_error("the gradient DY contains NaN values");

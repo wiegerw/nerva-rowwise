@@ -11,7 +11,6 @@
 #define NERVA_UTILITIES_TIMER_H
 
 #include "nerva/utilities/print.h"
-#include <algorithm>
 #include <chrono>
 #include "fmt/format.h"
 #include <iostream>
@@ -35,19 +34,27 @@ class map_timer
      : m_report_on_destruction(report_on_destruction)
     {}
 
+    void print_report(bool full = false) const
+    {
+      double total_time = 0;
+      std::cout << "--- timing results ---" << std::endl;
+      for (const auto& [key, value]: m_values)
+      {
+        auto seconds = total_seconds(key);
+        total_time += seconds;
+        std::cout << fmt::format("{:20} = {:.4f}", key, seconds) << std::endl;
+      }
+      std::cout << fmt::format("{:20} = {:.4f}", "total time", total_time) << std::endl;
+      if (full)
+      {
+      }
+    }
+
     ~map_timer()
     {
       if (m_report_on_destruction)
       {
-        double total_time = 0;
-        std::cout << "--- timing results ---" << std::endl;
-        for (const auto& [key, value]: m_values)
-        {
-          auto seconds = total_seconds(key);
-          total_time += seconds;
-          std::cout << fmt::format("{:20} = {:.4f}", key, seconds) << std::endl;
-        }
-        std::cout << fmt::format("{:20} = {:.4f}", "TOTAL TIME", total_time) << std::endl;
+        print_report();
       }
     }
 
@@ -98,6 +105,87 @@ class map_timer
     [[nodiscard]] const std::vector<std::pair<time, time>>& values(const std::string& key) const
     {
       return m_values.at(key);
+    }
+};
+
+class suspendable_timer
+{
+  public:
+    enum class timer_status
+    {
+      disabled,
+      active,
+      suspended
+    };
+
+  protected:
+    map_timer m_timer;
+    timer_status m_status = timer_status::disabled;
+    bool m_verbose = false;
+
+  public:
+    suspendable_timer(bool verbose = false)
+      : m_verbose(verbose)
+    {}
+
+    void enable()
+    {
+      if (m_status == timer_status::disabled)
+      {
+        m_status = timer_status::active;
+      }
+    }
+
+    void disable()
+    {
+      m_status = timer_status::disabled;
+    }
+
+    void suspend()
+    {
+      if (m_status != timer_status::disabled)
+      {
+        m_status = timer_status::suspended;
+      }
+    }
+
+    void resume()
+    {
+      if (m_status != timer_status::disabled)
+      {
+        m_status = timer_status::active;
+      }
+    }
+
+    void start(const std::string& key)
+    {
+      if (m_status == timer_status::active)
+      {
+        m_timer.start(key);
+      }
+    }
+
+    void stop(const std::string& key)
+    {
+      if (m_status == timer_status::active)
+      {
+        double s = m_timer.stop(key);
+        if (m_verbose)
+        {
+          auto index = m_timer.values(key).size();
+          std::cout << fmt::format("{:>15}-{:<4} {:.6f}s", key, index, s) << std::endl;
+        }
+      }
+    }
+
+    void print_report() const
+    {
+      m_timer.print_report();
+    }
+
+    void set_verbose(bool enabled)
+    {
+      m_verbose = enabled;
     }
 };
 

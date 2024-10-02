@@ -331,7 +331,7 @@ class mlp_tool: public command_line_tool
     bool no_shuffle = false;
     bool no_statistics = false;
     bool info = false;
-    bool use_nerva_timer = false;
+    std::string timer = "disabled";
 
     // pruning + growing
     std::string prune_strategy;
@@ -386,7 +386,7 @@ class mlp_tool: public command_line_tool
       // print options
       cli |= lyra::opt(options.precision, "value")["--precision"]("The precision that is used for printing.");
       cli |= lyra::opt(info)["--info"]("print some info about the multilayer_perceptron's");
-      cli |= lyra::opt(use_nerva_timer)["--timer"]("print timer messages");
+      cli |= lyra::opt(timer, "-t")["--timer"].choices("disabled", "brief", "full");
 
       // pruning + growing
       cli |= lyra::opt(prune_strategy, "strategy")["--prune"]("The pruning strategy: Magnitude(<drop_fraction>), SET(<drop_fraction>) or Threshold(<value>)");
@@ -420,10 +420,17 @@ class mlp_tool: public command_line_tool
       {
         options.statistics = false;
       }
-      if (use_nerva_timer)
+
+      if (timer != "disable")
       {
-        nerva_timer_enable();
+        nerva_timer.enable();
       }
+
+      if (timer == "full")
+      {
+        nerva_timer.set_verbose(true);
+      }
+
       if (options.threads >= 1 && options.threads <= 8)
       {
         omp_set_num_threads(options.threads);
@@ -505,6 +512,11 @@ class mlp_tool: public command_line_tool
 #endif
 
       algorithm.run();
+
+      if (timer == "brief" || timer == "full")
+      {
+        nerva_timer.print_report();
+      }
 
 #ifdef NERVA_ENABLE_PROFILING
       CALLGRIND_STOP_INSTRUMENTATION;

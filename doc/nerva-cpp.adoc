@@ -383,7 +383,20 @@ The size of the generated dataset (default: 1000).
 * `--info`
 Print detailed information about the multilayer perceptron.
 * `--timer`
-Print timer messages.
+Print timer messages. The following values are supported:
+|===
+|Value |Description
+
+|`disabled`
+| No timing information is displayed
+
+|`brief`
+| At the end, a report with accumulated timing measurements will be displayed
+
+|`full`
+| In addition, individual timing measurements will be displayed
+|===
+
 * `--precision <value>`
 The precision used for printing matrix elements.
 * `--edgeitems <value>`
@@ -722,6 +735,67 @@ Five actions take place at the start of every epoch:
 - Sparse weight matrices are pruned and regrown if a regrow function is specified.
 - Small weights in the subnormal range are clipped to zero if the `clip` option is set.
 // end::event-actions[]
+
+=== Timers
+The {library} has two timer classes, defined in the header file `link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/utilities/timer.h[timer.h]`:
+
+|===
+|class |description
+
+|`map_timer`
+|A timer that can be used for timing different operations.
+ Each operation is identified using a name, and for each name all timing results are stored.
+
+|`resumable_timer`
+|This is a `map_timer` that can be suspended.
+|===
+
+The {library} uses a predefined timer `nerva_timer` that is defined in the header file `link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/nerva_timer.h[nerva_timer.h]`.
+The `mlp` tool uses this timer `nerva_timer` to keep track of the time spent on feedforward, backpropagate, optimize calls during training, and possibly of some other computations. Each computation is identified with a unique name. If the option `--timer=brief` is set, the accumulated times of all computations will be displayed:
+[listing]
+----
+--- timing results ---
+backpropagate        = 5.6162
+batchnorm1           = 0.0895
+batchnorm2           = 0.0418
+batchnorm3           = 0.1030
+batchnorm4           = 0.8833
+feedforward          = 1.4613
+optimize             = 0.1137
+total time           = 8.3089
+----
+
+For fine-grained measurements two macros `NERVA_TIMER_START` and `NERVA_TIMER_STOP` are defined for starting and stopping the timer. An example can be found in the backpropagate call of batch normalization layers:
+[.small-code]
+[source,cpp]
+----
+include::../include/nerva/neural_networks/batch_normalization_layers.h[tag=timer]
+----
+To avoid any overhead, these macros can be disabled by defining the symbol `NERVA_DISABLE_TIMER`. If the option `--timer=full` is set, all individual timings will be displayed:
+[.small-code]
+[listing]
+----
+    feedforward-1    0.001753s
+     batchnorm1-1    0.000096s
+     batchnorm2-1    0.000043s
+     batchnorm3-1    0.000099s
+     batchnorm4-1    0.001125s
+  backpropagate-1    0.006895s
+       optimize-1    0.000184s
+    feedforward-2    0.001773s
+     batchnorm1-2    0.000117s
+     batchnorm2-2    0.000051s
+     batchnorm3-2    0.000124s
+     batchnorm4-2    0.001280s
+  backpropagate-2    0.006300s
+       optimize-2    0.000115s
+    feedforward-3    0.001471s
+     batchnorm1-3    0.000071s
+     batchnorm2-3    0.000023s
+     batchnorm3-3    0.000088s
+     batchnorm4-3    0.000667s
+----
+The calls are numbered, to make it easy to compare different runs. Unsurprisingly, the timing output shows that the computation labeled `batchnorm4` takes the majority of time.
 
 == Matrix operations
 The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.

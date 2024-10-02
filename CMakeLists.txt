@@ -57,6 +57,12 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${MKL_ROOT}/lib")
 
+# Option for disabling timer measurements. This may slightly increase the performance.
+option(NERVA_DISABLE_TIMER "Disable timer messages" OFF)
+if(NERVA_DISABLE_TIMER)
+    add_definitions(-DNERVA_DISABLE_TIMER)
+endif()
+
 # Suppress compiler warnings
 if(MSVC)
     add_compile_options(/utf-8)

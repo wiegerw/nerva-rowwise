@@ -59,6 +59,7 @@ struct batch_normalization_layer: public neural_network_layer
     result = hadamard(row_repeat(gamma, N), Z) + row_repeat(beta, N);
   }
 
+  // tag::timer[]
   void backpropagate(const eigen::matrix& Y, const eigen::matrix& DY) override
   {
     using eigen::diag;
@@ -73,14 +74,20 @@ struct batch_normalization_layer: public neural_network_layer
     NERVA_TIMER_START("batchnorm1")
     DZ = hadamard(row_repeat(gamma, N), DY);
     NERVA_TIMER_STOP("batchnorm1")
-    Dbeta = columns_sum(DY);
+
     NERVA_TIMER_START("batchnorm2")
-    Dgamma = columns_sum(hadamard(Z, DY));
+    Dbeta = columns_sum(DY);
     NERVA_TIMER_STOP("batchnorm2")
+
     NERVA_TIMER_START("batchnorm3")
-    DX = hadamard(row_repeat(inv_sqrt_Sigma / N, N), (N * identity<eigen::matrix>(N) - ones<eigen::matrix>(N, N)) * DZ - hadamard(Z, row_repeat(diag(Z.transpose() * DZ).transpose(), N)));
+    Dgamma = columns_sum(hadamard(Z, DY));
     NERVA_TIMER_STOP("batchnorm3")
+
+    NERVA_TIMER_START("batchnorm4")
+    DX = hadamard(row_repeat(inv_sqrt_Sigma / N, N), (N * identity<eigen::matrix>(N) - ones<eigen::matrix>(N, N)) * DZ - hadamard(Z, row_repeat(diag(Z.transpose() * DZ).transpose(), N)));
+    NERVA_TIMER_STOP("batchnorm4")
   }
+  // end::timer[]
 
   void optimize(scalar eta) override
   {

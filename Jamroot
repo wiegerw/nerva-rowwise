@@ -52,7 +52,6 @@ project nerva
        <cxxflags>-std=c++17
 
        <define>EIGEN_USE_MKL_ALL
-       <define>NERVA_TIMER
        <define>FMT_HEADER_ONLY
 
        # MKL

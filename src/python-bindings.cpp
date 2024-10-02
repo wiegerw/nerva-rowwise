@@ -624,12 +624,15 @@ PYBIND11_MODULE(nervalibrowwise, m)
   //                       global timer
   /////////////////////////////////////////////////////////////////////////
 
-  m.def("nerva_timer_enable", nerva_timer_enable);
-  m.def("nerva_timer_disable", nerva_timer_disable);
-  m.def("nerva_timer_suspend", nerva_timer_suspend);
-  m.def("nerva_timer_resume", nerva_timer_resume);
-  m.def("nerva_timer_start", nerva_timer_start);
-  m.def("nerva_timer_stop", nerva_timer_stop);
+  m.def("nerva_timer_enable", []() { nerva_timer.enable(); });
+  m.def("nerva_timer_disable", []() { nerva_timer.disable(); });
+  m.def("nerva_timer_suspend", []() { nerva_timer.suspend(); });
+  m.def("nerva_timer_resume", []() { nerva_timer.resume(); });
+  m.def("nerva_timer_start", [](const std::string& name) { nerva_timer.start(name); });
+  m.def("nerva_timer_stop", [](const std::string& name) { nerva_timer.stop(name); });
+  m.def("nerva_timer_set_verbose", [](bool enabled) { nerva_timer.set_verbose(enabled); });
+  m.def("nerva_timer_print_report", []() { nerva_timer.print_report(); });
+
 
   /////////////////////////////////////////////////////////////////////////
   //                       version

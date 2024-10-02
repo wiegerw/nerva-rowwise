@@ -10,84 +10,25 @@
 #pragma once
 
 #include "nerva/utilities/timer.h"
-#include "fmt/format.h"
 
-namespace nerva {
+inline nerva::utilities::suspendable_timer nerva_timer;
 
-enum class timer_status
+namespace nerva
 {
-  disabled,
-  active,
-  suspended
-};
 
-inline utilities::map_timer nerva_timer{true};
-inline timer_status nerva_timer_status = timer_status::disabled;
-inline bool nerva_timer_verbose{false};
-
-inline
-void nerva_timer_enable()
+inline void print_nerva_timer_report()
 {
-  if (nerva_timer_status == timer_status::disabled)
-  {
-    nerva_timer_status = timer_status::active;
-  }
+#ifndef NERVA_DISABLE_TIMER
+  nerva_timer.print_report();
+#endif
 }
 
-inline
-void nerva_timer_disable()
-{
-  nerva_timer_status = timer_status::disabled;
 }
 
-inline
-void nerva_timer_suspend()
-{
-  if (nerva_timer_status != timer_status::disabled)
-  {
-    nerva_timer_status = timer_status::suspended;
-  }
-}
-
-inline
-void nerva_timer_resume()
-{
-  if (nerva_timer_status != timer_status::disabled)
-  {
-    nerva_timer_status = timer_status::active;
-  }
-}
-
-inline
-void nerva_timer_start(const std::string& key)
-{
-  if (nerva_timer_status == timer_status::active)
-  {
-    nerva_timer.start(key);
-  }
-}
-
-inline
-void nerva_timer_stop(const std::string& key)
-{
-  if (nerva_timer_status == timer_status::active)
-  {
-    double s = nerva_timer.stop(key);
-    if (nerva_timer_verbose)
-    {
-      auto index = nerva_timer.values(key).size();
-      std::cout << fmt::format("{:>15}-{:<4} {:.6f}s", key, index, s) << std::endl;
-    }
-  }
-}
-
-#ifdef NERVA_TIMER
-#define NERVA_TIMER_START(name) nerva_timer_start(name);
-#define NERVA_TIMER_STOP(name) nerva_timer_stop(name);
+#ifndef NERVA_DISABLE_TIMER
+#define NERVA_TIMER_START(name) nerva_timer.start(name);
+#define NERVA_TIMER_STOP(name) nerva_timer.stop(name);
 #else
 #define NERVA_TIMER_START(name)
 #define NERVA_TIMER_STOP(name)
 #endif
-
-} // namespace nerva
-

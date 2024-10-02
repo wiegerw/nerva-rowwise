@@ -16,7 +16,7 @@ __version__ = "0.3"
 
 define_macros = [('VERSION_INFO', __version__)]
 include_dirs = ['../include']
-extra_compile_args = ['-DNERVA_TIMER']
+extra_compile_args = []
 extra_link_args = []
 
 CMAKE_DEPS_DIR = os.getenv('CMAKE_DEPS_DIR')
