@@ -1218,8 +1218,38 @@ Print detailed information about the multilayer perceptron.</p>
 </li>
 <li>
 <p><code>--timer</code>
-Print timer messages.</p>
+Print timer messages. The following values are supported:</p>
 </li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>disabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No timing information is displayed</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>brief</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">At the end, a report with accumulated timing measurements will be displayed</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>full</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">In addition, individual timing measurements will be displayed</p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--precision &lt;value&gt;</code>
 The precision used for printing matrix elements.</p>
@@ -1807,7 +1837,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-01 16:06:35 UTC
+Last updated 2024-10-02 13:52:00 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
