@@ -751,7 +751,7 @@ The {library} has two timer classes, defined in the header file `link:https://gi
 |===
 
 The {library} uses a predefined timer `nerva_timer` that is defined in the header file `link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/nerva_timer.h[nerva_timer.h]`.
-The `mlp` tool uses this timer `nerva_timer` to keep track of the time spent on feedforward, backpropagate, optimize calls during training, and possibly of some other computations. Each computation is identified with a unique name. If the option `--timer=brief` is set, the accumulated times of all computations will be displayed:
+The `mlp` tool uses this timer to keep track of the time spent on feedforward, backpropagate and optimize calls during training, and optionally of other computations. Each computation is identified with a unique name. If the option `--timer=brief` is set, the accumulated times of all computations will be displayed:
 [listing]
 ----
 --- timing results ---

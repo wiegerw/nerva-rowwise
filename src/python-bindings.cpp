@@ -113,11 +113,6 @@ PYBIND11_MODULE(nervalibrowwise, m)
     .def("__call__", &learning_rate_scheduler::operator())
     ;
 
-  py::class_<constant_scheduler, learning_rate_scheduler, std::shared_ptr<constant_scheduler>>(m, "constant_scheduler")
-    .def(py::init<scalar>(), py::return_value_policy::copy)
-    .def_readwrite("lr", &constant_scheduler::lr, py::return_value_policy::reference_internal)
-    ;
-
   py::class_<time_based_scheduler, learning_rate_scheduler, std::shared_ptr<time_based_scheduler>>(m, "time_based_scheduler")
     .def(py::init<scalar, scalar>(), py::return_value_policy::copy)
     .def_readwrite("lr", &time_based_scheduler::lr, py::return_value_policy::reference_internal)

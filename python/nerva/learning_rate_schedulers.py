@@ -13,14 +13,6 @@ class LearningRateScheduler(nervalibrowwise.learning_rate_scheduler):
     pass
 
 
-class ConstantScheduler(nervalibrowwise.constant_scheduler):
-    def __init__(self, lr: float):
-        super().__init__(lr)
-
-    def __str__(self):
-        return f'ConstantScheduler(lr={self.lr})'
-
-
 class TimeBasedScheduler(nervalibrowwise.time_based_scheduler):
     def __init__(self, lr: float, decay: float):
         super().__init__(lr, decay)

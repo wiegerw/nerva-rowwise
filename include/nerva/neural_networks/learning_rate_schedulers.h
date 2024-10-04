@@ -33,25 +33,6 @@ struct learning_rate_scheduler
   virtual ~learning_rate_scheduler() = default;
 };
 
-struct constant_scheduler: public learning_rate_scheduler
-{
-  scalar lr; // the learning rate
-
-  explicit constant_scheduler(scalar lr_)
-      : lr(lr_)
-  {}
-
-  scalar operator()(unsigned int i) override
-  {
-    return lr;
-  }
-
-  [[nodiscard]] std::string to_string() const override
-  {
-    return fmt::format("ConstantScheduler(lr={})", lr);
-  }
-};
-
 struct time_based_scheduler: public learning_rate_scheduler
 {
   scalar lr; // the current value of the learning rate
