@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Download the MNIST dataset.
-# For details about the dataset, visit: https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz
+# Download the MNIST dataset from Amazon.
+# For details about the dataset, visit: https://en.wikipedia.org/wiki/MNIST_database
 
 URL="https://s3.amazonaws.com/img-datasets/mnist.npz"
 FILENAME="mnist.npz"
