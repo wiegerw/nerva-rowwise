@@ -96,23 +96,15 @@ epoch   6  lr: 0.01000000  loss: 1.29761993  train accuracy: 0.54106000  test ac
 epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test accuracy: 0.51690000  time: 3.96624650s
 ----
 
-include::nerva-cpp.adoc[tags=mlptool-options]
-
-include::nerva-cpp.adoc[tags=general-options]
-
-include::nerva-cpp.adoc[tags=random-generator-options]
-
-include::nerva-cpp.adoc[tags=layer-configuration-options]
-
-include::nerva-cpp.adoc[tags=training-configuration-options]
-
-include::nerva-cpp.adoc[tags=pruning-options]
-
-include::nerva-cpp.adoc[tags=computation-options]
-
-include::nerva-cpp.adoc[tags=dataset-options]
-
-include::nerva-cpp.adoc[tags=miscellaneous-options]
+include::shared.adoc[tags=mlptool-options]
+include::shared.adoc[tags=general-options]
+include::shared.adoc[tags=random-generator-options]
+include::shared.adoc[tags=layer-configuration-options]
+include::shared.adoc[tags=training-configuration-options]
+include::shared.adoc[tags=dataset-options]
+include::shared.adoc[tags=pruning-options]
+include::shared.adoc[tags=computation-options]
+include::shared.adoc[tags=miscellaneous-options]
 
 == Overview of the code
 This section gives an overview of the Python code in the
@@ -295,7 +287,7 @@ output `Y`.
 . *optimization:* Given the gradient `DΘ`, update
 the parameters `Θ`.
 
-include::nerva-cpp.adoc[tags=event-functions]
+include::shared.adoc[tags=event-functions]
 
 [[on_start_epoch]]
 An example can be found in the tool `mlp`:
@@ -305,9 +297,8 @@ An example can be found in the tool `mlp`:
 include::../python/tools/mlp.py[tag=event]
 ----
 
-include::nerva-cpp.adoc[tags=event-actions]
-
-include::nerva-cpp.adoc[tags=io]
+include::shared.adoc[tags=event-actions]
+include::shared.adoc[tags=io]
 
 == Extending the library
 The {library} can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in {cpp}, as documented in the section
