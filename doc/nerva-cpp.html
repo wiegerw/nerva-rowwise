@@ -965,7 +965,7 @@ A semicolon separated list of layers. For example, <code>--layers=ReLU;AllReLU(0
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>SReLU(&lt;al&gt;,&lt;tl&gt;,&lt;ar&gt;,&lt;tr&gt;)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Linear layer with SReLU activation. The default value for the parameters are <code>al=0, tl=0, ar=0, tr=1</code>. For these
- values <code>SReLU</code> coincides with <code>ReLU</code>.</p></td>
+values <code>SReLU</code> coincides with <code>ReLU</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>TReLU(&lt;epsilon&gt;)</code></p></td>
@@ -986,7 +986,7 @@ A semicolon-separated list of the sizes of linear layers of the multilayer perce
 <li>
 <p><code>--densities &lt;value&gt;</code>
 A comma-separated list of linear layer densities. By default, all linear layers are dense (i.e. have density 1.0). If only one value is
- specified, it will be used for all linear layers.</p>
+specified, it will be used for all linear layers.</p>
 </li>
 <li>
 <p><code>--dropouts &lt;value&gt;</code>
@@ -1274,59 +1274,6 @@ The size of the generated dataset (default: 1000).
 </div>
 </div>
 <div class="sect4">
-<h5 id="_miscellaneous_options">Miscellaneous options</h5>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--info</code>
-Print detailed information about the multilayer perceptron.</p>
-</li>
-<li>
-<p><code>--timer</code>
-Print timer messages. The following values are supported:</p>
-</li>
-</ul>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>disabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No timing information is displayed</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>brief</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">At the end, a report with accumulated timing measurements will be displayed</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>full</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">In addition, individual timing measurements will be displayed</p></td>
-</tr>
-</tbody>
-</table>
-<div class="ulist">
-<ul>
-<li>
-<p><code>--precision &lt;value&gt;</code>
-The precision used for printing matrix elements.</p>
-</li>
-<li>
-<p><code>--edgeitems &lt;value&gt;</code>
-The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_pruning_and_growing_options">Pruning and growing options</h5>
 <div class="ulist">
 <ul>
@@ -1393,15 +1340,9 @@ The strategy used for growing in sparse weight matrices. The following strategie
 <li>
 <p><code>--grow-weights &lt;value&gt;</code>
 The weight generation function used for growing weights.
-See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.</p>
+See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.
+===== Computation options</p>
 </li>
-</ul>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_computation_options">Computation options</h5>
-<div class="ulist">
-<ul>
 <li>
 <p><code>--computation &lt;value&gt;</code>
 The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:</p>
@@ -1450,7 +1391,54 @@ The number of threads used by the MKL and OMP libraries.</p>
 </li>
 <li>
 <p><code>--gradient-step &lt;value&gt;</code>
-If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.</p>
+If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
+===== Miscellaneous options</p>
+</li>
+<li>
+<p><code>--info</code>
+Print detailed information about the multilayer perceptron.</p>
+</li>
+<li>
+<p><code>--timer</code>
+Print timer messages. The following values are supported:</p>
+</li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>disabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No timing information is displayed</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>brief</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">At the end, a report with accumulated timing measurements will be displayed</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>full</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">In addition, individual timing measurements will be displayed</p></td>
+</tr>
+</tbody>
+</table>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--precision &lt;value&gt;</code>
+The precision used for printing matrix elements.</p>
+</li>
+<li>
+<p><code>--edgeitems &lt;value&gt;</code>
+The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.</p>
 </li>
 </ul>
 </div>
@@ -2739,7 +2727,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-20 11:03:55 UTC
+Last updated 2025-01-20 11:04:45 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

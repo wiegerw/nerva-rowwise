@@ -5,10 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.23">
-<meta name="description" content="Documentation for the nerva-rowwise repository.">
-<meta name="author" content="Wieger Wesselink">
-<meta name="copyright" content="Copyright 2024 Wieger Wesselink">
-<title>The Nerva-Rowwise Python manual</title>
+<title>{mlptool} command line options</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -436,292 +433,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-pre.rouge table td { padding: 5px; }
-pre.rouge table pre { margin: 0; }
-pre.rouge, pre.rouge .w {
-  color: #24292f;
-  background-color: #f6f8fa;
-}
-pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
-  color: #cf222e;
-}
-pre.rouge .gr {
-  color: #f6f8fa;
-}
-pre.rouge .gd {
-  color: #82071e;
-  background-color: #ffebe9;
-}
-pre.rouge .nb {
-  color: #953800;
-}
-pre.rouge .nc {
-  color: #953800;
-}
-pre.rouge .no {
-  color: #953800;
-}
-pre.rouge .nn {
-  color: #953800;
-}
-pre.rouge .sr {
-  color: #116329;
-}
-pre.rouge .na {
-  color: #116329;
-}
-pre.rouge .nt {
-  color: #116329;
-}
-pre.rouge .gi {
-  color: #116329;
-  background-color: #dafbe1;
-}
-pre.rouge .ges {
-  font-weight: bold;
-  font-style: italic;
-}
-pre.rouge .kc {
-  color: #0550ae;
-}
-pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
-  color: #0550ae;
-}
-pre.rouge .sb {
-  color: #0550ae;
-}
-pre.rouge .bp {
-  color: #0550ae;
-}
-pre.rouge .ne {
-  color: #0550ae;
-}
-pre.rouge .nl {
-  color: #0550ae;
-}
-pre.rouge .py {
-  color: #0550ae;
-}
-pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
-  color: #0550ae;
-}
-pre.rouge .o, pre.rouge .ow {
-  color: #0550ae;
-}
-pre.rouge .gh {
-  color: #0550ae;
-  font-weight: bold;
-}
-pre.rouge .gu {
-  color: #0550ae;
-  font-weight: bold;
-}
-pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
-  color: #0a3069;
-}
-pre.rouge .nd {
-  color: #8250df;
-}
-pre.rouge .nf, pre.rouge .fm {
-  color: #8250df;
-}
-pre.rouge .err {
-  color: #f6f8fa;
-  background-color: #82071e;
-}
-pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
-  color: #6e7781;
-}
-pre.rouge .gl {
-  color: #6e7781;
-}
-pre.rouge .gt {
-  color: #6e7781;
-}
-pre.rouge .ni {
-  color: #24292f;
-}
-pre.rouge .si {
-  color: #24292f;
-}
-pre.rouge .ge {
-  color: #24292f;
-  font-style: italic;
-}
-pre.rouge .gs {
-  color: #24292f;
-  font-weight: bold;
-}
-</style>
 </head>
-<body id="demo" class="book toc2 toc-left">
+<body class="article">
 <div id="header">
-<h1>The Nerva-Rowwise Python manual</h1>
-<div class="details">
-<span id="author" class="author">Wieger Wesselink</span><br>
-<span id="email" class="email"><a href="mailto:j.w.wesselink@tue.nl">j.w.wesselink@tue.nl</a></span><br>
-</div>
-<div id="toc" class="toc2">
-<div id="toctitle"><h3>Contents</h3></div>
-<ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_installation">Installation</a>
-<ul class="sectlevel2">
-<li><a href="#_dependencies">Dependencies</a></li>
-</ul>
-</li>
-<li><a href="#_command_line_tools">Command line tools</a>
-<ul class="sectlevel2">
-<li><a href="#_the_tool_mlp_py">The tool mlp.py</a></li>
-</ul>
-</li>
-<li><a href="#_overview_of_the_code">Overview of the code</a>
-<ul class="sectlevel2">
-<li><a href="#_number_type">Number type</a></li>
-<li><a href="#_module_contents">Module contents</a></li>
-<li><a href="#_classes">Classes</a></li>
-<li><a href="#_accessing_c_data_structures">Accessing C++ data structures</a></li>
-<li><a href="#_training_a_neural_network">Training a neural network</a></li>
-</ul>
-</li>
-<li><a href="#_extending_the_library">Extending the library</a>
-<ul class="sectlevel2">
-<li><a href="#_adding_a_loss_function">Adding a loss function</a></li>
-</ul>
-</li>
-</ul>
-</div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<style>
-  .small-code .content pre {
-      font-size: 0.7em;
-  }
-</style>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_introduction">Introduction</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This document describes the implementation of the <em>Nerva-Rowwise Python Library</em>. This library features a Python module named <code>nerva</code>, that is built using Python bindings to the
-<a href="https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html">Nerva-Rowwise C++ Library</a>. Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>, to ensure an easy integration with PyTorch.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_installation">Installation</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The <em>Nerva-Rowwise Python Library</em> Python bindings can be installed via <code>pip</code>. The installation is done via a <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py">setup.py</a> script. The script has several dependencies, that need to be resolved using environment variables.</p>
-</div>
-<div class="sect2">
-<h3 id="_dependencies">Dependencies</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Intel MKL library <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html">oneMKL</a></p>
-</li>
-<li>
-<p>FMT <a href="https://github.com/fmtlib/fmt" class="bare">https://github.com/fmtlib/fmt</a></p>
-</li>
-<li>
-<p>Eigen <a href="https://eigen.tuxfamily.org/" class="bare">https://eigen.tuxfamily.org/</a></p>
-</li>
-<li>
-<p>pybind11 <a href="https://github.com/pybind/pybind11" class="bare">https://github.com/pybind/pybind11</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The MKL dependency can be resolved by setting the <code>MKL_ROOT</code> environment variable, or by setting the <code>ONEAPI_ROOT</code> environment variable.</p>
-</div>
-<div class="paragraph">
-<p>To resolve the FMT, Eigen and pybind11 dependencies, the environment variables
-<code>EIGEN_INCLUDE_DIR</code>, <code>FMT_INCLUDE_DIR</code> and <code>PYBIND11_INCLUDE_DIR</code> can be set.</p>
-</div>
-<div class="paragraph">
-<p>An alternative solution is to use CMake to resolve these three dependencies, see also the
-<a href="nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded automatically in the <code>_deps</code> subdirectory of the CMake build directory. After that it is sufficient to set the environment variable <code>CMAKE_DEPS_DIR</code>.</p>
-</div>
-<div id="pip-install" class="paragraph">
-<p>The <code>nerva</code> Python module can then be installed using</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>cd python
-pip install .</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_command_line_tools">Command line tools</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The tool <code>mlp.py</code> can be used to do training experiments with multilayer perceptrons.</p>
-</div>
-<div class="sect2">
-<h3 id="_the_tool_mlp_py">The tool mlp.py</h3>
-<div class="paragraph">
-<p>An example invocation of the <code>mlp.py</code> tool is</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>python ../python/tools/mlp.py \
-    --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072;1024;1024;10" \
-    --layer-weights=Xavier \
-    --optimizers="Nesterov(0.9)" \
-    --loss=SoftmaxCrossEntropy \
-    --learning-rate=0.01 \
-    --epochs=100 \
-    --batch-size=100 \
-    --threads=12 \
-    --overall-density=0.05 \
-    --cifar10=../data \
-    --seed=123</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that it automatically downloads the CIFAR-10 dataset in the folder <code>../data</code> if it doesn&#8217;t yet exist.</p>
-</div>
-<div class="paragraph">
-<p>The output may look like this:</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code>=== Nerva python model ===
-Sequential(
-  Sparse(output_size=1024, density=0.042382812500000006, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
-  Sparse(output_size=1024, density=0.06357421875000001, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
-  Dense(output_size=10, activation=NoActivation(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0)
-)
-loss = SoftmaxCrossEntropyLoss()
-scheduler = ConstantScheduler(lr=0.009999999776482582)
-layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
-
-
-=== Training Nerva model ===
-epoch   0  lr: 0.01000000  loss: 2.30246344  train accuracy: 0.10724000  test accuracy: 0.11390000  time: 0.00000000s
-epoch   1  lr: 0.01000000  loss: 1.89570341  train accuracy: 0.32142000  test accuracy: 0.32030000  time: 4.15395873s
-epoch   2  lr: 0.01000000  loss: 1.66956488  train accuracy: 0.40332000  test accuracy: 0.40220000  time: 3.60670412s
-epoch   3  lr: 0.01000000  loss: 1.53549386  train accuracy: 0.45616000  test accuracy: 0.44940000  time: 3.24853144s
-epoch   4  lr: 0.01000000  loss: 1.43913857  train accuracy: 0.49054000  test accuracy: 0.47920000  time: 3.29059404s
-epoch   5  lr: 0.01000000  loss: 1.36875251  train accuracy: 0.51380000  test accuracy: 0.49070000  time: 3.83244992s
-epoch   6  lr: 0.01000000  loss: 1.29761993  train accuracy: 0.54106000  test accuracy: 0.50710000  time: 3.59350869s
-epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test accuracy: 0.51690000  time: 3.96624650s</code></pre>
-</div>
-</div>
 <div class="sect3">
-<h4 id="mlp_tool">mlp.py command line options</h4>
+<h4 id="mlp_tool">{mlptool} command line options</h4>
 <div class="paragraph">
-<p>This section gives an overview of the command line interface of the <code>mlp.py</code> tool.</p>
+<p>This section gives an overview of the command line interface of the <code>{mlptool}</code> tool.</p>
 </div>
 <div class="sect4">
 <h5 id="_parameters_lists">Parameters lists</h5>
@@ -732,18 +452,44 @@ epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test ac
 <div class="sect4">
 <h5 id="_named_parameters">Named parameters</h5>
 <div class="paragraph">
-<p>Some of the items take parameters. For this we use a function call syntax with named parameters, e.g. <code>AllReLU(alpha=0.3)</code>. In case that there is only one parameter, the name may be omitted: <code>AllReLU(0.3)</code>. If the parameters have default values, they may be omitted. For example, <code>TReLU</code> or <code>TReLU()</code> is equivalent to <code>TReLU(al=0,tl=0,ar=0,tr=1)</code>.
-===== General options
-* <code>-?</code>, <code>-h</code>, <code>--help</code>
-Display help information.
-* <code>--debug</code>, <code>-d</code>
-Show debug output. This prints batches, weight matrices, bias vectors, gradients etc.
-===== Random generator options
-* <code>--seed &lt;value&gt;</code>
-A seed value for the random generator.
-===== Layer configuration options
-* <code>--layers &lt;value&gt;</code>
+<p>Some of the items take parameters. For this we use a function call syntax with named parameters, e.g. <code>AllReLU(alpha=0.3)</code>. In case that there is only one parameter, the name may be omitted: <code>AllReLU(0.3)</code>. If the parameters have default values, they may be omitted. For example, <code>TReLU</code> or <code>TReLU()</code> is equivalent to <code>TReLU(al=0,tl=0,ar=0,tr=1)</code>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_general_options">General options</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-?</code>, <code>-h</code>, <code>--help</code>
+Display help information.</p>
+</li>
+<li>
+<p><code>--debug</code>, <code>-d</code>
+Show debug output. This prints batches, weight matrices, bias vectors, gradients etc.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_random_generator_options">Random generator options</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--seed &lt;value&gt;</code>
+A seed value for the random generator.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_layer_configuration_options">Layer configuration options</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--layers &lt;value&gt;</code>
 A semicolon separated list of layers. For example, <code>--layers=ReLU;AllReLU(0.3);Linear</code> is used to specify a neural network with three layers with an ReLU, AllReLU and no activation function. The following layers are supported:</p>
+</li>
+</ul>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -817,7 +563,7 @@ A comma-separated list of dropout rates of linear layers. By default, all linear
 </li>
 <li>
 <p><code>--overall-density &lt;value&gt;</code>
-The overall density of the linear layers. This value should be in the interval \([0,1\)], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.</p>
+The overall density of the linear layers. This value should be in the interval \$[0,1\$], and it specifies the fraction of the total number of weights that is non-zero. The overall density is not distributed evenly over the layers. Instead, small layers will be assigned a higher density than large layers.</p>
 </li>
 <li>
 <p><code>--layer-weights &lt;value&gt;</code>
@@ -1014,9 +760,15 @@ See also
 Save weights and biases to a dictionary in NumPy <code>.npz</code> format.
 The weight matrices are stored with keys <code>W1,W2,&#8230;&#8203;</code> and the bias vectors with keys <code>b1,b2,&#8230;&#8203;</code>.
 See also
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>.
-===== Dataset options</p>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_dataset_options">Dataset options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--cifar10 &lt;directory&gt;</code>
 Specify the directory where the binary version of the
@@ -1041,9 +793,15 @@ Normalize the dataset.</p>
 </li>
 <li>
 <p><code>--preprocessed &lt;directory&gt;</code>
-A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <a href="#io">[io]</a> for information about the <code>.npz</code> format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.
-===== Pruning and growing options</p>
+A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <a href="#io">I/O</a> for information about the <code>.npz</code> format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_pruning_and_growing_options">Pruning and growing options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--prune &lt;strategy&gt;</code>
 The strategy used for pruning sparse weight matrices. The following strategies are supported:</p>
@@ -1107,9 +865,15 @@ The strategy used for growing in sparse weight matrices. The following strategie
 <li>
 <p><code>--grow-weights &lt;value&gt;</code>
 The weight generation function used for growing weights.
-See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.
-===== Computation options</p>
+See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_computation_options">Computation options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--computation &lt;value&gt;</code>
 The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:</p>
@@ -1158,9 +922,15 @@ The number of threads used by the MKL and OMP libraries.</p>
 </li>
 <li>
 <p><code>--gradient-step &lt;value&gt;</code>
-If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
-===== Miscellaneous options</p>
+If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_miscellaneous_options">Miscellaneous options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--info</code>
 Print detailed information about the multilayer perceptron.</p>
@@ -1209,404 +979,6 @@ The edgeitems used for printing matrices. This sets the number of border rows an
 </li>
 </ul>
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_overview_of_the_code">Overview of the code</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This section gives an overview of the Python code in the
-<em>Nerva-Rowwise Python Library</em>, and some explanations about the code.</p>
-</div>
-<div class="sect2">
-<h3 id="_number_type">Number type</h3>
-<div class="paragraph">
-<p>The <em>Nerva-Rowwise Python Library</em> uses 32-bit floats as its number type. The C++ library also supports 64-bit floats.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_module_contents">Module contents</h3>
-<div class="paragraph">
-<p>The most important files in the <code>nerva</code> module are given in the table below.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">File</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/multilayer_perceptron.py">multilayer_perceptron.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A multilayer perceptron class.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/layers.py">layers.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Neural network layers.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/activation_functions.py">activation_functions.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Activation functions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/loss_functions.py">loss_functions.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Loss functions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/weights.py">weights.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Weight initialization functions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/optimizers.py">optimizers.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Optimizer functions, for updating neural network parameters using their gradients.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/learning_rate_schedulers.py">learning_rate_schedulers.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Learning rate schedulers, for updating the learning rate during training.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/training.py">training.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A stochastic gradient descent algorithm.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/prune.py">prune.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Algorithms for pruning sparse weight matrices. This is used for dynamic sparse training.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/grow.py">grow.py</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Algorithms for (re-)growing sparse weights. This is used for dynamic sparse training.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_classes">Classes</h3>
-<div class="sect3">
-<h4 id="_class_multilayerperceptron">Class MultilayerPerceptron</h4>
-<div class="paragraph">
-<p>A multilayer perceptron (MLP) is modeled using the class <code>MultilayerPerceptron</code>. It contains a list of layers, and has member functions <code>feedforward</code>, <code>backpropagate</code> and <code>optimize</code> that can be used for training the neural network. Constructing an MLP can be done as follows:</p>
-</div>
-<div id="construct_mlp1" class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp1</span><span class="p">(</span><span class="n">sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
-
-    <span class="n">layer1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                   <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                   <span class="n">activation</span><span class="o">=</span><span class="n">ReLU</span><span class="p">(),</span>
-                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
-
-    <span class="n">layer2</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                   <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                   <span class="n">activation</span><span class="o">=</span><span class="n">ReLU</span><span class="p">(),</span>
-                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
-
-    <span class="n">layer3</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                   <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
-                   <span class="n">activation</span><span class="o">=</span><span class="n">NoActivation</span><span class="p">(),</span>
-                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
-
-    <span class="n">M</span> <span class="o">=</span> <span class="n">MultilayerPerceptron</span><span class="p">()</span>
-    <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer1</span><span class="p">,</span> <span class="n">layer2</span><span class="p">,</span> <span class="n">layer3</span><span class="p">]</span>
-    <span class="n">M</span><span class="p">.</span><span class="n">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="err">#</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">C</span><span class="o">++</span> <span class="n">data</span> <span class="n">structures</span>
-
-    <span class="k">return</span> <span class="n">M</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This creates an MLP with three linear layers. The parameter <code>sizes</code> contains the input and output sizes of the three layers. The weights are initialized using Xavier.</p>
-</div>
-<div class="paragraph">
-<p>Another way to construct MLPs is provided by the function <code>make_layers</code>, that offers a string based interface. An example is given in the code below:</p>
-</div>
-<div id="construct_mlp2" class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp2</span><span class="p">(</span><span class="n">linear_layer_sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
-
-    <span class="n">layer_specifications</span> <span class="o">=</span> <span class="p">[</span><span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"Linear"</span><span class="p">]</span>
-    <span class="n">linear_layer_densities</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
-    <span class="n">linear_layer_dropouts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
-    <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">]</span>
-    <span class="n">layer_optimizers</span> <span class="o">=</span> <span class="p">[</span><span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">]</span>
-    <span class="n">layers</span> <span class="o">=</span> <span class="n">make_layers</span><span class="p">(</span><span class="n">layer_specifications</span><span class="p">,</span>
-                         <span class="n">linear_layer_sizes</span><span class="p">,</span>
-                         <span class="n">linear_layer_densities</span><span class="p">,</span>
-                         <span class="n">linear_layer_dropouts</span><span class="p">,</span>
-                         <span class="n">linear_layer_weights</span><span class="p">,</span>
-                         <span class="n">layer_optimizers</span><span class="p">)</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="n">MultilayerPerceptron</span><span class="p">()</span>
-    <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span>
-    <span class="n">M</span><span class="p">.</span><span class="n">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="err">#</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">C</span><span class="o">++</span> <span class="n">data</span> <span class="n">structures</span>
-
-    <span class="k">return</span> <span class="n">M</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that optimizers should be specified for linear layers, but also for batch normalization layers.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. This is done by calling <code>M.compile(batch_size)</code>. As a result of this call, a C++ object is created that contains the actual model. A reference to this object is stored in the attribute <code>_model</code>.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_class_layer">Class Layer</h4>
-<div class="paragraph">
-<p>The class <code>Layer</code> is the base class of all neural network layers. There are three different types of layers:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Layer</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Dense</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A dense linear layer.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Sparse</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A sparse linear layer.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BatchNormalization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A batch normalization layer.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>A <code>Dense</code> layer has a constructor with the following parameters:</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span>
-                 <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                 <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                 <span class="n">activation</span><span class="p">:</span> <span class="n">Activation</span><span class="o">=</span><span class="nc">NoActivation</span><span class="p">(),</span>
-                 <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
-                 <span class="n">weight_initializer</span><span class="p">:</span> <span class="n">WeightInitializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">(),</span>
-                 <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mi">0</span>
-                <span class="p">):</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This only sets a number of attributes of the layer. Before using the layer the <code>compile</code> function must be called:</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="sh">"""</span><span class="s">
-        Creates a C++ object for the layer.
-
-        :param batch_size: the batch size
-        :return:
-        </span><span class="sh">"""</span>
-        <span class="n">activation</span> <span class="o">=</span> <span class="nf">print_activation</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">activation</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">dropout_rate</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="n">layer</span> <span class="o">=</span> <span class="n">nervalibrowwise</span><span class="p">.</span><span class="nf">make_dense_linear_layer</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">input_size</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">activation</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">weight_initializer</span><span class="p">),</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">optimizer</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">layer</span> <span class="o">=</span> <span class="n">nervalibrowwise</span><span class="p">.</span><span class="nf">make_dense_linear_dropout_layer</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">input_size</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">dropout_rate</span><span class="p">,</span> <span class="n">activation</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">weight_initializer</span><span class="p">),</span> <span class="nf">str</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">optimizer</span><span class="p">))</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">_layer</span> <span class="o">=</span> <span class="n">layer</span>
-        <span class="k">return</span> <span class="n">layer</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>As a result of this call a C++ object is created that contains the actual layer. It is stored in the attribute <code>_layer</code>. The normal workflow is to call the <code>compile</code> method of the multilayer perceptron, which will also compile the layers, as illustrated in
-<a href="#construct_mlp1">[construct_mlp1]</a> and <a href="#construct_mlp2">[construct_mlp2]</a>.</p>
-</div>
-<div class="paragraph">
-<p>A <code>Sparse</code> layer has an additional parameter <code>density</code> in the interval \([0,1]\), that determines the fraction of weights that are in the support. Sparse layers do not support dropout.</p>
-</div>
-<div class="paragraph">
-<p>A <code>BatchNormalization</code> layer has the following constructor:</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span>
-                 <span class="n">input_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                 <span class="n">output_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-                 <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span> <span class="o">=</span> <span class="nc">GradientDescent</span><span class="p">()</span>
-                <span class="p">):</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="n">input_size</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
-        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">input_size</span>
-        <span class="k">assert</span> <span class="n">self</span><span class="p">.</span><span class="n">output_size</span> <span class="o">==</span> <span class="n">self</span><span class="p">.</span><span class="n">input_size</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The output size may be omitted, since by definition it is the same as the input size.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_class_lossfunction">Class LossFunction</h4>
-<div class="paragraph">
-<p>The class <code>LossFunction</code> is the base class of all loss functions. There are five loss functions available:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>SquaredErrorLoss</code></p>
-</li>
-<li>
-<p><code>CrossEntropyLoss</code></p>
-</li>
-<li>
-<p><code>LogisticCrossEntropyLoss</code></p>
-</li>
-<li>
-<p><code>NegativeLogLikelihoodLoss</code></p>
-</li>
-<li>
-<p><code>SoftmaxCrossEntropyLoss</code></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>See the <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> document for precise definitions of these loss functions.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_activation_functions">Activation functions</h4>
-<div class="paragraph">
-<p>The class <code>ActivationFunction</code> is the base class of all activation functions. The following activation functions are available:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>ReLU</code></p>
-</li>
-<li>
-<p><code>Sigmoid</code></p>
-</li>
-<li>
-<p><code>Softmax</code></p>
-</li>
-<li>
-<p><code>LogSoftmax</code></p>
-</li>
-<li>
-<p><code>TReLU</code></p>
-</li>
-<li>
-<p><code>LeakyReLU</code></p>
-</li>
-<li>
-<p><code>AllReLU</code></p>
-</li>
-<li>
-<p><code>SReLU</code></p>
-</li>
-<li>
-<p><code>HyperbolicTangent</code></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>See the <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> document for precise definitions of these activation functions.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_accessing_c_data_structures">Accessing C++ data structures</h3>
-<div class="paragraph">
-<p>To a limited extent, the C++ data structures can be accessed in Python. In the file
-<code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/tests/loss_test.py">loss_test.py</a></code> it is demonstrated how to modify the weight matrices and bias vectors of dense layers via the <code>_layer</code> attribute:</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="python">        <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">_layer</span><span class="p">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">W1</span>
-        <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">_layer</span><span class="p">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b1</span>
-        <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">_layer</span><span class="p">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">W2</span>
-        <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">_layer</span><span class="p">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b2</span>
-        <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">_layer</span><span class="p">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">W3</span>
-        <span class="n">M</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">_layer</span><span class="p">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b3</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The weight matrices of sparse layers are not yet fully exposed to Python.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_training_a_neural_network">Training a neural network</h3>
-<div class="paragraph">
-<p>The class <code>StochasticGradientDescentAlgorithm</code> can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="python"><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">options</span><span class="p">.</span><span class="n">epochs</span><span class="p">):</span>
-    <span class="n">self</span><span class="p">.</span><span class="nf">on_start_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">batch_index</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="ow">in</span> <span class="nf">enumerate</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">train_loader</span><span class="p">):</span>
-        <span class="n">self</span><span class="p">.</span><span class="nf">on_start_batch</span><span class="p">(</span><span class="n">batch_index</span><span class="p">)</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="nf">to_one_hot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
-        <span class="n">Y</span> <span class="o">=</span> <span class="n">M</span><span class="p">.</span><span class="nf">feedforward</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">DY</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">loss</span><span class="p">.</span><span class="nf">gradient</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">options</span><span class="p">.</span><span class="n">batch_size</span>
-        <span class="n">M</span><span class="p">.</span><span class="nf">backpropagate</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">DY</span><span class="p">)</span>
-        <span class="n">M</span><span class="p">.</span><span class="nf">optimize</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span>
-        <span class="n">self</span><span class="p">.</span><span class="nf">on_end_batch</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-
-    <span class="n">self</span><span class="p">.</span><span class="nf">on_end_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-
-<span class="n">self</span><span class="p">.</span><span class="nf">on_end_training</span><span class="p">()</span></code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-We follow the PyTorch convention that the targets used for classification are provided as a one dimensional vector of integers. Using a call to <code>to_one_hot</code> this vector is transformed in to a one hot encoded boolean matrix of the same dimensions as the output <code>Y</code>.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>In every epoch, the dataset is divided into a number of batches. This is handled by the <code>DataLoader</code>, that creates batches <code>X</code> of a given batch size, with corresponding targets <code>T</code> (i.e. the expected outputs). Each batch goes through the three steps of stochastic gradient descent:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><strong>feedforward:</strong> Given an input batch <code>X</code> and
-the neural network parameters <code>Θ</code>, compute the
-output <code>Y</code>.</p>
-</li>
-<li>
-<p><strong>backpropagation:</strong> Given output <code>Y</code> corresponding to input <code>X</code> and targets <code>T</code>, compute the gradient  <code>DY</code> of <code>Y</code> with respect to the loss function. Then from <code>Y</code> and <code>DY</code>, compute the gradient <code>DΘ</code> of the parameters <code>Θ</code>.</p>
-</li>
-<li>
-<p><strong>optimization:</strong> Given the gradient <code>DΘ</code>, update
-the parameters <code>Θ</code>.</p>
-</li>
-</ol>
-</div>
 <div class="paragraph">
 <p>Note that the algorithm uses a number of event functions:</p>
 </div>
@@ -1649,7 +1021,7 @@ the parameters <code>Θ</code>.</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>The user can respond to these events by deriving from the class <code>StochasticGgradientDescentAlgorithm</code>. Typical use cases for these event functions are the following:</p>
+<p>The user can respond to these events by deriving from the class <code>{sgd_algorithm}</code>. Typical use cases for these event functions are the following:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1666,28 +1038,6 @@ the parameters <code>Θ</code>.</p>
 </div>
 <div class="paragraph">
 <p>Such operations are typically done after each epoch or after a given number of batches.</p>
-</div>
-<div id="on_start_epoch" class="paragraph">
-<p>An example can be found in the tool <code>mlp</code>:</p>
-</div>
-<div class="listingblock small-code">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="python">    <span class="k">def</span> <span class="nf">on_start_epoch</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">self</span><span class="p">.</span><span class="n">reload_data_directory</span><span class="p">:</span>
-            <span class="n">self</span><span class="p">.</span><span class="nf">reload_data</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">lr_scheduler</span><span class="p">:</span>
-            <span class="n">self</span><span class="p">.</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">lr_scheduler</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">self</span><span class="p">.</span><span class="n">M</span><span class="p">.</span><span class="nf">renew_dropout_masks</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">self</span><span class="p">.</span><span class="n">regrow</span><span class="p">:</span>
-            <span class="n">self</span><span class="p">.</span><span class="nf">regrow</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">M</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">epoch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">self</span><span class="p">.</span><span class="n">clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">self</span><span class="p">.</span><span class="n">M</span><span class="p">.</span><span class="n">_model</span><span class="p">.</span><span class="nf">clip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">clip</span><span class="p">)</span></code></pre>
-</div>
 </div>
 <div class="paragraph">
 <p>Five actions take place at the start of every epoch:</p>
@@ -1707,73 +1057,20 @@ the parameters <code>Θ</code>.</p>
 <p>Sparse weight matrices are pruned and regrown if a regrow function is specified.</p>
 </li>
 <li>
-<p>Small weights in the subnormal range are clipped to zero if the <code>clip</code> option is set.
-== I/O
-The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
+<p>Small weights in the subnormal range are clipped to zero if the <code>clip</code> option is set.</p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p>The <code>mlp.py</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
-</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_extending_the_library">Extending the library</h2>
+<h2 id="io">I/O</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <em>Nerva-Rowwise Python Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
-<a href="nerva-cpp.adoc#extending">Extending the library</a> of the C&#43;&#43; manual.
-After adding these components to C&#43;&#43;, they can be integrated in the <code>nerva</code> Python module.</p>
-</div>
-<div class="sect2">
-<h3 id="_adding_a_loss_function">Adding a loss function</h3>
-<div class="paragraph">
-<p>As an example, we will explain how the loss function <code>SoftmaxCrossEntropyLoss</code> is added to the <code>nerva</code> Python module.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The first step is to define a C++ class <code>softmax_cross_entropy_loss</code> in the header file
-<code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/loss_functions.h">loss_functions.h</a></code>.</p>
-</li>
-<li>
-<p>The next step is to add the class <code>softmax_cross_entropy_loss</code> to the Python bindings in the file <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/src/python-bindings.cpp">python-bindings.cpp</a></code>:</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>  py::class_&lt;softmax_cross_entropy_loss, loss_function, std::shared_ptr&lt;softmax_cross_entropy_loss&gt;&gt;(m, "softmax_cross_entropy_loss")
-    .def(py::init&lt;&gt;(), py::return_value_policy::copy)
-    ;</pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The third step is to define a Python class <code>SoftmaxCrossEntropyLoss</code> in the file <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/loss-functions.py">loss-functions.py</a></code>:</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>class SoftmaxCrossEntropyLoss(nervalibrowwise.softmax_cross_entropy_loss):
-    def __str__(self):
-        return 'SoftmaxCrossEntropyLoss()'</pre>
-</div>
+<p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
 </div>
 <div class="paragraph">
-<p>Note that the Python class derives from the C++ class. In the same file, an entry to the function <code>parse_loss_function</code> should be added.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The last step is to reinstall the <code>nerva</code> Python module via <code>pip</code>, see <a href="#pip-install">[pip-install]</a>.</p>
-</li>
-</ul>
-</div>
+<p>The <code>{mlptool}</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
 </div>
 </div>
 </div>
@@ -1783,29 +1080,5 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 Last updated 2025-01-20 11:04:45 UTC
 </div>
 </div>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [["\\(", "\\)"]],
-    displayMath: [["\\[", "\\]"]],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [["\\$", "\\$"]],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: { equationNumbers: { autoNumber: "none" } }
-})
-MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
-  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
-    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
-      data.math.root.display = "block"
-    }
-    return data
-  })
-})
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
 </body>
 </html>
