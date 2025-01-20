@@ -1,9 +1,9 @@
 project(NERVA_TEST)
 
 # Add SYCL support (only applicable to the Intel oneAPI icpx compiler)
-option(ENABLE_SYCL "Enable SYCL support" OFF)
+option(NERVA_ENABLE_SYCL "Enable SYCL support" OFF)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-    if(ENABLE_SYCL)
+    if(NERVA_ENABLE_SYCL)
         add_compile_definitions(NERVA_SYCL)
         add_compile_options(-Wno-deprecated-declarations)
         add_compile_options(-fsycl -fsycl-targets=spir64_x86_64 -fsycl-unnamed-lambda)

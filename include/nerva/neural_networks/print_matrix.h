@@ -179,6 +179,13 @@ struct matrix_row
   }
 };
 
+/**
+ * Prints a matrix in a format similar to NumPy's array printing.
+ * @tparam Matrix The type of the matrix.
+ * @param name The name of the matrix to be printed.
+ * @param x The matrix to be printed.
+ * @param edgeitems The number of items to print at the edges of the matrix.
+ */
 template <typename Matrix>
 void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems=3)
 {

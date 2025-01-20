@@ -60,6 +60,12 @@ void read_cifar10_slice(const std::string& filename, eigen::matrix& X, eigen::ma
   }
 }
 
+/**
+ * Loads the CIFAR-10 dataset from a directory
+ * @param directory The directory containing the CIFAR-10 dataset
+ * @param normalize If true, the data is normalized to the range [-1, 1]
+ * @return The CIFAR-10 dataset
+ */
 inline
 datasets::dataset load_cifar10_dataset(const std::string& directory, bool normalize=true)
 {

@@ -27,6 +27,14 @@ using matrix_view = eigen::matrix_map<scalar>;
 using matrix_ref = eigen::matrix_ref<scalar>;
 using long_vector = Eigen::Matrix<long, Eigen::Dynamic, 1>;
 
+/**
+ *
+ * @tparam Matrix
+ * @param Xtrain
+ * @param Ttrain
+ * @param Xtest
+ * @param Ttest
+ */
 template <typename Matrix>
 void dataset_info(const Matrix& Xtrain, const Matrix& Ttrain, const Matrix& Xtest, const Matrix& Ttest)
 {

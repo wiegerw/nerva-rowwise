@@ -31,16 +31,51 @@ endif::[]
 == Introduction
 This document describes the implementation of the {library}. In earlier versions, I relied heavily on lecture notes from https://www.cs.toronto.edu/~rgrosse/teaching.html[machine learning courses by Roger Grosse], which I highly recommend. This influence may still be evident in the naming of symbols.
 
-=== Installation
-The following build systems are supported:
+== Installation
+The following build systems are supported for building the {library}:
 
-- https://cmake.org/[CMake] 3.16+
+- https://cmake.org/[CMake] 3.16 or newer
 - https://www.bfgroup.xyz/b2/[B2]
 
-Using CMake, the {library} can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable `ONEAPI_ROOT` should point to the OneAPI installation directory, and the variable `MKL_DIR` to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using `FetchContent` commands.
+=== Dependencies
+The {library} has the following dependencies:
 
-==== Linux install
-The build and install can for example be done like this on a Linux system:
+* https://github.com/onqtam/doctest[doctest]
+* https://github.com/fmtlib/fmt[FMT]
+* https://github.com/bfgroup/Lyra[Lyra]
+* https://eigen.tuxfamily.org/[Eigen]
+* https://github.com/pybind/pybind11[pybind11]
+* https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html[Intel MKL]
+* https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html[Intel oneAPI] (*)
+
+(*) The Intel `oneAPI` dependency is optional. This library is needed for the SYCL computation mode.
+Note that `oneAPI` includes the `icpx` compiler and the `MKL` library.
+
+=== Environment variables
+The following environment variables may have to be set:
+
+- `ONEAPI_ROOT`: Path to the OneAPI installation directory.
+- `MKL_DIR`: Path to the MKL installation directory.
+- `MKL_NUM_THREADS`: Controls the number of threads used at runtime by the MKL library.
+- `OMP_NUM_THREADS`: Controls the number of threads used at runtime by the OMP library.
+- `NERVA_ENABLE_SYCL`: Set this variable to enable the SYCL computation mode.
+- `NERVA_USE_DOUBLE`: Set this variable to use double instead of single precision in the computations.
+
+Note that CMake seems to require setting the `MKL_DIR` variable, even if the `MKL`
+library is found in the `ONEAPI_ROOT` directory.
+
+See https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html[techniques-to-set-the-number-of-threads.html]
+for more information about setting the number of threads.
+
+TIP: You can skip setting the `ONEAPI_ROOT` variable by running the OneAPI `setvars.sh` script beforehand.
+This script does not set the `MKL_DIR` variable, so you may have to set it manually.
+
+=== Installation using CMake
+Using CMake, the {library} can be built in a standard way.
+Note that dependencies for `doctest`, `Eigen`, `FMT`, `Lyra`, and `pybind11` are automatically managed using the `FetchContent` commands in the build process.
+
+==== Linux CMake install
+On Linux, you can build and install the library with a command like this:
 
 [[cmake-build]]
 [source,bash]
@@ -54,25 +89,21 @@ cmake .. \
 make -j8
 make install
 ----
-TIP: Setting the `MKL_DIR` variable is not necessary if the OneAPI `setvars.sh` script is run beforehand.
 
-NOTE: For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
-https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044[1456044]
-and https://gitlab.com/libeigen/eigen/-/issues/2586[issues/2586] for more details.
-To resolve this issue, a hack has been applied in Nerva: by defining the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H`,
-the inclusion of the offending header file is prevented.
-
-[NOTE]
-====
-For the B2 build using the icpx compiler, the environment needs to be changed like this in advance. Alternatively, the OneAPI `setvars.sh` script can be called.
-[listing]
+==== Windows CMake install
+On Windows, a Visual Studio command line build can be done like this:
+[source]
 ----
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ONEAPI_ROOT/latest/lib
-PATH=$PATH:/$ONEAPI_ROOT/latest/bin
+cmake .. ^
+    -G "NMake Makefiles" ^
+    -DCMAKE_INSTALL_PREFIX=..\install ^
+    -DCMAKE_BUILD_TYPE=Release ^
+    -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
+nmake
+nmake install
 ----
-====
 
-==== SYCL install
+==== SYCL matrix operations
 There is an experimental computation mode for SYCL matrix operations, that can be enabled in the `mlp` tool using the flag `--computation=sycl`. This is only supported on Linux in combination with the Intel `icpx` compiler. It can be enabled using the following build command:
 [source]
 ----
@@ -87,26 +118,20 @@ cmake .. \
 
 NOTE: The initial tests with SYCL matrix operations on CPU have a rather disappointing performance.
 
-==== Windows Visual Studio install
-On Windows, a Visual Studio command line build can be done like this:
-[source]
-----
-cmake .. ^
-    -G "NMake Makefiles" ^
-    -DCMAKE_INSTALL_PREFIX=..\install ^
-    -DCMAKE_BUILD_TYPE=Release ^
-    -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
-nmake
-nmake install
-----
+==== Unit tests
 The unit tests can be run using the command
-
 [source]
 ----
 ctest -R nerva
 ----
 
-TIP: The number of threads that are used at runtime by the MKL library can be controlled using the environment variables `MKL_NUM_THREADS` and `OMP_NUM_THREADS`, see also https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html[techniques-to-set-the-number-of-threads.html].
+==== icpx + clang compilers
+If you're using the Clang or ICX (Intel's `icpx`) compilers, be aware of a longstanding issue between MKL and Eigen. More information is available in the following discussions:
+
+- https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044[Intel Community Discussion (1456044)]
+- https://gitlab.com/libeigen/eigen/-/issues/2586[Eigen Issue Tracker (Issue 2586)].
+
+To work around this issue in Nerva, the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H` has been defined. This prevents the inclusion of the problematic header file and resolves the compatibility issue.
 
 == Command line tools
 The following command line tools are available. They can be found in the `tools` directory.
