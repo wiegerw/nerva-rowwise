@@ -2605,7 +2605,20 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">Unresolved directive <span class="k">in </span>nerva-cpp.adoc - include::../examples/cifar10_pruning.sh[tag<span class="o">=</span>doc]</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">../install/bin/mlp <span class="se">\</span>
+    <span class="nt">--layers</span><span class="o">=</span><span class="s2">"ReLU;ReLU;Linear"</span> <span class="se">\</span>
+    <span class="nt">--layer-sizes</span><span class="o">=</span><span class="s2">"3072;1024;1024;10"</span> <span class="se">\</span>
+    <span class="nt">--layer-weights</span><span class="o">=</span>Xavier <span class="se">\</span>
+    <span class="nt">--optimizers</span><span class="o">=</span><span class="s2">"Nesterov(0.9)"</span> <span class="se">\</span>
+    <span class="nt">--loss</span><span class="o">=</span>SoftmaxCrossEntropy <span class="se">\</span>
+    <span class="nt">--learning-rate</span><span class="o">=</span>0.01 <span class="se">\</span>
+    <span class="nt">--epochs</span><span class="o">=</span>100 <span class="se">\</span>
+    <span class="nt">--batch-size</span><span class="o">=</span>100 <span class="se">\</span>
+    <span class="nt">--threads</span><span class="o">=</span>12 <span class="se">\</span>
+    <span class="nt">--overall-density</span><span class="o">=</span>0.05 <span class="se">\</span>
+    <span class="nt">--prune</span><span class="o">=</span><span class="s2">"Magnitude(0.1)"</span> <span class="se">\</span>
+    <span class="nt">--cifar10</span><span class="o">=</span>../data <span class="se">\</span>
+    <span class="nt">--seed</span><span class="o">=</span>123</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2726,7 +2739,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-10-25 09:13:18 UTC
+Last updated 2025-01-20 11:03:55 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
