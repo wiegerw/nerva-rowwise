@@ -566,9 +566,12 @@ pre.rouge .gs {
 <div id="toc" class="toc2">
 <div id="toctitle"><h3>Contents</h3></div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a>
+<li><a href="#_introduction">Introduction</a></li>
+<li><a href="#_installation">Installation</a>
 <ul class="sectlevel2">
-<li><a href="#_installation">Installation</a></li>
+<li><a href="#_dependencies">Dependencies</a></li>
+<li><a href="#_environment_variables">Environment variables</a></li>
+<li><a href="#_installation_using_cmake">Installation using CMake</a></li>
 </ul>
 </li>
 <li><a href="#_command_line_tools">Command line tools</a>
@@ -634,28 +637,118 @@ pre.rouge .gs {
 <div class="paragraph">
 <p>This document describes the implementation of the <em>Nerva-Rowwise C++ Library</em>. In earlier versions, I relied heavily on lecture notes from <a href="https://www.cs.toronto.edu/~rgrosse/teaching.html">machine learning courses by Roger Grosse</a>, which I highly recommend. This influence may still be evident in the naming of symbols.</p>
 </div>
-<div class="sect2">
-<h3 id="_installation">Installation</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation">Installation</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>The following build systems are supported:</p>
+<p>The following build systems are supported for building the <em>Nerva-Rowwise C++ Library</em>:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://cmake.org/">CMake</a> 3.16+</p>
+<p><a href="https://cmake.org/">CMake</a> 3.16 or newer</p>
 </li>
 <li>
 <p><a href="https://www.bfgroup.xyz/b2/">B2</a></p>
 </li>
 </ul>
 </div>
+<div class="sect2">
+<h3 id="_dependencies">Dependencies</h3>
 <div class="paragraph">
-<p>Using CMake, the <em>Nerva-Rowwise C++ Library</em> can be built in a standard way. The only prerequisite is that the Intel OneAPI library must be installed, and two environment variables must be set. The variable <code>ONEAPI_ROOT</code> should point to the OneAPI installation directory, and the variable <code>MKL_DIR</code> to the MKL installation directory. The dependencies for doctest, Eigen, FMT, Lyra and pybind11 are resolved automatically using <code>FetchContent</code> commands.</p>
+<p>The <em>Nerva-Rowwise C++ Library</em> has the following dependencies:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/onqtam/doctest">doctest</a></p>
+</li>
+<li>
+<p><a href="https://github.com/fmtlib/fmt">FMT</a></p>
+</li>
+<li>
+<p><a href="https://github.com/bfgroup/Lyra">Lyra</a></p>
+</li>
+<li>
+<p><a href="https://eigen.tuxfamily.org/">Eigen</a></p>
+</li>
+<li>
+<p><a href="https://github.com/pybind/pybind11">pybind11</a></p>
+</li>
+<li>
+<p><a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html">Intel MKL</a></p>
+</li>
+<li>
+<p><a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html">Intel oneAPI</a> (*)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>(*) The Intel <code>oneAPI</code> dependency is optional. This library is needed for the SYCL computation mode.
+Note that <code>oneAPI</code> includes the <code>icpx</code> compiler and the <code>MKL</code> library.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_environment_variables">Environment variables</h3>
+<div class="paragraph">
+<p>The following environment variables may have to be set:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ONEAPI_ROOT</code>: Path to the OneAPI installation directory.</p>
+</li>
+<li>
+<p><code>MKL_DIR</code>: Path to the MKL installation directory.</p>
+</li>
+<li>
+<p><code>MKL_NUM_THREADS</code>: Controls the number of threads used at runtime by the MKL library.</p>
+</li>
+<li>
+<p><code>OMP_NUM_THREADS</code>: Controls the number of threads used at runtime by the OMP library.</p>
+</li>
+<li>
+<p><code>NERVA_ENABLE_SYCL</code>: Set this variable to enable the SYCL computation mode.</p>
+</li>
+<li>
+<p><code>NERVA_USE_DOUBLE</code>: Set this variable to use double instead of single precision in the computations.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Note that CMake seems to require setting the <code>MKL_DIR</code> variable, even if the <code>MKL</code>
+library is found in the <code>ONEAPI_ROOT</code> directory.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html">techniques-to-set-the-number-of-threads.html</a>
+for more information about setting the number of threads.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can skip setting the <code>ONEAPI_ROOT</code> variable by running the OneAPI <code>setvars.sh</code> script beforehand.
+This script does not set the <code>MKL_DIR</code> variable, so you may have to set it manually.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_installation_using_cmake">Installation using CMake</h3>
+<div class="paragraph">
+<p>Using CMake, the <em>Nerva-Rowwise C++ Library</em> can be built in a standard way.
+Note that dependencies for <code>doctest</code>, <code>Eigen</code>, <code>FMT</code>, <code>Lyra</code>, and <code>pybind11</code> are automatically managed using the <code>FetchContent</code> commands in the build process.</p>
 </div>
 <div class="sect3">
-<h4 id="_linux_install">Linux install</h4>
+<h4 id="_linux_cmake_install">Linux CMake install</h4>
 <div class="paragraph">
-<p>The build and install can for example be done like this on a Linux system:</p>
+<p>On Linux, you can build and install the library with a command like this:</p>
 </div>
 <div id="cmake-build" class="listingblock">
 <div class="content">
@@ -669,57 +762,26 @@ make <span class="nt">-j8</span>
 make <span class="nb">install</span></code></pre>
 </div>
 </div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-Setting the <code>MKL_DIR</code> variable is not necessary if the OneAPI <code>setvars.sh</code> script is run beforehand.
-</td>
-</tr>
-</table>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-For the clang and icpx compilers one should know that there is a longstanding issue between MKL and Eigen. See
-<a href="https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044">1456044</a>
-and <a href="https://gitlab.com/libeigen/eigen/-/issues/2586">issues/2586</a> for more details.
-To resolve this issue, a hack has been applied in Nerva: by defining the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code>,
-the inclusion of the offending header file is prevented.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
+<div class="sect3">
+<h4 id="_windows_cmake_install">Windows CMake install</h4>
 <div class="paragraph">
-<p>For the B2 build using the icpx compiler, the environment needs to be changed like this in advance. Alternatively, the OneAPI <code>setvars.sh</code> script can be called.</p>
+<p>On Windows, a Visual Studio command line build can be done like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ONEAPI_ROOT/latest/lib
-PATH=$PATH:/$ONEAPI_ROOT/latest/bin</pre>
+<pre class="rouge highlight"><code>cmake .. ^
+    -G "NMake Makefiles" ^
+    -DCMAKE_INSTALL_PREFIX=..\install ^
+    -DCMAKE_BUILD_TYPE=Release ^
+    -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
+nmake
+nmake install</code></pre>
 </div>
-</div>
-</td>
-</tr>
-</table>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_sycl_install">SYCL install</h4>
+<h4 id="_sycl_matrix_operations">SYCL matrix operations</h4>
 <div class="paragraph">
 <p>There is an experimental computation mode for SYCL matrix operations, that can be enabled in the <code>mlp</code> tool using the flag <code>--computation=sycl</code>. This is only supported on Linux in combination with the Intel <code>icpx</code> compiler. It can be enabled using the following build command:</p>
 </div>
@@ -748,21 +810,7 @@ The initial tests with SYCL matrix operations on CPU have a rather disappointing
 </div>
 </div>
 <div class="sect3">
-<h4 id="_windows_visual_studio_install">Windows Visual Studio install</h4>
-<div class="paragraph">
-<p>On Windows, a Visual Studio command line build can be done like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>cmake .. ^
-    -G "NMake Makefiles" ^
-    -DCMAKE_INSTALL_PREFIX=..\install ^
-    -DCMAKE_BUILD_TYPE=Release ^
-    -DMKL_DIR="%ONEAPI_ROOT%\latest\lib\cmake\mkl"
-nmake
-nmake install</code></pre>
-</div>
-</div>
+<h4 id="_unit_tests">Unit tests</h4>
 <div class="paragraph">
 <p>The unit tests can be run using the command</p>
 </div>
@@ -771,17 +819,24 @@ nmake install</code></pre>
 <pre class="rouge highlight"><code>ctest -R nerva</code></pre>
 </div>
 </div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-The number of threads that are used at runtime by the MKL library can be controlled using the environment variables <code>MKL_NUM_THREADS</code> and <code>OMP_NUM_THREADS</code>, see also <a href="https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2024-2/techniques-to-set-the-number-of-threads.html">techniques-to-set-the-number-of-threads.html</a>.
-</td>
-</tr>
-</table>
+</div>
+<div class="sect3">
+<h4 id="_icpx_clang_compilers">icpx + clang compilers</h4>
+<div class="paragraph">
+<p>If you&#8217;re using the Clang or ICX (Intel&#8217;s <code>icpx</code>) compilers, be aware of a longstanding issue between MKL and Eigen. More information is available in the following discussions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://community.intel.com/t5/Intel-oneAPI-Math-Kernel-Library/Using-MKL-2023-0-0-20221201-with-Eigen/m-p/1456044">Intel Community Discussion (1456044)</a></p>
+</li>
+<li>
+<p><a href="https://gitlab.com/libeigen/eigen/-/issues/2586">Eigen Issue Tracker (Issue 2586)</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To work around this issue in Nerva, the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code> has been defined. This prevents the inclusion of the problematic header file and resolves the compatibility issue.</p>
 </div>
 </div>
 </div>
@@ -2727,7 +2782,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-20 11:15:11 UTC
+Last updated 2025-01-20 14:28:17 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
