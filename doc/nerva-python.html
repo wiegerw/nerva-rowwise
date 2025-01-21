@@ -584,6 +584,8 @@ pre.rouge .gs {
 <li><a href="#_classes">Classes</a></li>
 <li><a href="#_accessing_c_data_structures">Accessing C++ data structures</a></li>
 <li><a href="#_training_a_neural_network">Training a neural network</a></li>
+<li><a href="#_npz_format">NPZ format</a></li>
+<li><a href="#_storing_datasets_and_weights">Storing datasets and weights</a></li>
 </ul>
 </li>
 <li><a href="#_extending_the_library">Extending the library</a>
@@ -1709,10 +1711,21 @@ the parameters <code>Θ</code>.</p>
 <li>
 <p>Small weights in the subnormal range are clipped to zero if the <code>clip</code> option is set.
 == I/O
-The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
+The <em>Nerva-Rowwise Python Library</em> has support for reading and writing datasets and weights + biases of a model in NumPy NPZ format.
+This format is used for portability between C++ and Python implementations.
+There is no support yet for storing a complete model, including its architecture.</p>
 </li>
 </ul>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_npz_format">NPZ format</h3>
+<div class="paragraph">
+<p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_storing_datasets_and_weights">Storing datasets and weights</h3>
 <div class="paragraph">
 <p>The <code>mlp.py</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
 </div>
@@ -1780,7 +1793,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-20 14:28:17 UTC
+Last updated 2025-01-21 09:08:22 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

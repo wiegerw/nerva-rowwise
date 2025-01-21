@@ -572,6 +572,7 @@ pre.rouge .gs {
 <li><a href="#_dependencies">Dependencies</a></li>
 <li><a href="#_environment_variables">Environment variables</a></li>
 <li><a href="#_installation_using_cmake">Installation using CMake</a></li>
+<li><a href="#_installation_using_b2">Installation using B2</a></li>
 </ul>
 </li>
 <li><a href="#_command_line_tools">Command line tools</a>
@@ -596,7 +597,12 @@ pre.rouge .gs {
 <li><a href="#_mkl_library">MKL library</a></li>
 </ul>
 </li>
-<li><a href="#io">I/O</a></li>
+<li><a href="#io">I/O</a>
+<ul class="sectlevel2">
+<li><a href="#_npz_format">NPZ format</a></li>
+<li><a href="#_storing_datasets_and_weights">Storing datasets and weights</a></li>
+</ul>
+</li>
 <li><a href="#_performance">Performance</a>
 <ul class="sectlevel2">
 <li><a href="#_mini_batches">Mini-batches</a></li>
@@ -695,28 +701,44 @@ Note that <code>oneAPI</code> includes the <code>icpx</code> compiler and the <c
 <div class="paragraph">
 <p>The following environment variables may have to be set:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>ONEAPI_ROOT</code>: Path to the OneAPI installation directory.</p>
-</li>
-<li>
-<p><code>MKL_DIR</code>: Path to the MKL installation directory.</p>
-</li>
-<li>
-<p><code>MKL_NUM_THREADS</code>: Controls the number of threads used at runtime by the MKL library.</p>
-</li>
-<li>
-<p><code>OMP_NUM_THREADS</code>: Controls the number of threads used at runtime by the OMP library.</p>
-</li>
-<li>
-<p><code>NERVA_ENABLE_SYCL</code>: Set this variable to enable the SYCL computation mode.</p>
-</li>
-<li>
-<p><code>NERVA_USE_DOUBLE</code>: Set this variable to use double instead of single precision in the computations.</p>
-</li>
-</ul>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Environment variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ONEAPI_ROOT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the OneAPI installation directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MKL_DIR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the MKL installation directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MKL_NUM_THREADS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls the number of threads used at runtime by the MKL library.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OMP_NUM_THREADS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controls the number of threads used at runtime by the OMP library.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NERVA_ENABLE_SYCL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable the SYCL computation mode.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NERVA_USE_DOUBLE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use double instead of single precision in the computations.</p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
 <p>Note that CMake seems to require setting the <code>MKL_DIR</code> variable, even if the <code>MKL</code>
 library is found in the <code>ONEAPI_ROOT</code> directory.</p>
@@ -837,6 +859,95 @@ The initial tests with SYCL matrix operations on CPU have a rather disappointing
 </div>
 <div class="paragraph">
 <p>To work around this issue in Nerva, the symbol <code>EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H</code> has been defined. This prevents the inclusion of the problematic header file and resolves the compatibility issue.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_installation_using_b2">Installation using B2</h3>
+<div class="paragraph">
+<p>The <em>Nerva-Rowwise C++ Library</em> can also be built using the B2 build system.</p>
+</div>
+<div class="paragraph">
+<p>The following environment variables must be set:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Environment variable</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ONEAPI_ROOT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the OneAPI installation directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DOCTEST_INCLUDE_DIR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the doctest include directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>EIGEN_INCLUDE_DIR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the Eigen include directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>FMT_INCLUDE_DIR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the FMT include directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LYRA_INCLUDE_DIR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the Lyra include directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PYBIND11_INCLUDE_DIR</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the pybind11 include directory.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The Python include directory is currently hard coded to <code>/usr/include/python3.12</code>
+in the file
+<code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/Jamroot">Jamroot</a></code>
+This may have to be changed to the correct location on your system.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_building_the_tools">Building the tools</h4>
+<div class="paragraph">
+<p>The tools can be installed with a command like this, assuming that the <code>g++-14</code> compiler has been configured.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>cd tools
+b2 gcc-14 link=static release -j8</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will install the tools in the directory <code>install/bin</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_the_tests">Running the tests</h4>
+<div class="paragraph">
+<p>The unit tests can be run with a command like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>cd tests
+b2 gcc-14 link=static release -j8</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -2396,10 +2507,21 @@ The sparse CSR matrix functions in the MKL library take an argument of the opaqu
 <h2 id="io">I/O</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p>The <em>Nerva-Rowwise C++ Library</em> has support for reading and writing datasets and weights + biases of a model in NumPy NPZ format.
+This format is used for portability between C++ and Python implementations.
+There is no support yet for storing a complete model, including its architecture.</p>
+</div>
+<div class="sect2">
+<h3 id="_npz_format">NPZ format</h3>
+<div class="paragraph">
 <p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_storing_datasets_and_weights">Storing datasets and weights</h3>
 <div class="paragraph">
 <p>The <code>mlp</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
+</div>
 </div>
 </div>
 </div>
@@ -2782,7 +2904,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-20 14:28:17 UTC
+Last updated 2025-01-21 09:08:22 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
