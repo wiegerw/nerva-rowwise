@@ -181,7 +181,7 @@ output `Y`.
 . *optimization:* Given the gradient `DΘ`, update
 the parameters `Θ`.
 
-include::shared.adoc[tags=event-functions]
+include::overview-of-the-code.adoc[tags=event-functions]
 
 [[on_start_epoch]]
 An example can be found in the tool `mlp`:
@@ -191,6 +191,5 @@ An example can be found in the tool `mlp`:
 include::{root}/python/tools/mlp.py[tag=event]
 ----
 
-include::shared.adoc[tags=event-actions]
-include::shared.adoc[tags=io]
+include::overview-of-the-code.adoc[tags=event-actions]
 

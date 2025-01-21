@@ -178,6 +178,7 @@ See also
 link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format].
 // end::training-configuration-options[]
 
+
 // tag::dataset-options[]
 ===== Dataset options
 * `--cifar10 <directory>`
@@ -281,59 +282,3 @@ The precision used for printing matrix elements.
 * `--edgeitems <value>`
 The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.
 // end::miscellaneous-options[]
-
-// tag::event-functions[]
-Note that the algorithm uses a number of event functions:
-|===
-|Event |Description
-
-|`on_start_training`
-|Is called at the start of the training
-
-|`on_end_training`
-|Is called at the end of the training
-
-|`on_start_epoch`
-|Is called at the start of each epoch
-
-|`on_end_epoch`
-|Is called at the end of each epoch
-
-|`on_start_batch`
-|Is called at the start of each batch
-
-|`on_end_batch`
-|Is called at the end of each batch
-|===
-The user can respond to these events by deriving from the class `{sgd_algorithm}`. Typical use cases for these event functions are the following:
-
-- Update the learning rate.
-- Renew dropout masks.
-- Prune and grow sparse weights.
-
-Such operations are typically done after each epoch or after a given number of batches.
-// end::event-functions[]
-
-// tag::event-actions[]
-Five actions take place at the start of every epoch:
-
-- A preprocessed dataset is loaded from disk, which is done to avoid the expensive computation of augmented data at every epoch.
-- The learning rate is updated if a learning rate scheduler is set.
-- Dropout masks are renewed.
-- Sparse weight matrices are pruned and regrown if a regrow function is specified.
-- Small weights in the subnormal range are clipped to zero if the `clip` option is set.
-// end::event-actions[]
-
-// tag::io[]
-[[io]]
-== I/O
-The {library} has support for reading and writing datasets and weights + biases of a model in NumPy NPZ format.
-This format is used for portability between C++ and Python implementations.
-There is no support yet for storing a complete model, including its architecture.
-
-=== NPZ format
-The default storage format used in the Nerva libraries is the NumPy NPZ format, see link:https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html[numpy.lib.format]. The reason for choosing this format is portability between C++ and Python implementations. A file in `.npz` format can be used to store a dictionary of arrays.
-
-=== Storing datasets and weights
-The `{mlptool}` tool has options `--load-weights` and `--save-weights` for loading and saving the weights and bias vectors of an MLP, and options `--load-data` and `--save-data` for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are `W1, W2, ...` and `b1, b2, ...`. The keys for the training data plus targets are `Xtrain` and `Ttrain`, while for the test data plus targets we use `Xtest` and `Ttest`.
-// end::io[]

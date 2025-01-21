@@ -38,12 +38,12 @@ epoch   6  lr: 0.01000000  loss: 1.29761993  train accuracy: 0.54106000  test ac
 epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test accuracy: 0.51690000  time: 3.96624650s
 ----
 
-include::shared.adoc[tags=mlptool-options]
-include::shared.adoc[tags=general-options]
-include::shared.adoc[tags=random-generator-options]
-include::shared.adoc[tags=layer-configuration-options]
-include::shared.adoc[tags=training-configuration-options]
-include::shared.adoc[tags=dataset-options]
-include::shared.adoc[tags=pruning-options]
-include::shared.adoc[tags=computation-options]
-include::shared.adoc[tags=miscellaneous-options]
+include::command-line-tools.adoc[tags=mlptool-options]
+include::command-line-tools.adoc[tags=general-options]
+include::command-line-tools.adoc[tags=random-generator-options]
+include::command-line-tools.adoc[tags=layer-configuration-options]
+include::command-line-tools.adoc[tags=training-configuration-options]
+include::command-line-tools.adoc[tags=dataset-options]
+include::command-line-tools.adoc[tags=pruning-options]
+include::command-line-tools.adoc[tags=computation-options]
+include::command-line-tools.adoc[tags=miscellaneous-options]
