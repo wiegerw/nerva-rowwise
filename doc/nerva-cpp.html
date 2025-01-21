@@ -641,7 +641,17 @@ pre.rouge .gs {
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document describes the implementation of the <em>Nerva-Rowwise C++ Library</em>. In earlier versions, I relied heavily on lecture notes from <a href="https://www.cs.toronto.edu/~rgrosse/teaching.html">machine learning courses by Roger Grosse</a>, which I highly recommend. This influence may still be evident in the naming of symbols.</p>
+<p>The <em>Nerva-Rowwise C++ Library</em> is a library for neural networks.
+It is part of the Nerva library collection <a href="https://github.com/wiegerw/nerva" class="bare">https://github.com/wiegerw/nerva</a>, that includes
+native C++ and Python implementations of neural networks. Originally the library was intended
+for experimenting with truly sparse neural networks. Nowadays, the library
+also aims to provide a transparent and accessible implementation of neural networks.</p>
+</div>
+<div class="paragraph">
+<p>This document describes the implementation of the <em>Nerva-Rowwise C++ Library</em>. For initial versions
+of the library I took inspiration from lecture notes of
+<a href="https://www.cs.toronto.edu/~rgrosse/teaching.html">machine learning courses by Roger Grosse</a>, which I highly recommend.
+This influence may still be evident in the naming of symbols.</p>
 </div>
 </div>
 </div>
@@ -666,31 +676,48 @@ pre.rouge .gs {
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> has the following dependencies:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://github.com/onqtam/doctest">doctest</a></p>
-</li>
-<li>
-<p><a href="https://github.com/fmtlib/fmt">FMT</a></p>
-</li>
-<li>
-<p><a href="https://github.com/bfgroup/Lyra">Lyra</a></p>
-</li>
-<li>
-<p><a href="https://eigen.tuxfamily.org/">Eigen</a></p>
-</li>
-<li>
-<p><a href="https://github.com/pybind/pybind11">pybind11</a></p>
-</li>
-<li>
-<p><a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html">Intel MKL</a></p>
-</li>
-<li>
-<p><a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html">Intel oneAPI</a> (*)</p>
-</li>
-</ul>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Library</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/onqtam/doctest">doctest</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unit testing framework</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/fmtlib/fmt">FMT</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Formatting library</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/bfgroup/Lyra">Lyra</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command line argument parser</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://eigen.tuxfamily.org/">Eigen</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linear algebra library</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/pybind/pybind11">pybind11</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Python bindings</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html">Intel MKL</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Math Kernel Library</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html">Intel oneAPI</a> (*)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Intel oneAPI toolkit</p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
 <p>(*) The Intel <code>oneAPI</code> dependency is optional. This library is needed for the SYCL computation mode.
 Note that <code>oneAPI</code> includes the <code>icpx</code> compiler and the <code>MKL</code> library.</p>
@@ -2154,7 +2181,7 @@ the parameters <code>Θ</code>.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>map_timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A timer that can be used for timing different operations.
- Each operation is identified using a name, and for each name all timing results are stored.</p></td>
+Each operation is identified using a name, and for each name all timing results are stored.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>resumable_timer</code></p></td>
@@ -2240,7 +2267,8 @@ total time           = 8.3089</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The calls are numbered, to make it easy to compare different runs. Unsurprisingly, the timing output shows that the computation labeled <code>batchnorm4</code> takes the majority of time.</p>
+<p>The calls are numbered, to make it easy to compare different runs. Unsurprisingly, the timing output shows that the computation labeled <code>batchnorm4</code> takes the majority of time.
+:root: ../../</p>
 </div>
 </div>
 </div>
@@ -2520,7 +2548,8 @@ There is no support yet for storing a complete model, including its architecture
 <div class="sect2">
 <h3 id="_storing_datasets_and_weights">Storing datasets and weights</h3>
 <div class="paragraph">
-<p>The <code>mlp</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
+<p>The <code>mlp</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.
+:root: ../../</p>
 </div>
 </div>
 </div>
@@ -2648,7 +2677,8 @@ time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41</pre>
 </div>
 <div class="paragraph">
 <p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the <em>Nerva-Rowwise C++ Library</em> different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
-In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.</p>
+In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.
+:root: ../../</p>
 </div>
 </div>
 </div>
@@ -2680,8 +2710,8 @@ This matrix representation stores arrays of column and row indices to define the
 <h3 id="_sparse_initialization">Sparse initialization</h3>
 <div class="paragraph">
 <p>In SET, the sparsity is not divided evenly over the sparse layers. Instead, small layers are assigned a higher density than larger ones.
- In <span class="citation">[<a href="#DBLP_journals_nca_LiuMMPP21">6</a>]</span> formula (3), <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model">Erdős–Rényi graph topology</a>
- is suggested to calculate the densities of the sparse layers given a desired overall density of the sparse layers combined.
+In <span class="citation">[<a href="#DBLP_journals_nca_LiuMMPP21">6</a>]</span> formula (3), <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model">Erdős–Rényi graph topology</a>
+is suggested to calculate the densities of the sparse layers given a desired overall density of the sparse layers combined.
 In the <em>Nerva-Rowwise C++ Library</em> this is implemented in the function <code>compute_sparse_layer_densities</code>, see <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/layer_algorithms.h">layer_algorithms.h</a></code>. The original Python implementation can be found
 <a href="https://github.com/VITA-Group/Random_Pruning/blob/871077f1d10f9bc44941b093fd5ccbc4ec3984fa/CIFAR/sparselearning/core.py#L155">here</a>, along with several other sparse initialization strategies.
 In the tool <code>mlp</code> the option <code>--overall-density</code> is used for assigning Erdős–Rényi densities to the sparse layers. See <a href="#mlp_output">[mlp_output]</a> for an example of this. The overall density of <code>0.05</code> is converted into densities <code>[0.042382877, 0.06357384, 1.0]</code> for the individual layers.</p>
@@ -2904,7 +2934,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-21 09:08:22 UTC
+Last updated 2025-01-21 13:11:02 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

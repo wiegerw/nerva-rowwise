@@ -610,8 +610,24 @@ pre.rouge .gs {
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document describes the implementation of the <em>Nerva-Rowwise Python Library</em>. This library features a Python module named <code>nerva</code>, that is built using Python bindings to the
-<a href="https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html">Nerva-Rowwise C++ Library</a>. Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>, to ensure an easy integration with PyTorch.</p>
+<p>The <em>Nerva-Rowwise Python Library</em> is a library for neural networks.
+It is part of the Nerva library collection <a href="https://github.com/wiegerw/nerva" class="bare">https://github.com/wiegerw/nerva</a>, that includes
+native C++ and Python implementations of neural networks. Originally the library was intended
+for experimenting with truly sparse neural networks. Nowadays, the library
+also aims to provide a transparent and accessible implementation of neural networks.</p>
+</div>
+<div class="paragraph">
+<p>This document describes the implementation of the <em>Nerva-Rowwise Python Library</em>. For initial versions
+of the library I took inspiration from lecture notes of
+<a href="https://www.cs.toronto.edu/~rgrosse/teaching.html">machine learning courses by Roger Grosse</a>, which I highly recommend.
+This influence may still be evident in the naming of symbols.</p>
+</div>
+<div class="paragraph">
+<p>This library features a Python module named <code>nerva</code>, that is built using Python bindings to the
+<a href="https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html">Nerva-Rowwise C++ Library</a>.
+Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>, to ensure
+an easy integration with PyTorch.
+:root: ../../</p>
 </div>
 </div>
 </div>
@@ -648,7 +664,7 @@ pre.rouge .gs {
 </div>
 <div class="paragraph">
 <p>An alternative solution is to use CMake to resolve these three dependencies, see also the
-<a href="nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded automatically in the <code>_deps</code> subdirectory of the CMake build directory. After that it is sufficient to set the environment variable <code>CMAKE_DEPS_DIR</code>.</p>
+<a href="{root}//home/runner/work/nerva-rowwise/nerva-rowwise/doc/nerva-python.adoc/nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded automatically in the <code>_deps</code> subdirectory of the CMake build directory. After that it is sufficient to set the environment variable <code>CMAKE_DEPS_DIR</code>.</p>
 </div>
 <div id="pip-install" class="paragraph">
 <p>The <code>nerva</code> Python module can then be installed using</p>
@@ -1207,7 +1223,8 @@ The precision used for printing matrix elements.</p>
 </li>
 <li>
 <p><code>--edgeitems &lt;value&gt;</code>
-The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.</p>
+The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.
+:root: ../../</p>
 </li>
 </ul>
 </div>
@@ -1737,7 +1754,7 @@ There is no support yet for storing a complete model, including its architecture
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise Python Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
-<a href="nerva-cpp.adoc#extending">Extending the library</a> of the C&#43;&#43; manual.
+<a href="../..//doc/nerva-cpp.adoc#extending">Extending the library</a> of the C&#43;&#43; manual.
 After adding these components to C&#43;&#43;, they can be integrated in the <code>nerva</code> Python module.</p>
 </div>
 <div class="sect2">
@@ -1793,7 +1810,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-01-21 09:08:22 UTC
+Last updated 2025-01-21 13:11:02 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
