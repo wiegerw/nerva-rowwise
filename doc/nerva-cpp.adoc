@@ -54,12 +54,27 @@ Note that `oneAPI` includes the `icpx` compiler and the `MKL` library.
 === Environment variables
 The following environment variables may have to be set:
 
-- `ONEAPI_ROOT`: Path to the OneAPI installation directory.
-- `MKL_DIR`: Path to the MKL installation directory.
-- `MKL_NUM_THREADS`: Controls the number of threads used at runtime by the MKL library.
-- `OMP_NUM_THREADS`: Controls the number of threads used at runtime by the OMP library.
-- `NERVA_ENABLE_SYCL`: Set this variable to enable the SYCL computation mode.
-- `NERVA_USE_DOUBLE`: Set this variable to use double instead of single precision in the computations.
+|===
+|Environment variable |Description
+
+|`ONEAPI_ROOT`
+|Path to the OneAPI installation directory.
+
+|`MKL_DIR`
+|Path to the MKL installation directory.
+
+|`MKL_NUM_THREADS`
+|Controls the number of threads used at runtime by the MKL library.
+
+|`OMP_NUM_THREADS`
+|Controls the number of threads used at runtime by the OMP library.
+
+|`NERVA_ENABLE_SYCL`
+|Enable the SYCL computation mode.
+
+|`NERVA_USE_DOUBLE`
+|Use double instead of single precision in the computations.
+|===
 
 Note that CMake seems to require setting the `MKL_DIR` variable, even if the `MKL`
 library is found in the `ONEAPI_ROOT` directory.
@@ -132,6 +147,57 @@ If you're using the Clang or ICX (Intel's `icpx`) compilers, be aware of a longs
 - https://gitlab.com/libeigen/eigen/-/issues/2586[Eigen Issue Tracker (Issue 2586)].
 
 To work around this issue in Nerva, the symbol `EIGEN_COLPIVOTINGHOUSEHOLDERQR_LAPACKE_H` has been defined. This prevents the inclusion of the problematic header file and resolves the compatibility issue.
+
+=== Installation using B2
+The {library} can also be built using the B2 build system.
+
+The following environment variables must be set:
+
+|===
+|Environment variable |Description
+
+|`ONEAPI_ROOT`
+|Path to the OneAPI installation directory.
+
+|`DOCTEST_INCLUDE_DIR`
+|Path to the doctest include directory.
+
+|`EIGEN_INCLUDE_DIR`
+|Path to the Eigen include directory.
+
+|`FMT_INCLUDE_DIR`
+|Path to the FMT include directory.
+
+|`LYRA_INCLUDE_DIR`
+|Path to the Lyra include directory.
+
+|`PYBIND11_INCLUDE_DIR`
+|Path to the pybind11 include directory.
+
+|===
+
+NOTE: The Python include directory is currently hard coded to `/usr/include/python3.12`
+in the file
+`link:https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/Jamroot[Jamroot]`
+This may have to be changed to the correct location on your system.
+
+==== Building the tools
+The tools can be installed with a command like this, assuming that the `g++-14` compiler has been configured.
+[source]
+----
+cd tools
+b2 gcc-14 link=static release -j8
+----
+
+This will install the tools in the directory `install/bin`.
+
+==== Running the tests
+The unit tests can be run with a command like this:
+[source]
+----
+cd tests
+b2 gcc-14 link=static release -j8
+----
 
 == Command line tools
 The following command line tools are available. They can be found in the `tools` directory.
