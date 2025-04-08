@@ -1,4 +1,4 @@
-name: Copy Docs to Nerva Python repositories
+name: Copy Docs to nerva-[jax/numpy/tensorflow/torch] repositories
 
 on:
   schedule:
