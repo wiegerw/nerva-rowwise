@@ -1,0 +1,56 @@
+name: Copy Docs to nerva-[jax/numpy/tensorflow/torch] repositories
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout nerva-rowwise
+        uses: actions/checkout@v3
+
+      - name: Copy files to nerva-jax
+        run: |
+          git clone https://github.com/wiegerw/nerva-jax.git
+          cp -r doc/include/* nerva-jax/doc/include/
+          cd nerva-jax
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add doc/include/*
+          git commit -m "Update docs from nerva-rowwise" || echo "No changes to commit"
+          git push
+
+      - name: Copy files to nerva-numpy
+        run: |
+          git clone https://github.com/wiegerw/nerva-numpy.git
+          cp -r doc/include/* nerva-numpy/doc/include/
+          cd nerva-numpy
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add doc/include/*
+          git commit -m "Update docs from nerva-rowwise" || echo "No changes to commit"
+          git push
+
+      - name: Copy files to nerva-torch
+        run: |
+          git clone https://github.com/wiegerw/nerva-torch.git
+          cp -r doc/include/* nerva-torch/doc/include/
+          cd nerva-torch
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add doc/include/*
+          git commit -m "Update docs from nerva-rowwise" || echo "No changes to commit"
+          git push
+
+      - name: Copy files to nerva-tensorflow
+        run: |
+          git clone https://github.com/wiegerw/nerva-tensorflow.git
+          cp -r doc/include/* nerva-tensorflow/doc/include/
+          cd nerva-tensorflow
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add doc/include/*
+          git commit -m "Update docs from nerva-rowwise" || echo "No changes to commit"
+          git push
+
