@@ -59,10 +59,14 @@ else:
     MKL_ROOT = os.getenv('MKL_ROOT')
 if not MKL_ROOT:
     raise RuntimeError('Could not detect the MKL library. Please set the ONEAPI_ROOT or the MKL_ROOT environment variable')
+print(f'MKL_ROOT = {MKL_ROOT}')
 if sys.platform.startswith("win") and not ONEAPI_ROOT:
     raise RuntimeError('Could not detect the oneAPI library. Please set the ONEAPI_ROOT environment variable')
+if not Path(MKL_ROOT).exists():
+    raise RuntimeError('The folder MKL_ROOT does not exist.')
 MKL_INCLUDE_DIR = f'{MKL_ROOT}/include'
 MKL_LIB_DIR = f'{MKL_ROOT}/lib'
+
 
 define_macros += [('EIGEN_USE_MKL_ALL', 1)]
 include_dirs += [EIGEN_INCLUDE_DIR, FMT_INCLUDE_DIR, MKL_INCLUDE_DIR, PYBIND11_INCLUDE_DIR]
