@@ -17,10 +17,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Cache TeX Live
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/texlive
+          key: ${{ runner.os }}-texlive-${{ hashFiles('**/texlive-version.txt') }}  # Use a version file to create a unique key
+          restore-keys: |
+            ${{ runner.os }}-texlive-
+
       - name: Set up TeX Live
         run: |
-          sudo apt-get update
-          sudo apt-get install -y texlive texlive-latex-extra texlive-fonts-recommended texlive-xetex texlive-science
+          if [ ! -d "/usr/local/texlive" ]; then
+            echo "Installing TeX Live..."
+            sudo apt-get update
+            sudo apt-get install -y wget
+            wget -qO- http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz | tar xz
+            cd install-tl-*
+            echo "selected_scheme scheme-full" > texlive.profile
+            echo "TEXLIVE_INSTALL_PREFIX=/usr/local/texlive" >> texlive.profile
+            echo "TEXLIVE_VERSION=2023" >> texlive.profile  # Specify the version you want
+            echo "selected_scheme scheme-full" >> texlive.profile
+            echo "option_install_default_packages 0" >> texlive.profile  # Prevent default packages from being installed
+            echo "option_install_packages texlive,texlive-latex-extra,texlive-fonts-recommended,texlive-xetex,texlive-science" >> texlive.profile
+            ./install-tl --profile=texlive.profile
+          else
+            echo "TeX Live is already installed."
+          fi
 
       - name: Compile LaTeX
         run: |
@@ -38,3 +60,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./output_directory
           destination_dir: pdf
+
