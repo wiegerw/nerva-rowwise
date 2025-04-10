@@ -93,8 +93,13 @@ else:
                         '-lm',
                         '-ldl',
                        ]
+    # for the libiomp5 dependency
     if ONEAPI_ROOT:
-        extra_link_args.append(f'-L{ONEAPI_ROOT}/compiler/latest/lib')  # for the libiomp5 dependency
+        lib_dir = os.path.join(ONEAPI_ROOT, "compiler/latest/lib")
+        extra_link_args += [
+            f'-L{lib_dir}',
+            f'-Wl,-rpath,{lib_dir}'
+        ]
 
 # We need to use absolute paths, since the src folder is in the parent directory.
 current_dir = os.path.abspath(os.path.dirname(__file__))
