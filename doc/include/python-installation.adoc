@@ -18,10 +18,9 @@ An alternative solution is to use CMake to resolve these three dependencies, see
 link:{root}/{docfile}/nerva-cpp.adoc#cmake-build[CMake install] section in the C++ documentation. The `cmake` command causes the three libraries to be downloaded automatically in the `_deps` subdirectory of the CMake build directory. After that it is sufficient to set the environment variable `CMAKE_DEPS_DIR`.
 
 [[pip-install]]
-The `nerva` Python module can then be installed using
-[source]
+To install the Python module, run the following command from the `python` directory of the repository:
+
+[source,sh]
 ----
-cd python
 pip install .
 ----
-

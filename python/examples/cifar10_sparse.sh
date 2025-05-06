@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # tag::doc[]
-../install/bin/mlp \
+python ../tools/mlp.py \
     --layers="ReLU;ReLU;Linear" \
     --layer-sizes="3072;1024;1024;10" \
     --layer-weights=Xavier \
@@ -12,6 +12,6 @@
     --batch-size=100 \
     --threads=12 \
     --overall-density=0.05 \
-    --dataset=../data/cifar10-flattened.npz \
+    --dataset=../../data/cifar10-flattened.npz \
     --seed=123
 # end::doc[]

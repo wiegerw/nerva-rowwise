@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # tag::doc[]
-python ../python/tools/mlp.py \
+python ../tools/mlp.py \
     --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="784;1024;512;10" \
+    --layer-sizes="3072;1024;1024;10" \
     --layer-weights=Xavier \
-    --optimizers="Momentum(0.9);Momentum(0.9);Momentum(0.9)" \
+    --optimizers="Nesterov(0.9)" \
     --loss=SoftmaxCrossEntropy \
     --learning-rate=0.01 \
     --epochs=100 \
     --batch-size=100 \
     --threads=12 \
-    --cifar10=../data \
+    --dataset=../../data/cifar10-flattened.npz \
     --seed=123
 # end::doc[]

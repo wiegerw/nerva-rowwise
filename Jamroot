@@ -73,7 +73,7 @@ project nerva
        <toolset>gcc:<linkflags>-lm
        <toolset>gcc:<linkflags>-ldl
        <toolset>gcc:<linkflags>-Wl,-rpath,$(MKL_ROOT)/lib
-       <toolset>gcc:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/latest/lib
+       <toolset>gcc:<linkflags>-Wl,-rpath,$(ONEAPI_ROOT)/compiler/latest/lib
 
        # clang
        <toolset>clang:<cxxflags>-m64

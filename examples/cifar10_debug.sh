@@ -12,7 +12,7 @@
     --batch-size=100 \
     --threads=12 \
     --overall-density=0.05 \
-    --cifar10=../data \
+    --dataset=../data/cifar10-flattened.npz \
     --seed=123 \
     --debug
 # end::doc[]

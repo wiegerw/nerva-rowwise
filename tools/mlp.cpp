@@ -378,6 +378,7 @@ class mlp_tool: public command_line_tool
       cli |= lyra::opt(options.mnist, "value")["--mnist"]("The directory of the MNIST dataset");
       cli |= lyra::opt(options.dataset, "value")["--generate-dataset"]("Use a generated dataset (checkerboard, mini)");
       cli |= lyra::opt(options.dataset_size, "value")["--dataset-size"]("The size of the dataset (default: 1000)");
+      cli |= lyra::opt(load_dataset_file, "value")["--dataset"]("Loads the dataset from a file in .npz format");
       cli |= lyra::opt(load_dataset_file, "value")["--load-dataset"]("Loads the dataset from a file in .npz format");
       cli |= lyra::opt(save_dataset_file, "value")["--save-dataset"]("Saves the dataset to a file in .npz format");
       cli |= lyra::opt(options.normalize_data)["--normalize"]("Normalize the data");

@@ -12,6 +12,6 @@
     --batch-size=100 \
     --threads=12 \
     --overall-density=0.05 \
-    --mnist=../data \
+    --dataset=../data/mnist-flattened.npz \
     --seed=123
 # end::doc[]

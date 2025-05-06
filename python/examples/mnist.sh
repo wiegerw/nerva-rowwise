@@ -1,17 +1,16 @@
 #!/bin/bash
 
 # tag::doc[]
-../install/bin/mlp \
+python ../tools/mlp.py \
     --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072;1024;1024;10" \
+    --layer-sizes="784;1024;512;10" \
     --layer-weights=Xavier \
-    --optimizers="Nesterov(0.9)" \
+    --optimizers="Momentum(0.9);Momentum(0.9);Momentum(0.9)" \
     --loss=SoftmaxCrossEntropy \
     --learning-rate=0.01 \
     --epochs=100 \
     --batch-size=100 \
     --threads=12 \
-    --overall-density=0.05 \
-    --dataset=../data/cifar10-flattened.npz \
+    --dataset=../../data/mnist-flattened.npz \
     --seed=123
 # end::doc[]

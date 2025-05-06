@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # tag::doc[]
-../install/bin/mlp \
+python ../tools/mlp.py \
     --layers="ReLU;ReLU;Linear" \
     --layer-sizes="784;1024;512;10" \
     --layer-weights=Xavier \
@@ -11,6 +11,7 @@
     --epochs=100 \
     --batch-size=100 \
     --threads=12 \
-    --mnist=../data \
+    --overall-density=0.05 \
+    --dataset=../../data/mnist-flattened.npz \
     --seed=123
 # end::doc[]
