@@ -66,6 +66,7 @@ project nerva
        <toolset>gcc:<cxxflags>-Wno-enum-compare
 
        <toolset>gcc:<linkflags>-L$(MKL_LIB_DIR)
+       <toolset>gcc:<linkflags>-L$(ONEAPI_ROOT)/compiler/latest/lib
        <toolset>gcc:<linkflags>"-Wl,--start-group -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group"
        <toolset>gcc:<linkflags>-liomp5
        <toolset>gcc:<linkflags>-lpthread
