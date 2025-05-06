@@ -671,12 +671,11 @@ an easy integration with PyTorch.
 <a href="{root}//home/runner/work/nerva-rowwise/nerva-rowwise/doc/nerva-python.adoc/nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded automatically in the <code>_deps</code> subdirectory of the CMake build directory. After that it is sufficient to set the environment variable <code>CMAKE_DEPS_DIR</code>.</p>
 </div>
 <div id="pip-install" class="paragraph">
-<p>The <code>nerva</code> Python module can then be installed using</p>
+<p>To install the Python module, run the following command from the <code>python</code> directory of the repository:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>cd python
-pip install .</code></pre>
+<pre class="rouge highlight"><code data-lang="sh">pip <span class="nb">install</span> .</code></pre>
 </div>
 </div>
 </div>
@@ -695,19 +694,7 @@ pip install .</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>python ../python/tools/mlp.py \
-    --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072;1024;1024;10" \
-    --layer-weights=Xavier \
-    --optimizers="Nesterov(0.9)" \
-    --loss=SoftmaxCrossEntropy \
-    --learning-rate=0.01 \
-    --epochs=100 \
-    --batch-size=100 \
-    --threads=12 \
-    --overall-density=0.05 \
-    --cifar10=../data \
-    --seed=123</code></pre>
+<pre class="rouge highlight"><code>Unresolved directive in include/python-command-line-tools.adoc - include::../..//examples/cifar10_sparse_python.sh[tag=doc]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1821,7 +1808,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-06 15:37:15 UTC
+Last updated 2025-05-06 15:54:13 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
