@@ -566,53 +566,65 @@ pre.rouge .gs {
 <div id="toc" class="toc2">
 <div id="toctitle"><h3>Contents</h3></div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_installation">Installation</a>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_installation">2. Installation</a>
 <ul class="sectlevel2">
-<li><a href="#_dependencies">Dependencies</a></li>
-<li><a href="#_environment_variables">Environment variables</a></li>
-<li><a href="#_installation_using_cmake">Installation using CMake</a></li>
-<li><a href="#_installation_using_b2">Installation using B2</a></li>
+<li><a href="#_dependencies">2.1. Dependencies</a></li>
+<li><a href="#_environment_variables">2.2. Environment variables</a></li>
+<li><a href="#_installation_using_cmake">2.3. Installation using CMake</a></li>
+<li><a href="#_installation_using_b2">2.4. Installation using B2</a></li>
 </ul>
 </li>
-<li><a href="#_command_line_tools">Command line tools</a>
+<li><a href="#_command_line_tools">3. Command line tools</a>
 <ul class="sectlevel2">
-<li><a href="#_the_tool_mlp">The tool mlp</a></li>
-<li><a href="#_the_tool_mkl">The tool mkl</a></li>
-<li><a href="#_the_tool_inspect_npz">The tool inspect_npz</a></li>
+<li><a href="#_the_tool_mlp">3.1. The tool mlp</a></li>
+<li><a href="#_the_tool_mkl">3.2. The tool mkl</a></li>
+<li><a href="#_the_tool_inspect_npz">3.3. The tool inspect_npz</a></li>
 </ul>
 </li>
-<li><a href="#_overview_of_the_code">Overview of the code</a>
+<li><a href="#_overview_of_the_code">4. Overview of the code</a>
 <ul class="sectlevel2">
-<li><a href="#_number_type">Number type</a></li>
-<li><a href="#_header_files">Header files</a></li>
-<li><a href="#_classes">Classes</a></li>
-<li><a href="#_training_a_neural_network">Training a neural network</a></li>
-<li><a href="#_timers">Timers</a></li>
-<li><a href="#_eigen_library">Eigen library</a></li>
-<li><a href="#_mkl_library">MKL library</a></li>
+<li><a href="#_number_type">4.1. Number type</a></li>
+<li><a href="#_header_files">4.2. Header files</a></li>
+<li><a href="#_classes">4.3. Classes</a></li>
+<li><a href="#_training_a_neural_network">4.4. Training a neural network</a></li>
+<li><a href="#_timers">4.5. Timers</a></li>
 </ul>
 </li>
-<li><a href="#io">I/O</a>
+<li><a href="#_matrix_operations">5. Matrix operations</a>
 <ul class="sectlevel2">
-<li><a href="#_npz_format">NPZ format</a></li>
-<li><a href="#preparing-data">Preparing data</a></li>
-<li><a href="#_storing_datasets_and_weights">Storing datasets and weights</a></li>
-<li><a href="#_mini_batches">Mini-batches</a></li>
-<li><a href="#_matrix_products">Matrix products</a></li>
-<li><a href="#_nerva_computation_mode">Nerva computation mode</a></li>
-<li><a href="#_subnormal_numbers">Subnormal numbers</a></li>
-<li><a href="#_sparse_matrices">Sparse matrices</a></li>
-<li><a href="#_sparse_evolutionary_training">Sparse evolutionary training</a></li>
-<li><a href="#_sparse_initialization">Sparse initialization</a></li>
-<li><a href="#_pruning_weights">Pruning weights</a></li>
-<li><a href="#_growing_weights">Growing weights</a></li>
-<li><a href="#_classes_for_pruning_and_growing">Classes for pruning and growing</a></li>
-<li><a href="#_experiments_with_sparse_training">Experiments with sparse training</a></li>
+<li><a href="#_eigen_library">5.1. Eigen library</a></li>
+<li><a href="#_mkl_library">5.2. MKL library</a></li>
 </ul>
 </li>
-<li><a href="#extending">Extending the library</a></li>
-<li><a href="#_references">References</a></li>
+<li><a href="#io">6. I/O</a>
+<ul class="sectlevel2">
+<li><a href="#_npz_format">6.1. NPZ format</a></li>
+<li><a href="#preparing-data">6.2. Preparing data</a></li>
+<li><a href="#_storing_datasets_and_weights">6.3. Storing datasets and weights</a></li>
+</ul>
+</li>
+<li><a href="#_performance">7. Performance</a>
+<ul class="sectlevel2">
+<li><a href="#_mini_batches">7.1. Mini-batches</a></li>
+<li><a href="#_matrix_products">7.2. Matrix products</a></li>
+<li><a href="#_nerva_computation_mode">7.3. Nerva computation mode</a></li>
+<li><a href="#_subnormal_numbers">7.4. Subnormal numbers</a></li>
+</ul>
+</li>
+<li><a href="#_sparse_neural_networks">8. Sparse neural networks</a>
+<ul class="sectlevel2">
+<li><a href="#_sparse_matrices">8.1. Sparse matrices</a></li>
+<li><a href="#_sparse_evolutionary_training">8.2. Sparse evolutionary training</a></li>
+<li><a href="#_sparse_initialization">8.3. Sparse initialization</a></li>
+<li><a href="#_pruning_weights">8.4. Pruning weights</a></li>
+<li><a href="#_growing_weights">8.5. Growing weights</a></li>
+<li><a href="#_classes_for_pruning_and_growing">8.6. Classes for pruning and growing</a></li>
+<li><a href="#_experiments_with_sparse_training">8.7. Experiments with sparse training</a></li>
+</ul>
+</li>
+<li><a href="#extending">9. Extending the library</a></li>
+<li><a href="#_references">10. References</a></li>
 </ul>
 </div>
 </div>
@@ -627,7 +639,7 @@ pre.rouge .gs {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">Introduction</h2>
+<h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> is a library for neural networks.
@@ -645,7 +657,7 @@ This influence may still be evident in the naming of symbols.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_installation">Installation</h2>
+<h2 id="_installation">2. Installation</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The following build systems are supported for building the <em>Nerva-Rowwise C++ Library</em>:</p>
@@ -661,7 +673,7 @@ This influence may still be evident in the naming of symbols.</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_dependencies">Dependencies</h3>
+<h3 id="_dependencies">2.1. Dependencies</h3>
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> has the following dependencies:</p>
 </div>
@@ -712,7 +724,7 @@ This influence may still be evident in the naming of symbols.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_environment_variables">Environment variables</h3>
+<h3 id="_environment_variables">2.2. Environment variables</h3>
 <div class="paragraph">
 <p>The following environment variables may have to be set:</p>
 </div>
@@ -777,13 +789,13 @@ This script does not set the <code>MKL_DIR</code> variable, so you may have to s
 </div>
 </div>
 <div class="sect2">
-<h3 id="_installation_using_cmake">Installation using CMake</h3>
+<h3 id="_installation_using_cmake">2.3. Installation using CMake</h3>
 <div class="paragraph">
 <p>Using CMake, the <em>Nerva-Rowwise C++ Library</em> can be built in a standard way.
 Note that dependencies for <code>doctest</code>, <code>Eigen</code>, <code>FMT</code>, <code>Lyra</code>, and <code>pybind11</code> are automatically managed using the <code>FetchContent</code> commands in the build process.</p>
 </div>
 <div class="sect3">
-<h4 id="_linux_cmake_install">Linux CMake install</h4>
+<h4 id="_linux_cmake_install">2.3.1. Linux CMake install</h4>
 <div class="paragraph">
 <p>On Linux, you can build and install the library with a command like this:</p>
 </div>
@@ -801,7 +813,7 @@ make <span class="nb">install</span></code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_windows_cmake_install">Windows CMake install</h4>
+<h4 id="_windows_cmake_install">2.3.2. Windows CMake install</h4>
 <div class="paragraph">
 <p>On Windows, a Visual Studio command line build can be done like this:</p>
 </div>
@@ -818,7 +830,7 @@ nmake install</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_sycl_matrix_operations">SYCL matrix operations</h4>
+<h4 id="_sycl_matrix_operations">2.3.3. SYCL matrix operations</h4>
 <div class="paragraph">
 <p>There is an experimental computation mode for SYCL matrix operations, that can be enabled in the <code>mlp</code> tool using the flag <code>--computation=sycl</code>. This is only supported on Linux in combination with the Intel <code>icpx</code> compiler. It can be enabled using the following build command:</p>
 </div>
@@ -847,7 +859,7 @@ The initial tests with SYCL matrix operations on CPU have a rather disappointing
 </div>
 </div>
 <div class="sect3">
-<h4 id="_unit_tests">Unit tests</h4>
+<h4 id="_unit_tests">2.3.4. Unit tests</h4>
 <div class="paragraph">
 <p>The unit tests can be run using the command</p>
 </div>
@@ -858,7 +870,7 @@ The initial tests with SYCL matrix operations on CPU have a rather disappointing
 </div>
 </div>
 <div class="sect3">
-<h4 id="_icpx_clang_compilers">icpx + clang compilers</h4>
+<h4 id="_icpx_clang_compilers">2.3.5. icpx + clang compilers</h4>
 <div class="paragraph">
 <p>If you&#8217;re using the Clang or ICX (Intel&#8217;s <code>icpx</code>) compilers, be aware of a longstanding issue between MKL and Eigen. More information is available in the following discussions:</p>
 </div>
@@ -878,7 +890,7 @@ The initial tests with SYCL matrix operations on CPU have a rather disappointing
 </div>
 </div>
 <div class="sect2">
-<h3 id="_installation_using_b2">Installation using B2</h3>
+<h3 id="_installation_using_b2">2.4. Installation using B2</h3>
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> can also be built using the B2 build system.</p>
 </div>
@@ -939,7 +951,7 @@ This may have to be changed to the correct location on your system.
 </table>
 </div>
 <div class="sect3">
-<h4 id="_building_the_tools">Building the tools</h4>
+<h4 id="_building_the_tools">2.4.1. Building the tools</h4>
 <div class="paragraph">
 <p>The tools can be installed with a command like this, assuming that the <code>g++-14</code> compiler has been configured.</p>
 </div>
@@ -954,7 +966,7 @@ b2 gcc-14 link=static release -j8</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_running_the_tests">Running the tests</h4>
+<h4 id="_running_the_tests">2.4.2. Running the tests</h4>
 <div class="paragraph">
 <p>The unit tests can be run with a command like this:</p>
 </div>
@@ -969,7 +981,7 @@ b2 gcc-14 link=static release -j8</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_command_line_tools">Command line tools</h2>
+<h2 id="_command_line_tools">3. Command line tools</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The following command line tools are available. They can be found in the <code>tools</code> directory.</p>
@@ -1001,7 +1013,7 @@ b2 gcc-14 link=static release -j8</code></pre>
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_the_tool_mlp">The tool mlp</h3>
+<h3 id="_the_tool_mlp">3.1. The tool mlp</h3>
 <div class="paragraph">
 <p>The tool <code>mlp</code> can be used for training multilayer perceptrons. An example invocation of the <code>mlp</code> tool is</p>
 </div>
@@ -1047,7 +1059,7 @@ epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test acc
 </div>
 </div>
 <div class="sect3">
-<h4 id="mlp_tool">mlp command line options</h4>
+<h4 id="mlp_tool">3.1.1. mlp command line options</h4>
 <div class="paragraph">
 <p>This section gives an overview of the command line interface of the <code>mlp</code> tool.</p>
 </div>
@@ -1639,7 +1651,7 @@ The edgeitems used for printing matrices. This sets the number of border rows an
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_tool_mkl">The tool mkl</h3>
+<h3 id="_the_tool_mkl">3.2. The tool mkl</h3>
 <div class="paragraph">
 <p>The tool <code>mkl</code> is used for benchmarking sparse and dense matrix products. An example of running the <code>mkl</code> tool is</p>
 </div>
@@ -1687,7 +1699,7 @@ density(A) = 0.5
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_tool_inspect_npz">The tool inspect_npz</h3>
+<h3 id="_the_tool_inspect_npz">3.3. The tool inspect_npz</h3>
 <div class="paragraph">
 <p>The tool <code>inspect_npz</code> is a simple tool to show the contents of a file in NumPy NPZ format. The tool <code>mlp</code> uses this format to load and save datasets, and to load and save weight matrices + bias vectors of linear layers. The output may look like this:</p>
 </div>
@@ -1729,14 +1741,14 @@ b3= (10)
 </div>
 </div>
 <div class="sect1">
-<h2 id="_overview_of_the_code">Overview of the code</h2>
+<h2 id="_overview_of_the_code">4. Overview of the code</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section gives an overview of the C++ code in the
 <em>Nerva-Rowwise C++ Library</em>, and some information that is needed for understanding the code.</p>
 </div>
 <div class="sect2">
-<h3 id="_number_type">Number type</h3>
+<h3 id="_number_type">4.1. Number type</h3>
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> uses a type called <code>scalar</code> as its number type. By default, it is defined as a 32-bit float. It is possible to change this by defining the symbol <code>NERVA_USE_DOUBLE</code>, in which case 64 bit doubles are used. The corresponding code is</p>
 </div>
@@ -1754,7 +1766,7 @@ b3= (10)
 </div>
 </div>
 <div class="sect2">
-<h3 id="_header_files">Header files</h3>
+<h3 id="_header_files">4.2. Header files</h3>
 <div class="paragraph">
 <p>The most important header files in are given in the table below.</p>
 </div>
@@ -1814,9 +1826,9 @@ b3= (10)
 </table>
 </div>
 <div class="sect2">
-<h3 id="_classes">Classes</h3>
+<h3 id="_classes">4.3. Classes</h3>
 <div class="sect3">
-<h4 id="_class_multilayer_perceptron">Class multilayer_perceptron</h4>
+<h4 id="_class_multilayer_perceptron">4.3.1. Class multilayer_perceptron</h4>
 <div class="paragraph">
 <p>A multilayer perceptron (MLP) is modeled using the class <code>multilayer_perceptron</code>. It contains a list of layers, and has member functions <code>feedforward</code>, <code>backpropagate</code> and <code>optimize</code> that can be used for training the neural network. Constructing an MLP can be done manually, as is illustrated in the tests:</p>
 </div>
@@ -1891,7 +1903,7 @@ b3= (10)
 </div>
 </div>
 <div class="sect3">
-<h4 id="_class_neural_network_layer">Class neural_network_layer</h4>
+<h4 id="_class_neural_network_layer">4.3.2. Class neural_network_layer</h4>
 <div class="paragraph">
 <p>The class <code>neural_network_layer</code> is the base class of all neural network layers. It has attributes for the input matrix <code>X</code> and the corresponding gradient <code>DX</code>. Usually a layer has some additional parameters that can be learned by training the neural network. The most important member functions of <code>neural_network_layer</code> are given below.</p>
 </div>
@@ -1911,7 +1923,7 @@ b3= (10)
 </div>
 </div>
 <div class="sect3">
-<h4 id="_class_loss_function">Class loss_function</h4>
+<h4 id="_class_loss_function">4.3.3. Class loss_function</h4>
 <div class="paragraph">
 <p>The class <code>loss_function</code> is the base class of all loss functions. Although a loss function is similar to a layer, the interface is different:</p>
 </div>
@@ -1951,7 +1963,7 @@ b3= (10)
 </div>
 </div>
 <div class="sect3">
-<h4 id="_activation_functions">Activation functions</h4>
+<h4 id="_activation_functions">4.3.4. Activation functions</h4>
 <div class="paragraph">
 <p>Currently, there is no common base class for activation functions. For example, the ReLU activation function is implemented like this:</p>
 </div>
@@ -1994,7 +2006,7 @@ interfaces of layers, loss functions and activation functions. This may be chang
 </div>
 </div>
 <div class="sect2">
-<h3 id="_training_a_neural_network">Training a neural network</h3>
+<h3 id="_training_a_neural_network">4.4. Training a neural network</h3>
 <div class="paragraph">
 <p>The class <code>stochastic_gradient_descent_algorithm</code> can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:</p>
 </div>
@@ -2162,7 +2174,7 @@ the parameters <code>Θ</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_timers">Timers</h3>
+<h3 id="_timers">4.5. Timers</h3>
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> has two timer classes, defined in the header file <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/utilities/timer.h">timer.h</a></code>:</p>
 </div>
@@ -2267,9 +2279,16 @@ total time           = 8.3089</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The calls are numbered, to make it easy to compare different runs. Unsurprisingly, the timing output shows that the computation labeled <code>batchnorm4</code> takes the majority of time.
-== Matrix operations
-The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.</p>
+<p>The calls are numbered, to make it easy to compare different runs. Unsurprisingly, the timing output shows that the computation labeled <code>batchnorm4</code> takes the majority of time.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_matrix_operations">5. Matrix operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.</p>
 </div>
 <table id="table_matrix_operations" class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. matrix operations</caption>
@@ -2452,15 +2471,14 @@ The most important part of the implementation of neural networks consists of mat
 <div class="paragraph">
 <p>See the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> for an overview of how these matrix operations are used.</p>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_eigen_library">Eigen library</h3>
+<h3 id="_eigen_library">5.1. Eigen library</h3>
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> uses the <a href="https://eigen.tuxfamily.org/">Eigen library</a> for representing matrices. The matrix operations in table <a href="#table_matrix_operations">matrix operations</a> have been implemented using Eigen, see the file <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h">matrix_operations.h</a>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mkl_library">MKL library</h3>
+<h3 id="_mkl_library">5.2. MKL library</h3>
 <div class="paragraph">
 <p>Using the Eigen library alone is not sufficient for obtaining high performance. Therefore, the <em>Nerva-Rowwise C++ Library</em> uses the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> as a backend. The Eigen library supports MKL by means of the compiler flag <code>EIGEN_USE_MKL_ALL</code>, see also <a href="https://eigen.tuxfamily.org/dox/TopicUsingIntelMKL.html">TopicUsingIntelMKL.html</a>.
 Note that the MKL library is included in the <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html">Intel oneAPI base toolkit</a>.</p>
@@ -2525,7 +2543,7 @@ The sparse CSR matrix functions in the MKL library take an argument of the opaqu
 </div>
 </div>
 <div class="sect1">
-<h2 id="io">I/O</h2>
+<h2 id="io">6. I/O</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> has support for reading and writing datasets and weights + biases of a model in NumPy NPZ format.
@@ -2533,22 +2551,22 @@ This format is used for portability between C++ and Python implementations.
 There is no support yet for storing a complete model, including its architecture.</p>
 </div>
 <div class="sect2">
-<h3 id="_npz_format">NPZ format</h3>
+<h3 id="_npz_format">6.1. NPZ format</h3>
 <div class="paragraph">
 <p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="preparing-data">Preparing data</h3>
+<h3 id="preparing-data">6.2. Preparing data</h3>
 <div class="paragraph">
 <p>The <code>mlp</code> tool requires training and testing data to be stored in <code>.npz</code> format.
 To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
 </div>
 <div class="paragraph">
-<p>The script is located at <code>data/prepare_data.py</code> and can be run from the command line.</p>
+<p>The script is located at <a href="../../data/prepare_data.py" class="bare">../../data/prepare_data.py</a> and can be run from the command line.</p>
 </div>
 <div class="sect3">
-<h4 id="_mnist">MNIST</h4>
+<h4 id="_mnist">6.2.1. MNIST</h4>
 <div class="paragraph">
 <p>To download and prepare the MNIST dataset, run:</p>
 </div>
@@ -2585,7 +2603,7 @@ To help with this, a script is provided to download and preprocess datasets comm
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cifar_10">CIFAR-10</h4>
+<h4 id="_cifar_10">6.2.2. CIFAR-10</h4>
 <div class="paragraph">
 <p>To download and prepare the CIFAR-10 dataset, run:</p>
 </div>
@@ -2628,13 +2646,13 @@ To help with this, a script is provided to download and preprocess datasets comm
 </div>
 </div>
 <div class="sect3">
-<h4 id="_reusing_existing_files">Reusing Existing Files</h4>
+<h4 id="_reusing_existing_files">6.2.3. Reusing Existing Files</h4>
 <div class="paragraph">
 <p>If the required <code>.npz</code> files already exist, the script will detect this and skip reprocessing. You can safely rerun the script without overwriting files.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_help">Help</h4>
+<h4 id="_help">6.2.4. Help</h4>
 <div class="paragraph">
 <p>For help with usage, run:</p>
 </div>
@@ -2649,15 +2667,21 @@ To help with this, a script is provided to download and preprocess datasets comm
 </div>
 </div>
 <div class="sect2">
-<h3 id="_storing_datasets_and_weights">Storing datasets and weights</h3>
+<h3 id="_storing_datasets_and_weights">6.3. Storing datasets and weights</h3>
 <div class="paragraph">
-<p>The <code>mlp</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.
-== Performance
-This section discusses various aspects that play a role for the performance of a neural network library.</p>
+<p>The <code>mlp</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_performance">7. Performance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section discusses various aspects that play a role for the performance of a neural network library.</p>
 </div>
 <div class="sect2">
-<h3 id="_mini_batches">Mini-batches</h3>
+<h3 id="_mini_batches">7.1. Mini-batches</h3>
 <div class="paragraph">
 <p>In textbooks and tutorials, the training of a neural network is usually explained in terms of individual examples. But in order to achieve high performance, it is absolutely necessary to use mini-batches. On <a href="https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Iterative_method">Wikipedia</a> this is explained as follows:</p>
 </div>
@@ -2673,13 +2697,13 @@ This section discusses various aspects that play a role for the performance of a
 </div>
 </div>
 <div class="sect2">
-<h3 id="_matrix_products">Matrix products</h3>
+<h3 id="_matrix_products">7.2. Matrix products</h3>
 <div class="paragraph">
 <p>The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the <a href="https://en.wikipedia.org/wiki/Math_Kernel_Library">Intel Math Kernel library (MKL)</a> is used. Currently, this dependency is hard coded, but there are plans to make this optional. To experiment with other implementations, like SYCL or BLAS, a global setting is used that is discussed in the next section.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_nerva_computation_mode">Nerva computation mode</h3>
+<h3 id="_nerva_computation_mode">7.3. Nerva computation mode</h3>
 <div class="paragraph">
 <p>In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The <em>Nerva-Rowwise C++ Library</em> uses a global setting <code>NervaComputation</code> to experiment with other implementations. For example, the function <code>softmax_layer::feedforward</code> contains this:</p>
 </div>
@@ -2715,7 +2739,7 @@ The command line tool <code>mlp</code> has an option <code>--computation</code> 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_subnormal_numbers">Subnormal numbers</h3>
+<h3 id="_subnormal_numbers">7.4. Subnormal numbers</h3>
 <div class="paragraph">
 <p>Experiments with sparse neural networks have shown that the performance can be negatively influenced by <a href="https://en.wikipedia.org/wiki/Subnormal_number">subnormal numbers</a>. The example program <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/examples/subnormal_numbers.cpp">subnormal_numbers.cpp</a></code> illustrates the problem. The table below is the result of the following experiment.
 The dot product of two large vectors of floating-point numbers is computed. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from <code>1</code> to <code>1e−45</code>. For values larger than <code>1e−35</code>, the time needed for this calculation is about <code>0.044</code> seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to <code>0.37</code> seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.</p>
@@ -2773,13 +2797,19 @@ time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41</pre>
 </div>
 <div class="paragraph">
 <p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the <em>Nerva-Rowwise C++ Library</em> different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
-In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.
-== Sparse neural networks
-Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_journals_corr_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The <em>Nerva-Rowwise C++ Library</em> supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_conf_icml_NikdanPIKA23">4</a>]</span>.</p>
+In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sparse_neural_networks">8. Sparse neural networks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_journals_corr_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The <em>Nerva-Rowwise C++ Library</em> supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_conf_icml_NikdanPIKA23">4</a>]</span>.</p>
 </div>
 <div class="sect2">
-<h3 id="_sparse_matrices">Sparse matrices</h3>
+<h3 id="_sparse_matrices">8.1. Sparse matrices</h3>
 <div class="paragraph">
 <p>Since we are dealing with a programming context, we say that the <em>support</em> of a sparse matrix refers to the set of positions (or indices) in the matrix that are explicitly stored. Elements inside the support can have a non-zero value. Elements outside the support have the value zero by definition.</p>
 </div>
@@ -2790,13 +2820,13 @@ This matrix representation stores arrays of column and row indices to define the
 </div>
 </div>
 <div class="sect2">
-<h3 id="_sparse_evolutionary_training">Sparse evolutionary training</h3>
+<h3 id="_sparse_evolutionary_training">8.2. Sparse evolutionary training</h3>
 <div class="paragraph">
 <p>Sparse evolutionary training (SET) is a method for efficiently training sparse neural networks, see e.g. <span class="citation">[<a href="#DBLP_journals_nca_LiuMMPP21">6</a>]</span>. The idea behind this method is to start the training with a random sparse topology, and to periodically prune and regrow some of the weights.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_sparse_initialization">Sparse initialization</h3>
+<h3 id="_sparse_initialization">8.3. Sparse initialization</h3>
 <div class="paragraph">
 <p>In SET, the sparsity is not divided evenly over the sparse layers. Instead, small layers are assigned a higher density than larger ones.
 In <span class="citation">[<a href="#DBLP_journals_nca_LiuMMPP21">6</a>]</span> formula (3), <a href="https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model">Erdős–Rényi graph topology</a>
@@ -2807,37 +2837,37 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 </div>
 </div>
 <div class="sect2">
-<h3 id="_pruning_weights">Pruning weights</h3>
+<h3 id="_pruning_weights">8.4. Pruning weights</h3>
 <div class="paragraph">
 <p>Pruning weights is about removing parameters from a neural network, see also <a href="https://en.wikipedia.org/wiki/Pruning_(artificial_neural_network)">Pruning (artificial_neural_network)</a>. In our context removing parameters is about removing elements from the support of a sparse weight matrix. The effect of this is that the values corresponding to these elements are zeroed.</p>
 </div>
 <div class="sect3">
-<h4 id="_threshold_pruning">Threshold pruning</h4>
+<h4 id="_threshold_pruning">8.4.1. Threshold pruning</h4>
 <div class="paragraph">
 <p>In threshold pruning, all weights \(w_{ij}\) with \(|w_{ij}| \leq t\) for a given threshold \(t\) are pruned from a weight matrix \(W\).</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_magnitude_based_pruning">Magnitude based pruning</h4>
+<h4 id="_magnitude_based_pruning">8.4.2. Magnitude based pruning</h4>
 <div class="paragraph">
 <p>Magnitude based pruning is special case of threshold pruning. In magnitude based pruning, the threshold \(t\) is computed such that for a given fraction \(\zeta\) of the weights we have \(|w_{ij}| \leq t\). To ensure that the desired fraction of weights is removed, our implementation takes into account that there can be multiple weights with
 \(|w_{ij}| = t\).</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_set_based_pruning">SET based pruning</h4>
+<h4 id="_set_based_pruning">8.4.3. SET based pruning</h4>
 <div class="paragraph">
 <p>In SET based pruning, magnitude pruning is applied to positive weights and negative weights separately. So a fraction \(\zeta\) of the positive weights and a fraction \(\zeta\) of the negative weights are pruned.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_growing_weights">Growing weights</h3>
+<h3 id="_growing_weights">8.5. Growing weights</h3>
 <div class="paragraph">
 <p>Growing weights is about adding parameters to a neural network. In our context adding parameters is about adding elements to the support of a sparse weight matrix.</p>
 </div>
 <div class="sect3">
-<h4 id="_random_growing">Random growing</h4>
+<h4 id="_random_growing">8.5.1. Random growing</h4>
 <div class="paragraph">
 <p>In random growing, a given number of elements is chosen randomly from the positions outside the support of a weight matrix. These new elements are then added to the support. Since the new elements need to be initialized, a weight initializer needs to be chosen to generate values for them.</p>
 </div>
@@ -2847,7 +2877,7 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 </div>
 </div>
 <div class="sect2">
-<h3 id="_classes_for_pruning_and_growing">Classes for pruning and growing</h3>
+<h3 id="_classes_for_pruning_and_growing">8.6. Classes for pruning and growing</h3>
 <div class="paragraph">
 <p>In the <em>Nerva-Rowwise C++ Library</em>, the classes <code>prune_function</code> and <code>grow_function</code> are used to represent generic pruning and growing strategies:</p>
 </div>
@@ -2880,7 +2910,7 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 </div>
 </div>
 <div class="sect2">
-<h3 id="_experiments_with_sparse_training">Experiments with sparse training</h3>
+<h3 id="_experiments_with_sparse_training">8.7. Experiments with sparse training</h3>
 <div class="paragraph">
 <p>In <span class="citation">[<a href="#wesselink2024nervatrulysparseimplementation">7</a>]</span> we report on some of our experiments with sparse neural networks.</p>
 </div>
@@ -2932,7 +2962,7 @@ pruning + growing 13332/66662 weights</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="extending">Extending the library</h2>
+<h2 id="extending">9. Extending the library</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers and pruning or growing functions. This can be done by inheriting from the appropriate base class and implementing the required virtual functions. The table below provides an overview:</p>
@@ -2989,7 +3019,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_references">References</h2>
+<h2 id="_references">10. References</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a id="DBLP_journals_jmlr_BaydinPRS17"></a>[1] A. G. Baydin, B. A. Pearlmutter, A. A. Radul, and J. M. Siskind, “Automatic Differentiation in Machine Learning: a Survey,” <em>J. Mach. Learn. Res.</em>, vol. 18, pp. 153:1–153:43, 2017, [Online]. Available: <a href="https://jmlr.org/papers/v18/17-468.html" class="bare">https://jmlr.org/papers/v18/17-468.html</a>.</p>
@@ -3023,7 +3053,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-12 15:02:30 UTC
+Last updated 2025-05-12 16:05:20 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

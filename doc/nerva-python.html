@@ -566,28 +566,41 @@ pre.rouge .gs {
 <div id="toc" class="toc2">
 <div id="toctitle"><h3>Contents</h3></div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_installation">2. Installation</a>
 <ul class="sectlevel2">
-<li><a href="#_requirements">Requirements</a></li>
-<li><a href="#_environment_variables">Environment Variables</a></li>
-<li><a href="#_alternative_cmake_dependency_resolution">Alternative: CMake Dependency Resolution</a></li>
-<li><a href="#_compiler_requirements">Compiler Requirements</a></li>
-<li><a href="#_python_compatibility">Python Compatibility</a></li>
-<li><a href="#_installing_the_python_module">Installing the Python Module</a></li>
-<li><a href="#_the_tool_mlp_py">The tool mlp.py</a></li>
-<li><a href="#_number_type">Number type</a></li>
-<li><a href="#_module_contents">Module contents</a></li>
-<li><a href="#_classes">Classes</a></li>
-<li><a href="#_accessing_c_data_structures">Accessing C++ data structures</a></li>
-<li><a href="#_training_a_neural_network">Training a neural network</a></li>
+<li><a href="#_requirements">2.1. Requirements</a></li>
+<li><a href="#_environment_variables">2.2. Environment Variables</a></li>
+<li><a href="#_alternative_cmake_dependency_resolution">2.3. Alternative: CMake Dependency Resolution</a></li>
+<li><a href="#_compiler_requirements">2.4. Compiler Requirements</a></li>
+<li><a href="#_python_compatibility">2.5. Python Compatibility</a></li>
+<li><a href="#_installing_the_python_module">2.6. Installing the Python Module</a></li>
 </ul>
 </li>
-<li><a href="#io">I/O</a>
+<li><a href="#_command_line_tools">3. Command line tools</a>
 <ul class="sectlevel2">
-<li><a href="#_npz_format">NPZ format</a></li>
-<li><a href="#preparing-data">Preparing data</a></li>
-<li><a href="#_storing_datasets_and_weights">Storing datasets and weights</a></li>
-<li><a href="#_adding_a_loss_function">Adding a loss function</a></li>
+<li><a href="#_the_tool_mlp_py">3.1. The tool mlp.py</a></li>
+</ul>
+</li>
+<li><a href="#_overview_of_the_code">4. Overview of the code</a>
+<ul class="sectlevel2">
+<li><a href="#_number_type">4.1. Number type</a></li>
+<li><a href="#_module_contents">4.2. Module contents</a></li>
+<li><a href="#_classes">4.3. Classes</a></li>
+<li><a href="#_accessing_c_data_structures">4.4. Accessing C++ data structures</a></li>
+<li><a href="#_training_a_neural_network">4.5. Training a neural network</a></li>
+</ul>
+</li>
+<li><a href="#io">5. I/O</a>
+<ul class="sectlevel2">
+<li><a href="#_npz_format">5.1. NPZ format</a></li>
+<li><a href="#preparing-data">5.2. Preparing data</a></li>
+<li><a href="#_storing_datasets_and_weights">5.3. Storing datasets and weights</a></li>
+</ul>
+</li>
+<li><a href="#_extending_the_library">6. Extending the library</a>
+<ul class="sectlevel2">
+<li><a href="#_adding_a_loss_function">6.1. Adding a loss function</a></li>
 </ul>
 </li>
 </ul>
@@ -604,7 +617,7 @@ pre.rouge .gs {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction">Introduction</h2>
+<h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise Python Library</em> is a library for neural networks.
@@ -622,9 +635,13 @@ This influence may still be evident in the naming of symbols.</p>
 <div class="paragraph">
 <p>This library features a Python module named <code>nerva</code>, that is built using Python bindings to the
 <a href="https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html">Nerva-Rowwise C++ Library</a>.
-Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>, to ensure an easy integration with PyTorch.
-== Installation</p>
+Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>, to ensure an easy integration with PyTorch.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation">2. Installation</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise Python Library</em> Python bindings provide access to the high-performance C backend of the Nerva neural network library. These bindings are built using `pybind11` and compiled with C20. Installation is supported via <code>pip</code>, but requires several system-level dependencies to be available.</p>
 </div>
@@ -632,7 +649,7 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 <p>The installation process uses a <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py"><code>setup.py</code></a> script located in the <code>python</code> directory of the repository. This script requires certain environment variables to be set in order to locate the necessary libraries and headers.</p>
 </div>
 <div class="sect2">
-<h3 id="_requirements">Requirements</h3>
+<h3 id="_requirements">2.1. Requirements</h3>
 <div class="paragraph">
 <p>Before installing the Python bindings, ensure the following C++ libraries are available on your system:</p>
 </div>
@@ -657,7 +674,7 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 </div>
 </div>
 <div class="sect2">
-<h3 id="_environment_variables">Environment Variables</h3>
+<h3 id="_environment_variables">2.2. Environment Variables</h3>
 <div class="paragraph">
 <p>The build system locates dependencies using the following environment variables:</p>
 </div>
@@ -679,7 +696,7 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 </div>
 </div>
 <div class="sect2">
-<h3 id="_alternative_cmake_dependency_resolution">Alternative: CMake Dependency Resolution</h3>
+<h3 id="_alternative_cmake_dependency_resolution">2.3. Alternative: CMake Dependency Resolution</h3>
 <div class="paragraph">
 <p>If you built the C++ library using CMake, you can optionally have FMT, Eigen, and pybind11 downloaded automatically via CMake’s <code>FetchContent</code> mechanism. These will be placed in the <code>_deps</code> subdirectory of the build directory.</p>
 </div>
@@ -712,7 +729,7 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 </div>
 </div>
 <div class="sect2">
-<h3 id="_compiler_requirements">Compiler Requirements</h3>
+<h3 id="_compiler_requirements">2.4. Compiler Requirements</h3>
 <div class="paragraph">
 <p>A C++17-compatible compiler is required. The installation has been tested with</p>
 </div>
@@ -731,13 +748,13 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 </div>
 </div>
 <div class="sect2">
-<h3 id="_python_compatibility">Python Compatibility</h3>
+<h3 id="_python_compatibility">2.5. Python Compatibility</h3>
 <div class="paragraph">
 <p>The bindings are compatible with Python 3.12 and newer. Make sure your <code>pip</code> corresponds to a supported version of Python.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_installing_the_python_module">Installing the Python Module</h3>
+<h3 id="_installing_the_python_module">2.6. Installing the Python Module</h3>
 <div class="paragraph">
 <p>To install the Python bindings, navigate to the <code>python</code> subdirectory of the repository and run:</p>
 </div>
@@ -747,13 +764,19 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 </div>
 </div>
 <div class="paragraph">
-<p>This will build the native extension and install the <code>nerva</code> Python module. If any required environment variables are missing or incorrectly set, <code>setup.py</code> will raise an informative error.
-== Command line tools
-The tool <code>mlp.py</code> can be used to do training experiments with multilayer perceptrons.</p>
+<p>This will build the native extension and install the <code>nerva</code> Python module. If any required environment variables are missing or incorrectly set, <code>setup.py</code> will raise an informative error.</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_command_line_tools">3. Command line tools</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The tool <code>mlp.py</code> can be used to do training experiments with multilayer perceptrons.</p>
 </div>
 <div class="sect2">
-<h3 id="_the_tool_mlp_py">The tool mlp.py</h3>
+<h3 id="_the_tool_mlp_py">3.1. The tool mlp.py</h3>
 <div class="paragraph">
 <p>An example invocation of the <code>mlp.py</code> tool is</p>
 </div>
@@ -808,7 +831,7 @@ epoch  10  lr: 0.01000000  loss: 1.19145860  train accuracy: 0.57378000  test ac
 </div>
 </div>
 <div class="sect3">
-<h4 id="mlp_tool">mlp.py command line options</h4>
+<h4 id="mlp_tool">3.1.1. mlp.py command line options</h4>
 <div class="paragraph">
 <p>This section gives an overview of the command line interface of the <code>mlp.py</code> tool.</p>
 </div>
@@ -1294,24 +1317,30 @@ The precision used for printing matrix elements.</p>
 </li>
 <li>
 <p><code>--edgeitems &lt;value&gt;</code>
-The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.
-== Overview of the code
-This section gives an overview of the Python code in the
-<em>Nerva-Rowwise Python Library</em>, and some explanations about the code.</p>
+The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_overview_of_the_code">4. Overview of the code</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section gives an overview of the Python code in the
+<em>Nerva-Rowwise Python Library</em>, and some explanations about the code.</p>
+</div>
 <div class="sect2">
-<h3 id="_number_type">Number type</h3>
+<h3 id="_number_type">4.1. Number type</h3>
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise Python Library</em> uses 32-bit floats as its number type. The C++ library also supports 64-bit floats.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_module_contents">Module contents</h3>
+<h3 id="_module_contents">4.2. Module contents</h3>
 <div class="paragraph">
 <p>The most important files in the <code>nerva</code> module are given in the table below.</p>
 </div>
@@ -1371,9 +1400,9 @@ This section gives an overview of the Python code in the
 </table>
 </div>
 <div class="sect2">
-<h3 id="_classes">Classes</h3>
+<h3 id="_classes">4.3. Classes</h3>
 <div class="sect3">
-<h4 id="_class_multilayerperceptron">Class MultilayerPerceptron</h4>
+<h4 id="_class_multilayerperceptron">4.3.1. Class MultilayerPerceptron</h4>
 <div class="paragraph">
 <p>A multilayer perceptron (MLP) is modeled using the class <code>MultilayerPerceptron</code>. It contains a list of layers, and has member functions <code>feedforward</code>, <code>backpropagate</code> and <code>optimize</code> that can be used for training the neural network. Constructing an MLP can be done as follows:</p>
 </div>
@@ -1451,7 +1480,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_class_layer">Class Layer</h4>
+<h4 id="_class_layer">4.3.2. Class Layer</h4>
 <div class="paragraph">
 <p>The class <code>Layer</code> is the base class of all neural network layers. There are three different types of layers:</p>
 </div>
@@ -1547,7 +1576,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_class_lossfunction">Class LossFunction</h4>
+<h4 id="_class_lossfunction">4.3.3. Class LossFunction</h4>
 <div class="paragraph">
 <p>The class <code>LossFunction</code> is the base class of all loss functions. There are five loss functions available:</p>
 </div>
@@ -1575,7 +1604,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_activation_functions">Activation functions</h4>
+<h4 id="_activation_functions">4.3.4. Activation functions</h4>
 <div class="paragraph">
 <p>The class <code>ActivationFunction</code> is the base class of all activation functions. The following activation functions are available:</p>
 </div>
@@ -1616,7 +1645,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_accessing_c_data_structures">Accessing C++ data structures</h3>
+<h3 id="_accessing_c_data_structures">4.4. Accessing C++ data structures</h3>
 <div class="paragraph">
 <p>To a limited extent, the C++ data structures can be accessed in Python. In the file
 <code><a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/tests/loss_test.py">loss_test.py</a></code> it is demonstrated how to modify the weight matrices and bias vectors of dense layers via the <code>_layer</code> attribute:</p>
@@ -1636,7 +1665,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_training_a_neural_network">Training a neural network</h3>
+<h3 id="_training_a_neural_network">4.5. Training a neural network</h3>
 <div class="paragraph">
 <p>The class <code>StochasticGradientDescentAlgorithm</code> can be used to train a neural network. It takes as input a multilayer perceptron, a dataset, a loss function, a learning rate scheduler, and a struct containing options like the number of epochs. The main loop looks like this:</p>
 </div>
@@ -1798,7 +1827,7 @@ the parameters <code>Θ</code>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="io">I/O</h2>
+<h2 id="io">5. I/O</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise Python Library</em> has support for reading and writing datasets and weights + biases of a model in NumPy NPZ format.
@@ -1806,22 +1835,22 @@ This format is used for portability between C++ and Python implementations.
 There is no support yet for storing a complete model, including its architecture.</p>
 </div>
 <div class="sect2">
-<h3 id="_npz_format">NPZ format</h3>
+<h3 id="_npz_format">5.1. NPZ format</h3>
 <div class="paragraph">
 <p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="preparing-data">Preparing data</h3>
+<h3 id="preparing-data">5.2. Preparing data</h3>
 <div class="paragraph">
 <p>The <code>mlp</code> tool requires training and testing data to be stored in <code>.npz</code> format.
 To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
 </div>
 <div class="paragraph">
-<p>The script is located at <code>data/prepare_data.py</code> and can be run from the command line.</p>
+<p>The script is located at <a href="../../data/prepare_data.py" class="bare">../../data/prepare_data.py</a> and can be run from the command line.</p>
 </div>
 <div class="sect3">
-<h4 id="_mnist">MNIST</h4>
+<h4 id="_mnist">5.2.1. MNIST</h4>
 <div class="paragraph">
 <p>To download and prepare the MNIST dataset, run:</p>
 </div>
@@ -1858,7 +1887,7 @@ To help with this, a script is provided to download and preprocess datasets comm
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cifar_10">CIFAR-10</h4>
+<h4 id="_cifar_10">5.2.2. CIFAR-10</h4>
 <div class="paragraph">
 <p>To download and prepare the CIFAR-10 dataset, run:</p>
 </div>
@@ -1901,13 +1930,13 @@ To help with this, a script is provided to download and preprocess datasets comm
 </div>
 </div>
 <div class="sect3">
-<h4 id="_reusing_existing_files">Reusing Existing Files</h4>
+<h4 id="_reusing_existing_files">5.2.3. Reusing Existing Files</h4>
 <div class="paragraph">
 <p>If the required <code>.npz</code> files already exist, the script will detect this and skip reprocessing. You can safely rerun the script without overwriting files.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_help">Help</h4>
+<h4 id="_help">5.2.4. Help</h4>
 <div class="paragraph">
 <p>For help with usage, run:</p>
 </div>
@@ -1922,17 +1951,23 @@ To help with this, a script is provided to download and preprocess datasets comm
 </div>
 </div>
 <div class="sect2">
-<h3 id="_storing_datasets_and_weights">Storing datasets and weights</h3>
+<h3 id="_storing_datasets_and_weights">5.3. Storing datasets and weights</h3>
 <div class="paragraph">
-<p>The <code>mlp.py</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.
-== Extending the library
-The <em>Nerva-Rowwise Python Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
+<p>The <code>mlp.py</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_extending_the_library">6. Extending the library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <em>Nerva-Rowwise Python Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
 <a href="nerva-cpp.html#extending" class="bare">nerva-cpp.html#extending</a> of the C&#43;&#43; manual.
 After adding these components to C&#43;&#43;, they can be integrated in the <code>nerva</code> Python module.</p>
 </div>
-</div>
 <div class="sect2">
-<h3 id="_adding_a_loss_function">Adding a loss function</h3>
+<h3 id="_adding_a_loss_function">6.1. Adding a loss function</h3>
 <div class="paragraph">
 <p>As an example, we will explain how the loss function <code>SoftmaxCrossEntropyLoss</code> is added to the <code>nerva</code> Python module.</p>
 </div>
@@ -1984,7 +2019,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-12 15:02:30 UTC
+Last updated 2025-05-12 16:05:20 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
