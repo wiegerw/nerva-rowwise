@@ -17,6 +17,8 @@
 :sgd_algorithm: StochasticGgradientDescentAlgorithm
 :cpp: C&#43;&#43;
 :nerva-python:  # This is used as an ifdef directive
+:sectnums:
+:sectnumlevels: 3
 
 ifdef::env-github[]
 :note-caption: :information_source:
@@ -31,8 +33,13 @@ endif::[]
 ++++
 
 include::include/introduction.adoc[]
+
 include::include/python-installation.adoc[]
+
 include::include/python-command-line-tools.adoc[]
+
 include::include/python-overview-of-the-code.adoc[]
+
 include::include/io.adoc[]
+
 include::include/python-extending-the-library.adoc[]

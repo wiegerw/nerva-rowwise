@@ -13,7 +13,7 @@ The default storage format used in the Nerva libraries is the NumPy NPZ format, 
 The `mlp` tool requires training and testing data to be stored in `.npz` format.
 To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including **MNIST** and **CIFAR-10**.
 
-The script is located at `data/prepare_data.py` and can be run from the command line.
+The script is located at link:../../data/prepare_data.py[] and can be run from the command line.
 
 ==== MNIST
 
