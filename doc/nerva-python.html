@@ -566,19 +566,15 @@ pre.rouge .gs {
 <div id="toc" class="toc2">
 <div id="toctitle"><h3>Contents</h3></div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_installation">Installation</a>
+<li><a href="#_introduction">Introduction</a>
 <ul class="sectlevel2">
-<li><a href="#_dependencies">Dependencies</a></li>
-</ul>
-</li>
-<li><a href="#_command_line_tools">Command line tools</a>
-<ul class="sectlevel2">
+<li><a href="#_requirements">Requirements</a></li>
+<li><a href="#_environment_variables">Environment Variables</a></li>
+<li><a href="#_alternative_cmake_dependency_resolution">Alternative: CMake Dependency Resolution</a></li>
+<li><a href="#_compiler_requirements">Compiler Requirements</a></li>
+<li><a href="#_python_compatibility">Python Compatibility</a></li>
+<li><a href="#_installing_the_python_module">Installing the Python Module</a></li>
 <li><a href="#_the_tool_mlp_py">The tool mlp.py</a></li>
-</ul>
-</li>
-<li><a href="#_overview_of_the_code">Overview of the code</a>
-<ul class="sectlevel2">
 <li><a href="#_number_type">Number type</a></li>
 <li><a href="#_module_contents">Module contents</a></li>
 <li><a href="#_classes">Classes</a></li>
@@ -589,11 +585,8 @@ pre.rouge .gs {
 <li><a href="#io">I/O</a>
 <ul class="sectlevel2">
 <li><a href="#_npz_format">NPZ format</a></li>
+<li><a href="#preparing-data">Preparing data</a></li>
 <li><a href="#_storing_datasets_and_weights">Storing datasets and weights</a></li>
-</ul>
-</li>
-<li><a href="#_extending_the_library">Extending the library</a>
-<ul class="sectlevel2">
 <li><a href="#_adding_a_loss_function">Adding a loss function</a></li>
 </ul>
 </li>
@@ -629,63 +622,135 @@ This influence may still be evident in the naming of symbols.</p>
 <div class="paragraph">
 <p>This library features a Python module named <code>nerva</code>, that is built using Python bindings to the
 <a href="https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html">Nerva-Rowwise C++ Library</a>.
-Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>, to ensure
-an easy integration with PyTorch.
-:root: ../../</p>
+Note that the matrix type used internally in the <code>nerva</code> module is <code>torch.Tensor</code>, to ensure an easy integration with PyTorch.
+== Installation</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_installation">Installation</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>The <em>Nerva-Rowwise Python Library</em> Python bindings can be installed via <code>pip</code>. The installation is done via a <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py">setup.py</a> script. The script has several dependencies, that need to be resolved using environment variables.</p>
+<p>The <em>Nerva-Rowwise Python Library</em> Python bindings provide access to the high-performance C backend of the Nerva neural network library. These bindings are built using `pybind11` and compiled with C20. Installation is supported via <code>pip</code>, but requires several system-level dependencies to be available.</p>
+</div>
+<div class="paragraph">
+<p>The installation process uses a <a href="https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py"><code>setup.py</code></a> script located in the <code>python</code> directory of the repository. This script requires certain environment variables to be set in order to locate the necessary libraries and headers.</p>
 </div>
 <div class="sect2">
-<h3 id="_dependencies">Dependencies</h3>
+<h3 id="_requirements">Requirements</h3>
+<div class="paragraph">
+<p>Before installing the Python bindings, ensure the following C++ libraries are available on your system:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Intel MKL library <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html">oneMKL</a></p>
+<p>Intel oneMKL (for efficient linear algebra routines): <a href="https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html">oneMKL</a></p>
 </li>
 <li>
-<p>FMT <a href="https://github.com/fmtlib/fmt" class="bare">https://github.com/fmtlib/fmt</a></p>
+<p>FMT (header-only formatting library): <a href="https://github.com/fmtlib/fmt" class="bare">https://github.com/fmtlib/fmt</a></p>
 </li>
 <li>
-<p>Eigen <a href="https://eigen.tuxfamily.org/" class="bare">https://eigen.tuxfamily.org/</a></p>
+<p>Eigen (header-only C++ linear algebra library): <a href="https://eigen.tuxfamily.org/" class="bare">https://eigen.tuxfamily.org/</a></p>
 </li>
 <li>
-<p>pybind11 <a href="https://github.com/pybind/pybind11" class="bare">https://github.com/pybind/pybind11</a></p>
+<p>pybind11 (for binding C++ to Python): <a href="https://github.com/pybind/pybind11" class="bare">https://github.com/pybind/pybind11</a></p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The MKL dependency can be resolved by setting the <code>MKL_ROOT</code> environment variable, or by setting the <code>ONEAPI_ROOT</code> environment variable.</p>
+<p>These libraries must be available as header files (and, for MKL, also as linkable libraries) at build time.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_environment_variables">Environment Variables</h3>
+<div class="paragraph">
+<p>The build system locates dependencies using the following environment variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="c"># Required for MKL</span>
+<span class="nb">export </span><span class="nv">MKL_ROOT</span><span class="o">=</span>/opt/intel/oneapi/mkl/latest
+<span class="c"># or use:</span>
+<span class="nb">export </span><span class="nv">ONEAPI_ROOT</span><span class="o">=</span>/opt/intel/oneapi
+
+<span class="c"># Required if not using CMake dependency resolution</span>
+<span class="nb">export </span><span class="nv">EIGEN_INCLUDE_DIR</span><span class="o">=</span>/path/to/eigen
+<span class="nb">export </span><span class="nv">FMT_INCLUDE_DIR</span><span class="o">=</span>/path/to/fmt/include
+<span class="nb">export </span><span class="nv">PYBIND11_INCLUDE_DIR</span><span class="o">=</span>/path/to/pybind11/include</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>To resolve the FMT, Eigen and pybind11 dependencies, the environment variables
-<code>EIGEN_INCLUDE_DIR</code>, <code>FMT_INCLUDE_DIR</code> and <code>PYBIND11_INCLUDE_DIR</code> can be set.</p>
+<p>If the <code>ONEAPI_ROOT</code> variable is set, the MKL path will be inferred as <code>$ONEAPI_ROOT/mkl/latest</code>. If you are on Windows, setting <code>ONEAPI_ROOT</code> is required to find the Intel OpenMP runtime (<code>libiomp5</code>).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_alternative_cmake_dependency_resolution">Alternative: CMake Dependency Resolution</h3>
+<div class="paragraph">
+<p>If you built the C++ library using CMake, you can optionally have FMT, Eigen, and pybind11 downloaded automatically via CMake’s <code>FetchContent</code> mechanism. These will be placed in the <code>_deps</code> subdirectory of the build directory.</p>
 </div>
 <div class="paragraph">
-<p>An alternative solution is to use CMake to resolve these three dependencies, see also the
-<a href="{root}//home/runner/work/nerva-rowwise/nerva-rowwise/doc/nerva-python.adoc/nerva-cpp.adoc#cmake-build">CMake install</a> section in the C++ documentation. The <code>cmake</code> command causes the three libraries to be downloaded automatically in the <code>_deps</code> subdirectory of the CMake build directory. After that it is sufficient to set the environment variable <code>CMAKE_DEPS_DIR</code>.</p>
+<p>To use the CMake-resolved dependencies, set the following environment variable:</p>
 </div>
-<div id="pip-install" class="paragraph">
-<p>To install the Python module, run the following command from the <code>python</code> directory of the repository:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sh"><span class="nb">export </span><span class="nv">CMAKE_DEPS_DIR</span><span class="o">=</span>/path/to/cmake-build/_deps</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This tells <code>setup.py</code> to look for the headers in:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>CMAKE_DEPS_DIR/eigen-src</code></p>
+</li>
+<li>
+<p><code>CMAKE_DEPS_DIR/fmt-src/include</code></p>
+</li>
+<li>
+<p><code>CMAKE_DEPS_DIR/pybind11-src/include</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Refer to the <a href="nerva-cpp.html#cmake-build">CMake install</a> section in the C++ documentation for details.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compiler_requirements">Compiler Requirements</h3>
+<div class="paragraph">
+<p>A C++17-compatible compiler is required. The installation has been tested with</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Linux/macOS:</strong> GCC 13+ or Clang 14+</p>
+</li>
+<li>
+<p><strong>Windows:</strong> Visual Studio 2022 or later</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The setup script uses OpenMP and links against MKL; make sure these are available on your platform.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_python_compatibility">Python Compatibility</h3>
+<div class="paragraph">
+<p>The bindings are compatible with Python 3.12 and newer. Make sure your <code>pip</code> corresponds to a supported version of Python.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_installing_the_python_module">Installing the Python Module</h3>
+<div class="paragraph">
+<p>To install the Python bindings, navigate to the <code>python</code> subdirectory of the repository and run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="sh">pip <span class="nb">install</span> .</code></pre>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_command_line_tools">Command line tools</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>The tool <code>mlp.py</code> can be used to do training experiments with multilayer perceptrons.</p>
+<p>This will build the native extension and install the <code>nerva</code> Python module. If any required environment variables are missing or incorrectly set, <code>setup.py</code> will raise an informative error.
+== Command line tools
+The tool <code>mlp.py</code> can be used to do training experiments with multilayer perceptrons.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_the_tool_mlp_py">The tool mlp.py</h3>
@@ -694,7 +759,18 @@ an easy integration with PyTorch.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>Unresolved directive in include/python-command-line-tools.adoc - include::../..//examples/cifar10_sparse_python.sh[tag=doc]</code></pre>
+<pre class="rouge highlight"><code>python ../tools/mlp.py \
+    --layers="ReLU;ReLU;Linear" \
+    --layer-sizes="3072;1024;1024;10" \
+    --layer-weights=Xavier \
+    --optimizers="Nesterov(0.9)" \
+    --loss=SoftmaxCrossEntropy \
+    --learning-rate=0.01 \
+    --epochs=100 \
+    --batch-size=100 \
+    --threads=12 \
+    --dataset=../../data/cifar10-flattened.npz \
+    --seed=123</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -705,26 +781,30 @@ an easy integration with PyTorch.
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code>=== Nerva python model ===
-Sequential(
-  Sparse(output_size=1024, density=0.042382812500000006, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
-  Sparse(output_size=1024, density=0.06357421875000001, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+<pre class="rouge highlight"><code>Loading dataset from file ../../data/cifar10-flattened.npz
+=== Nerva python model ===
+MultilayerPerceptron(
+  Dense(output_size=1024, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0),
+  Dense(output_size=1024, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0),
   Dense(output_size=10, activation=NoActivation(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0)
 )
 loss = SoftmaxCrossEntropyLoss()
-scheduler = ConstantScheduler(lr=0.009999999776482582)
-layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
+scheduler = 0.01
+layer densities: 3145728/3145728 (100%), 1048576/1048576 (100%), 10240/10240 (100%)
 
 
 === Training Nerva model ===
-epoch   0  lr: 0.01000000  loss: 2.30246344  train accuracy: 0.10724000  test accuracy: 0.11390000  time: 0.00000000s
-epoch   1  lr: 0.01000000  loss: 1.89570341  train accuracy: 0.32142000  test accuracy: 0.32030000  time: 4.15395873s
-epoch   2  lr: 0.01000000  loss: 1.66956488  train accuracy: 0.40332000  test accuracy: 0.40220000  time: 3.60670412s
-epoch   3  lr: 0.01000000  loss: 1.53549386  train accuracy: 0.45616000  test accuracy: 0.44940000  time: 3.24853144s
-epoch   4  lr: 0.01000000  loss: 1.43913857  train accuracy: 0.49054000  test accuracy: 0.47920000  time: 3.29059404s
-epoch   5  lr: 0.01000000  loss: 1.36875251  train accuracy: 0.51380000  test accuracy: 0.49070000  time: 3.83244992s
-epoch   6  lr: 0.01000000  loss: 1.29761993  train accuracy: 0.54106000  test accuracy: 0.50710000  time: 3.59350869s
-epoch   7  lr: 0.01000000  loss: 1.23931273  train accuracy: 0.56170000  test accuracy: 0.51690000  time: 3.96624650s</code></pre>
+epoch   0  lr: 0.01000000  loss: 2.30489253  train accuracy: 0.09768000  test accuracy: 0.09770000  time: 0.00000000s
+epoch   1  lr: 0.01000000  loss: 1.67161558  train accuracy: 0.40710000  test accuracy: 0.40870000  time: 14.79412249s
+epoch   2  lr: 0.01000000  loss: 1.57473959  train accuracy: 0.44548000  test accuracy: 0.44260000  time: 14.33901316s
+epoch   3  lr: 0.01000000  loss: 1.48164101  train accuracy: 0.47662000  test accuracy: 0.46680000  time: 14.62393199s
+epoch   4  lr: 0.01000000  loss: 1.40226001  train accuracy: 0.50328000  test accuracy: 0.48750000  time: 15.14273496s
+epoch   5  lr: 0.01000000  loss: 1.35031182  train accuracy: 0.52174000  test accuracy: 0.49900000  time: 15.16651454s
+epoch   6  lr: 0.01000000  loss: 1.31527882  train accuracy: 0.53150000  test accuracy: 0.50410000  time: 15.02228177s
+epoch   7  lr: 0.01000000  loss: 1.27560615  train accuracy: 0.54598000  test accuracy: 0.51150000  time: 14.99119695s
+epoch   8  lr: 0.01000000  loss: 1.24606835  train accuracy: 0.55446000  test accuracy: 0.51660000  time: 14.84064179s
+epoch   9  lr: 0.01000000  loss: 1.21105695  train accuracy: 0.56862000  test accuracy: 0.52180000  time: 14.82885451s
+epoch  10  lr: 0.01000000  loss: 1.19145860  train accuracy: 0.57378000  test accuracy: 0.52410000  time: 15.87854538s</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -1215,21 +1295,14 @@ The precision used for printing matrix elements.</p>
 <li>
 <p><code>--edgeitems &lt;value&gt;</code>
 The edgeitems used for printing matrices. This sets the number of border rows and columns that are printed.
-:root: ../../</p>
+== Overview of the code
+This section gives an overview of the Python code in the
+<em>Nerva-Rowwise Python Library</em>, and some explanations about the code.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_overview_of_the_code">Overview of the code</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This section gives an overview of the Python code in the
-<em>Nerva-Rowwise Python Library</em>, and some explanations about the code.</p>
 </div>
 <div class="sect2">
 <h3 id="_number_type">Number type</h3>
@@ -1739,21 +1812,124 @@ There is no support yet for storing a complete model, including its architecture
 </div>
 </div>
 <div class="sect2">
+<h3 id="preparing-data">Preparing data</h3>
+<div class="paragraph">
+<p>The <code>mlp</code> tool requires training and testing data to be stored in <code>.npz</code> format.
+To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
+</div>
+<div class="paragraph">
+<p>The script is located at <code>data/prepare_data.py</code> and can be run from the command line.</p>
+</div>
+<div class="sect3">
+<h4 id="_mnist">MNIST</h4>
+<div class="paragraph">
+<p>To download and prepare the MNIST dataset, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python data/prepare_data.py <span class="nt">--dataset</span><span class="o">=</span>mnist <span class="nt">--download</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Download <code>mnist.npz</code> from the official source if not already present.</p>
+</li>
+<li>
+<p>Create a flattened and normalized version of the dataset as <code>data/mnist-flattened.npz</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The output file contains:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Xtrain</code>, <code>Xtest</code>: flattened and normalized image data</p>
+</li>
+<li>
+<p><code>Ttrain</code>, <code>Ttest</code>: corresponding label vectors</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_cifar_10">CIFAR-10</h4>
+<div class="paragraph">
+<p>To download and prepare the CIFAR-10 dataset, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python data/prepare_data.py <span class="nt">--dataset</span><span class="o">=</span>cifar10 <span class="nt">--download</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Download the CIFAR-10 binary dataset from <a href="https://www.cs.toronto.edu/~kriz/cifar.html" class="bare">https://www.cs.toronto.edu/~kriz/cifar.html</a></p>
+</li>
+<li>
+<p>Extract the archive</p>
+</li>
+<li>
+<p>Flatten and normalize the RGB images into shape <code>[N, 3072]</code></p>
+</li>
+<li>
+<p>Save the result as <code>data/cifar10-flattened.npz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As with MNIST, the <code>.npz</code> file will contain:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Xtrain</code>, <code>Xtest</code>: flattened image arrays with pixel values normalized to <code>[0, 1]</code></p>
+</li>
+<li>
+<p><code>Ttrain</code>, <code>Ttest</code>: integer class labels</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_reusing_existing_files">Reusing Existing Files</h4>
+<div class="paragraph">
+<p>If the required <code>.npz</code> files already exist, the script will detect this and skip reprocessing. You can safely rerun the script without overwriting files.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_help">Help</h4>
+<div class="paragraph">
+<p>For help with usage, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python data/prepare_data.py <span class="nt">--help</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This displays all options, including how to customize the output directory.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_storing_datasets_and_weights">Storing datasets and weights</h3>
 <div class="paragraph">
 <p>The <code>mlp.py</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.
-:root: ../../</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_extending_the_library">Extending the library</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The <em>Nerva-Rowwise Python Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
-<a href="../..//doc/nerva-cpp.adoc#extending">Extending the library</a> of the C&#43;&#43; manual.
+== Extending the library
+The <em>Nerva-Rowwise Python Library</em> can be extended in several obvious ways, such as adding new layers, activation functions, loss functions, learning rate schedulers, and pruning or growing functions. However, the implementation of those extensions must be done in C&#43;&#43;, as documented in the section
+<a href="nerva-cpp.html#extending" class="bare">nerva-cpp.html#extending</a> of the C&#43;&#43; manual.
 After adding these components to C&#43;&#43;, they can be integrated in the <code>nerva</code> Python module.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_adding_a_loss_function">Adding a loss function</h3>
@@ -1771,11 +1947,11 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </li>
 </ul>
 </div>
-<div class="listingblock">
+<div class="listingblock small-code">
 <div class="content">
-<pre>  py::class_&lt;softmax_cross_entropy_loss, loss_function, std::shared_ptr&lt;softmax_cross_entropy_loss&gt;&gt;(m, "softmax_cross_entropy_loss")
-    .def(py::init&lt;&gt;(), py::return_value_policy::copy)
-    ;</pre>
+<pre class="rouge highlight"><code data-lang="c++">  <span class="n">py</span><span class="o">::</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">softmax_cross_entropy_loss</span><span class="p">,</span> <span class="n">loss_function</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">softmax_cross_entropy_loss</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s">"softmax_cross_entropy_loss"</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">py</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;&gt;</span><span class="p">(),</span> <span class="n">py</span><span class="o">::</span><span class="n">return_value_policy</span><span class="o">::</span><span class="n">copy</span><span class="p">)</span>
+    <span class="p">;</span></code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -1785,11 +1961,11 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </li>
 </ul>
 </div>
-<div class="listingblock">
+<div class="listingblock small-code">
 <div class="content">
-<pre>class SoftmaxCrossEntropyLoss(nervalibrowwise.softmax_cross_entropy_loss):
-    def __str__(self):
-        return 'SoftmaxCrossEntropyLoss()'</pre>
+<pre class="rouge highlight"><code data-lang="python"><span class="k">class</span> <span class="nc">SoftmaxCrossEntropyLoss</span><span class="p">(</span><span class="n">nervalibrowwise</span><span class="p">.</span><span class="n">softmax_cross_entropy_loss</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sh">'</span><span class="s">SoftmaxCrossEntropyLoss()</span><span class="sh">'</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1808,7 +1984,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-06 15:54:13 UTC
+Last updated 2025-05-12 15:02:30 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

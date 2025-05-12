@@ -589,10 +589,6 @@ pre.rouge .gs {
 <li><a href="#_classes">Classes</a></li>
 <li><a href="#_training_a_neural_network">Training a neural network</a></li>
 <li><a href="#_timers">Timers</a></li>
-</ul>
-</li>
-<li><a href="#_matrix_operations">Matrix operations</a>
-<ul class="sectlevel2">
 <li><a href="#_eigen_library">Eigen library</a></li>
 <li><a href="#_mkl_library">MKL library</a></li>
 </ul>
@@ -600,19 +596,12 @@ pre.rouge .gs {
 <li><a href="#io">I/O</a>
 <ul class="sectlevel2">
 <li><a href="#_npz_format">NPZ format</a></li>
+<li><a href="#preparing-data">Preparing data</a></li>
 <li><a href="#_storing_datasets_and_weights">Storing datasets and weights</a></li>
-</ul>
-</li>
-<li><a href="#_performance">Performance</a>
-<ul class="sectlevel2">
 <li><a href="#_mini_batches">Mini-batches</a></li>
 <li><a href="#_matrix_products">Matrix products</a></li>
 <li><a href="#_nerva_computation_mode">Nerva computation mode</a></li>
 <li><a href="#_subnormal_numbers">Subnormal numbers</a></li>
-</ul>
-</li>
-<li><a href="#_sparse_neural_networks">Sparse neural networks</a>
-<ul class="sectlevel2">
 <li><a href="#_sparse_matrices">Sparse matrices</a></li>
 <li><a href="#_sparse_evolutionary_training">Sparse evolutionary training</a></li>
 <li><a href="#_sparse_initialization">Sparse initialization</a></li>
@@ -719,8 +708,7 @@ This influence may still be evident in the naming of symbols.</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>(*) The Intel <code>oneAPI</code> dependency is optional. This library is needed for the SYCL computation mode.
-Note that <code>oneAPI</code> includes the <code>icpx</code> compiler and the <code>MKL</code> library.</p>
+<p>(*) The Intel <code>oneAPI</code> dependency is optional, but highly recommended. This library is needed for the SYCL computation mode. Note that <code>oneAPI</code> includes the <code>icpx</code> compiler and the <code>MKL</code> library. Please make sure to use the latest version of <code>oneAPI</code>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1035,7 +1023,7 @@ b2 gcc-14 link=static release -j8</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from <a href="https://www.cs.toronto.edu/~kriz/cifar.html" class="bare">https://www.cs.toronto.edu/~kriz/cifar.html</a>.</p>
+<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from <a href="https://www.cs.toronto.edu/~kriz/cifar.html" class="bare">https://www.cs.toronto.edu/~kriz/cifar.html</a>. The dataset must then be converted to the required <code>.npz</code> format using the <code>prepare_data.py</code> script; see the section <a href="#preparing-data">Preparing data</a> for details.</p>
 </div>
 <div class="paragraph">
 <p>The output may look like this:</p>
@@ -2280,16 +2268,8 @@ total time           = 8.3089</pre>
 </div>
 <div class="paragraph">
 <p>The calls are numbered, to make it easy to compare different runs. Unsurprisingly, the timing output shows that the computation labeled <code>batchnorm4</code> takes the majority of time.
-:root: ../../</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_matrix_operations">Matrix operations</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.</p>
+== Matrix operations
+The most important part of the implementation of neural networks consists of matrix operations. In the implementation of activation functions, loss functions and neural network layers, many different matrix operations are needed. In Nerva a structured approach is followed to implement these components. All equations are expressed in terms of the matrix operations in the table below.</p>
 </div>
 <table id="table_matrix_operations" class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 1. matrix operations</caption>
@@ -2472,6 +2452,7 @@ total time           = 8.3089</pre>
 <div class="paragraph">
 <p>See the specification document <a href="https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf">Nerva library specifications</a> for an overview of how these matrix operations are used.</p>
 </div>
+</div>
 <div class="sect2">
 <h3 id="_eigen_library">Eigen library</h3>
 <div class="paragraph">
@@ -2558,19 +2539,122 @@ There is no support yet for storing a complete model, including its architecture
 </div>
 </div>
 <div class="sect2">
+<h3 id="preparing-data">Preparing data</h3>
+<div class="paragraph">
+<p>The <code>mlp</code> tool requires training and testing data to be stored in <code>.npz</code> format.
+To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
+</div>
+<div class="paragraph">
+<p>The script is located at <code>data/prepare_data.py</code> and can be run from the command line.</p>
+</div>
+<div class="sect3">
+<h4 id="_mnist">MNIST</h4>
+<div class="paragraph">
+<p>To download and prepare the MNIST dataset, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python data/prepare_data.py <span class="nt">--dataset</span><span class="o">=</span>mnist <span class="nt">--download</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Download <code>mnist.npz</code> from the official source if not already present.</p>
+</li>
+<li>
+<p>Create a flattened and normalized version of the dataset as <code>data/mnist-flattened.npz</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The output file contains:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Xtrain</code>, <code>Xtest</code>: flattened and normalized image data</p>
+</li>
+<li>
+<p><code>Ttrain</code>, <code>Ttest</code>: corresponding label vectors</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_cifar_10">CIFAR-10</h4>
+<div class="paragraph">
+<p>To download and prepare the CIFAR-10 dataset, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python data/prepare_data.py <span class="nt">--dataset</span><span class="o">=</span>cifar10 <span class="nt">--download</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Download the CIFAR-10 binary dataset from <a href="https://www.cs.toronto.edu/~kriz/cifar.html" class="bare">https://www.cs.toronto.edu/~kriz/cifar.html</a></p>
+</li>
+<li>
+<p>Extract the archive</p>
+</li>
+<li>
+<p>Flatten and normalize the RGB images into shape <code>[N, 3072]</code></p>
+</li>
+<li>
+<p>Save the result as <code>data/cifar10-flattened.npz</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As with MNIST, the <code>.npz</code> file will contain:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Xtrain</code>, <code>Xtest</code>: flattened image arrays with pixel values normalized to <code>[0, 1]</code></p>
+</li>
+<li>
+<p><code>Ttrain</code>, <code>Ttest</code>: integer class labels</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_reusing_existing_files">Reusing Existing Files</h4>
+<div class="paragraph">
+<p>If the required <code>.npz</code> files already exist, the script will detect this and skip reprocessing. You can safely rerun the script without overwriting files.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_help">Help</h4>
+<div class="paragraph">
+<p>For help with usage, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python data/prepare_data.py <span class="nt">--help</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This displays all options, including how to customize the output directory.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_storing_datasets_and_weights">Storing datasets and weights</h3>
 <div class="paragraph">
 <p>The <code>mlp</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.
-:root: ../../</p>
+== Performance
+This section discusses various aspects that play a role for the performance of a neural network library.</p>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_performance">Performance</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This section discusses various aspects that play a role for the performance of a neural network library.</p>
 </div>
 <div class="sect2">
 <h3 id="_mini_batches">Mini-batches</h3>
@@ -2690,16 +2774,9 @@ time =   0.370310 | value = 1.4e-45    | sum = -1.44152e-41</pre>
 <div class="paragraph">
 <p>On <a href="https://groups.google.com/g/llvm-dev/c/TDGKHFU4hzE/m/k-LEa3NvBQAJ">Google Groups</a> this problem is discussed. A possible solution is to instruct the compiler to flush subnormal values to zero. But there doesn&#8217;t seem to be a portable way to achieve this. In the <em>Nerva-Rowwise C++ Library</em> different solutions have been tried. One of them is to periodically flush weights in the subnormal range to zero using the <code>--clip</code> command line option of the <code>mlp</code> tool.
 In <span class="citation">[<a href="#DBLP_journals_actanum_HighamM22">2</a>]</span> the problem of subnormal numbers is discussed.
-:root: ../../</p>
+== Sparse neural networks
+Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_journals_corr_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The <em>Nerva-Rowwise C++ Library</em> supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_conf_icml_NikdanPIKA23">4</a>]</span>.</p>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_sparse_neural_networks">Sparse neural networks</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Sparse neural network layers are often simulated using binary masks, see <span class="citation">[<a href="#DBLP_journals_corr_abs-2102-01732">3</a>]</span>. This is caused by the lack of support for sparse tensors in popular neural network frameworks. Note that PyTorch is currently developing <a href="https://pytorch.org/docs/stable/sparse.html">sparse tensors</a>. The <em>Nerva-Rowwise C++ Library</em> supports truly sparse layers, meaning that the weight matrices of sparse layers are stored in a sparse matrix format. Another example of truly sparse layers is given by <span class="citation">[<a href="#DBLP_conf_icml_NikdanPIKA23">4</a>]</span>.</p>
 </div>
 <div class="sect2">
 <h3 id="_sparse_matrices">Sparse matrices</h3>
@@ -2946,7 +3023,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-06 15:54:13 UTC
+Last updated 2025-05-12 15:02:30 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
