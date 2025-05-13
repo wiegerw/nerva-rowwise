@@ -602,6 +602,7 @@ pre.rouge .gs {
 <li><a href="#_npz_format">6.1. NPZ format</a></li>
 <li><a href="#preparing-data">6.2. Preparing data</a></li>
 <li><a href="#_storing_datasets_and_weights">6.3. Storing datasets and weights</a></li>
+<li><a href="#_storing_datasets_and_weights_2">6.4. Storing datasets and weights</a></li>
 </ul>
 </li>
 <li><a href="#_performance">7. Performance</a>
@@ -1035,7 +1036,9 @@ b2 gcc-14 link=static release -j8</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that first the CIFAR-10 binary version needs to be downloaded from <a href="https://www.cs.toronto.edu/~kriz/cifar.html" class="bare">https://www.cs.toronto.edu/~kriz/cifar.html</a>. The dataset must then be converted to the required <code>.npz</code> format using the <code>prepare_data.py</code> script; see the section <a href="#preparing-data">Preparing data</a> for details.</p>
+<p>This will train a <a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> model using an MLP consisting of three sparse layers with activation functions ReLU, ReLU and no activation.
+A script <code>prepare_data.py</code> is available in the <code>data</code> directory
+that can be used to download the dataset, flatten it and store it in <code>.npz</code> format. See the section <a href="#preparing-data">Preparing data</a> for details.</p>
 </div>
 <div class="paragraph">
 <p>The output may look like this:</p>
@@ -2547,20 +2550,18 @@ The sparse CSR matrix functions in the MKL library take an argument of the opaqu
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise C++ Library</em> has support for reading and writing datasets and weights + biases of a model in NumPy NPZ format.
-This format is used for portability between C++ and Python implementations.
-There is no support yet for storing a complete model, including its architecture.</p>
+This format is used for portability between C++ and Python implementations. There is no support yet for storing a complete model, including its architecture.</p>
 </div>
 <div class="sect2">
 <h3 id="_npz_format">6.1. NPZ format</h3>
 <div class="paragraph">
-<p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
+<p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays in a compressed format.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="preparing-data">6.2. Preparing data</h3>
 <div class="paragraph">
-<p>The <code>mlp</code> tool requires training and testing data to be stored in <code>.npz</code> format.
-To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
+<p>The mlp tool requires training and testing data to be stored in <code>.npz</code> format. To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
 </div>
 <div class="paragraph">
 <p>The script is located at <a href="../../data/prepare_data.py" class="bare">../../data/prepare_data.py</a> and can be run from the command line.</p>
@@ -2665,11 +2666,87 @@ To help with this, a script is provided to download and preprocess datasets comm
 <p>This displays all options, including how to customize the output directory.</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_inspecting_npz_files">6.2.5. Inspecting <code>.npz</code> files</h4>
+<div class="paragraph">
+<p>To inspect the contents of a <code>.npz</code> file (such as <code>mnist-flattened.npz</code> or <code>cifar10-flattened.npz</code>), you can use the <code>inspect_npz.py</code> utility included in the distribution:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python tools/inspect_npz.py data/mnist-flattened.npz</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This prints the shape and values of each array stored in the file. To print only the names, shapes, and norms without dumping the full contents, use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python tools/inspect_npz.py data/mnist-flattened.npz <span class="nt">--shapes-only</span></code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_storing_datasets_and_weights">6.3. Storing datasets and weights</h3>
 <div class="paragraph">
 <p>The <code>mlp</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_storing_datasets_and_weights_2">6.4. Storing datasets and weights</h3>
+<div class="paragraph">
+<p>The mlp tool supports saving and loading both datasets and model parameters using the NumPy <code>.npz</code> format. This ensures compatibility between Python and C++ implementations by storing everything in a standard dictionary of arrays.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use <code>--save-data</code> and <code>--load-data</code> to write or read datasets.</p>
+</li>
+<li>
+<p>Use <code>--save-weights</code> and <code>--load-weights</code> to store or restore the weights and biases of a trained model.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>.npz</code> file for datasets contains the following keys:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Xtrain</code>, <code>Ttrain</code>: input features and target labels for the training set</p>
+</li>
+<li>
+<p><code>Xtest</code>, <code>Ttest</code>: input features and target labels for the test set</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>.npz</code> file for model parameters stores each layer&#8217;s weights and biases under the keys:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>W1</code>, <code>W2</code>, <code>&#8230;&#8203;</code>: weight matrices for the first, second, etc. linear layer</p>
+</li>
+<li>
+<p><code>b1</code>, <code>b2</code>, <code>&#8230;&#8203;</code>: corresponding bias vectors</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These arrays use standard NumPy formats and can be inspected or manipulated easily in Python using <code>numpy.load()</code> and <code>numpy.savez()</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+    Note: The architecture of the model (e.g., number of layers or activation functions) is not stored in the <code>.npz</code> file. This must be specified separately when reloading weights.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -3053,7 +3130,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-12 16:05:20 UTC
+Last updated 2025-05-13 08:23:45 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

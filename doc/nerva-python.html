@@ -596,6 +596,7 @@ pre.rouge .gs {
 <li><a href="#_npz_format">5.1. NPZ format</a></li>
 <li><a href="#preparing-data">5.2. Preparing data</a></li>
 <li><a href="#_storing_datasets_and_weights">5.3. Storing datasets and weights</a></li>
+<li><a href="#_storing_datasets_and_weights_2">5.4. Storing datasets and weights</a></li>
 </ul>
 </li>
 <li><a href="#_extending_the_library">6. Extending the library</a>
@@ -844,18 +845,44 @@ epoch  10  lr: 0.01000000  loss: 1.19145860  train accuracy: 0.57378000  test ac
 <div class="sect4">
 <h5 id="_named_parameters">Named parameters</h5>
 <div class="paragraph">
-<p>Some of the items take parameters. For this we use a function call syntax with named parameters, e.g. <code>AllReLU(alpha=0.3)</code>. In case that there is only one parameter, the name may be omitted: <code>AllReLU(0.3)</code>. If the parameters have default values, they may be omitted. For example, <code>TReLU</code> or <code>TReLU()</code> is equivalent to <code>TReLU(al=0,tl=0,ar=0,tr=1)</code>.
-===== General options
-* <code>-?</code>, <code>-h</code>, <code>--help</code>
-Display help information.
-* <code>--debug</code>, <code>-d</code>
-Show debug output. This prints batches, weight matrices, bias vectors, gradients etc.
-===== Random generator options
-* <code>--seed &lt;value&gt;</code>
-A seed value for the random generator.
-===== Layer configuration options
-* <code>--layers &lt;value&gt;</code>
+<p>Some of the items take parameters. For this we use a function call syntax with named parameters, e.g. <code>AllReLU(alpha=0.3)</code>. In case that there is only one parameter, the name may be omitted: <code>AllReLU(0.3)</code>. If the parameters have default values, they may be omitted. For example, <code>TReLU</code> or <code>TReLU()</code> is equivalent to <code>TReLU(al=0,tl=0,ar=0,tr=1)</code>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_general_options">General options</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>-?</code>, <code>-h</code>, <code>--help</code>
+Display help information.</p>
+</li>
+<li>
+<p><code>--debug</code>, <code>-d</code>
+Show debug output. This prints batches, weight matrices, bias vectors, gradients etc.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_random_generator_options">Random generator options</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--seed &lt;value&gt;</code>
+A seed value for the random generator.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_layer_configuration_options">Layer configuration options</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--layers &lt;value&gt;</code>
 A semicolon separated list of layers. For example, <code>--layers=ReLU;AllReLU(0.3);Linear</code> is used to specify a neural network with three layers with an ReLU, AllReLU and no activation function. The following layers are supported:</p>
+</li>
+</ul>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1126,9 +1153,15 @@ See also
 Save weights and biases to a dictionary in NumPy <code>.npz</code> format.
 The weight matrices are stored with keys <code>W1,W2,&#8230;&#8203;</code> and the bias vectors with keys <code>b1,b2,&#8230;&#8203;</code>.
 See also
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>.
-===== Dataset options</p>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_dataset_options">Dataset options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--cifar10 &lt;directory&gt;</code>
 Specify the directory where the binary version of the
@@ -1153,9 +1186,15 @@ Normalize the dataset.</p>
 </li>
 <li>
 <p><code>--preprocessed &lt;directory&gt;</code>
-A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <a href="#io">I/O</a> for information about the <code>.npz</code> format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.
-===== Pruning and growing options</p>
+A directory containing datasets named <code>epoch0.npz</code>, <code>epoch1.npz</code>, &#8230;&#8203; See <a href="#io">I/O</a> for information about the <code>.npz</code> format. This can for example be used to precompute augmented datasets. A script <a href="../python/tools/generate_cifar10_augmented_datasets.py">generate_cifar10_augmented_datasets.py</a> is available for creating augmented CIFAR-10 datasets.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_pruning_and_growing_options">Pruning and growing options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--prune &lt;strategy&gt;</code>
 The strategy used for pruning sparse weight matrices. The following strategies are supported:</p>
@@ -1219,9 +1258,15 @@ The strategy used for growing in sparse weight matrices. The following strategie
 <li>
 <p><code>--grow-weights &lt;value&gt;</code>
 The weight generation function used for growing weights.
-See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.
-===== Computation options</p>
+See <code>--layer-weights</code> for supported values. The default value is <code>Xavier</code>.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_computation_options">Computation options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--computation &lt;value&gt;</code>
 The computation mode that is used for backpropagation. This is used for performance measurements. The following computation modes are available:</p>
@@ -1270,9 +1315,15 @@ The number of threads used by the MKL and OMP libraries.</p>
 </li>
 <li>
 <p><code>--gradient-step &lt;value&gt;</code>
-If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.
-===== Miscellaneous options</p>
+If this value is set, gradient checks are performed with the given step size. This is very slow, and should only be used for debugging.</p>
 </li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_miscellaneous_options">Miscellaneous options</h5>
+<div class="ulist">
+<ul>
 <li>
 <p><code>--info</code>
 Print detailed information about the multilayer perceptron.</p>
@@ -1831,20 +1882,18 @@ the parameters <code>Θ</code>.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <em>Nerva-Rowwise Python Library</em> has support for reading and writing datasets and weights + biases of a model in NumPy NPZ format.
-This format is used for portability between C++ and Python implementations.
-There is no support yet for storing a complete model, including its architecture.</p>
+This format is used for portability between C++ and Python implementations. There is no support yet for storing a complete model, including its architecture.</p>
 </div>
 <div class="sect2">
 <h3 id="_npz_format">5.1. NPZ format</h3>
 <div class="paragraph">
-<p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays.</p>
+<p>The default storage format used in the Nerva libraries is the NumPy NPZ format, see <a href="https://numpy.org/doc/stable/reference/generated/numpy.lib.format.html">numpy.lib.format</a>. The reason for choosing this format is portability between C++ and Python implementations. A file in <code>.npz</code> format can be used to store a dictionary of arrays in a compressed format.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="preparing-data">5.2. Preparing data</h3>
 <div class="paragraph">
-<p>The <code>mlp</code> tool requires training and testing data to be stored in <code>.npz</code> format.
-To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
+<p>The mlp.py tool requires training and testing data to be stored in <code>.npz</code> format. To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
 </div>
 <div class="paragraph">
 <p>The script is located at <a href="../../data/prepare_data.py" class="bare">../../data/prepare_data.py</a> and can be run from the command line.</p>
@@ -1949,11 +1998,87 @@ To help with this, a script is provided to download and preprocess datasets comm
 <p>This displays all options, including how to customize the output directory.</p>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_inspecting_npz_files">5.2.5. Inspecting <code>.npz</code> files</h4>
+<div class="paragraph">
+<p>To inspect the contents of a <code>.npz</code> file (such as <code>mnist-flattened.npz</code> or <code>cifar10-flattened.npz</code>), you can use the <code>inspect_npz.py</code> utility included in the distribution:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python tools/inspect_npz.py data/mnist-flattened.npz</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This prints the shape and values of each array stored in the file. To print only the names, shapes, and norms without dumping the full contents, use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">python tools/inspect_npz.py data/mnist-flattened.npz <span class="nt">--shapes-only</span></code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_storing_datasets_and_weights">5.3. Storing datasets and weights</h3>
 <div class="paragraph">
 <p>The <code>mlp.py</code> tool has options <code>--load-weights</code> and <code>--save-weights</code> for loading and saving the weights and bias vectors of an MLP, and options <code>--load-data</code> and <code>--save-data</code> for loading and saving a dataset in NPZ format. The keys in the dictionary for the weight matrices and bias vectors of linear layers are <code>W1, W2, &#8230;&#8203;</code> and <code>b1, b2, &#8230;&#8203;</code>. The keys for the training data plus targets are <code>Xtrain</code> and <code>Ttrain</code>, while for the test data plus targets we use <code>Xtest</code> and <code>Ttest</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_storing_datasets_and_weights_2">5.4. Storing datasets and weights</h3>
+<div class="paragraph">
+<p>The mlp.py tool supports saving and loading both datasets and model parameters using the NumPy <code>.npz</code> format. This ensures compatibility between Python and C++ implementations by storing everything in a standard dictionary of arrays.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use <code>--save-data</code> and <code>--load-data</code> to write or read datasets.</p>
+</li>
+<li>
+<p>Use <code>--save-weights</code> and <code>--load-weights</code> to store or restore the weights and biases of a trained model.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>.npz</code> file for datasets contains the following keys:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Xtrain</code>, <code>Ttrain</code>: input features and target labels for the training set</p>
+</li>
+<li>
+<p><code>Xtest</code>, <code>Ttest</code>: input features and target labels for the test set</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>.npz</code> file for model parameters stores each layer&#8217;s weights and biases under the keys:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>W1</code>, <code>W2</code>, <code>&#8230;&#8203;</code>: weight matrices for the first, second, etc. linear layer</p>
+</li>
+<li>
+<p><code>b1</code>, <code>b2</code>, <code>&#8230;&#8203;</code>: corresponding bias vectors</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These arrays use standard NumPy formats and can be inspected or manipulated easily in Python using <code>numpy.load()</code> and <code>numpy.savez()</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+    Note: The architecture of the model (e.g., number of layers or activation functions) is not stored in the <code>.npz</code> file. This must be specified separately when reloading weights.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -2019,7 +2144,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-12 16:05:20 UTC
+Last updated 2025-05-13 08:23:45 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
