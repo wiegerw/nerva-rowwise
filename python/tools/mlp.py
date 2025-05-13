@@ -199,7 +199,7 @@ def print_command_line_arguments(args):
         else:
             return f'{words[0]}={quote(words[1])}'
 
-    print("python3 " + " ".join(print_arg(arg) for arg in sys.argv) + '\n')
+    print("python " + " ".join(print_arg(arg) for arg in sys.argv) + '\n')
 
 
 def initialize_frameworks(args):
