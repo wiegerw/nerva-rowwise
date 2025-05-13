@@ -41,11 +41,21 @@ epoch  10  lr: 0.01000000  loss: 1.19145860  train accuracy: 0.57378000  test ac
 ----
 
 include::command-line-tools.adoc[tags=mlptool-options]
+
 include::command-line-tools.adoc[tags=general-options]
+
 include::command-line-tools.adoc[tags=random-generator-options]
+
 include::command-line-tools.adoc[tags=layer-configuration-options]
+
 include::command-line-tools.adoc[tags=training-configuration-options]
+
 include::command-line-tools.adoc[tags=dataset-options]
+
+ifdef::nerva-python[]
 include::command-line-tools.adoc[tags=pruning-options]
+
 include::command-line-tools.adoc[tags=computation-options]
+
 include::command-line-tools.adoc[tags=miscellaneous-options]
+endif::nerva-python[]

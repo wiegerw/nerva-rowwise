@@ -1,110 +1,152 @@
 #!/usr/bin/env python3
 
-# Copyright 2023 Wieger Wesselink.
+# Copyright 2023 - 2025 Wieger Wesselink.
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE or http://www.boost.org/LICENSE_1_0.txt)
 
 import argparse
 import pathlib
 import sys
+import tempfile
 
 import numpy as np
 import torch
 
-from nerva.datasets import create_cifar10_augmented_datasets, create_dataloaders, custom_load_cifar10_data, \
-    create_cifar10_augmented_dataloaders, extract_tensors_from_dataloader, save_dict_to_npz
+from nerva.datasets import (
+    create_cifar10_augmented_datasets,
+    create_dataloaders,
+    custom_load_cifar10_data,
+    create_cifar10_augmented_dataloaders,
+    extract_tensors_from_dataloader,
+    save_dict_to_npz,
+)
 from nerva.utilities import pp
 
 
-def load_models(model: str, datadir: str):
+def load_dataloaders(model: str, datadir: str):
+    """
+    Load training and test dataloaders for a specific model (e.g., 'cifar10').
+    """
     if model == 'cifar10':
         train_dataset, test_dataset = create_cifar10_augmented_datasets(datadir)
         return create_dataloaders(train_dataset, test_dataset, len(train_dataset), len(test_dataset))
-    else:
-        raise RuntimeError(f'Unknown model {model}')
+    raise RuntimeError(f'Unknown model "{model}"')
 
 
-def inspect_data(outputdir, epochs):
+def inspect_output_dir(outputdir: str, epochs: int):
+    """
+    Print a brief summary of the data stored in each epoch's `.npz` file.
+    """
     for epoch in range(epochs):
         print(f'--- epoch {epoch} ---')
         path = pathlib.Path(outputdir) / f'epoch{epoch}.npz'
-        d = np.load(path)
-        Xtrain = d['Xtrain']
-        pp(f'Xtrain', Xtrain)
+        if not path.exists():
+            print(f'[WARNING] Missing file: {path}')
+            continue
+        data = np.load(path)
+        pp('Xtrain', data['Xtrain'])
 
 
-
-# check if the data is stored correctly
-def check(datadir):
-    import tempfile
+def check_data_integrity(datadir: str):
+    """
+    Check that saving and reloading the dataset using `.npz` preserves the data integrity.
+    Also tests loading via C++ bindings.
+    """
     from nervalibcolwise import data_set
 
     Xtrain, Ttrain, Xtest, Ttest = custom_load_cifar10_data(datadir)
     pp('Xtrain', Xtrain)
     pp('Ttrain', Ttrain)
 
-    filename = tempfile.NamedTemporaryFile().name + '_cifar.npz'
+    with tempfile.NamedTemporaryFile(suffix="_cifar.npz", delete=False) as tmp:
+        filename = tmp.name
 
-    # save the data to .npz
-    print(f'Saving data to file {filename}')
-    with open(filename, "wb") as f:
-        np.savez_compressed(f,
-                            Xtrain=Xtrain.detach().numpy(),
-                            Ttrain=Ttrain.detach().numpy(),
-                            Xtest=Xtest.detach().numpy(),
-                            Ttest=Ttest.detach().numpy()
-                            )
+    print(f'Saving data to {filename}')
+    np.savez_compressed(
+        filename,
+        Xtrain=Xtrain.numpy(),
+        Ttrain=Ttrain.numpy(),
+        Xtest=Xtest.numpy(),
+        Ttest=Ttest.numpy()
+    )
 
-    # load the .npz data
-    print(f'Loading data from file {filename}')
-    d = np.load(filename)
-    Xtrain_new = d['Xtrain']
-    pp(f'Xtrain_new', Xtrain_new)
+    print(f'Loading data from {filename}')
+    loaded = np.load(filename)
+    pp('Xtrain_new', loaded['Xtrain'])
 
-    print(f'Loading data to c++ data_set {filename}')
-    data2 = data_set()
-    data2.import_cifar10_from_npz(filename)
-    data2.info()
+    print(f'Loading data to C++ data_set from {filename}')
+    dataset = data_set()
+    dataset.import_cifar10_from_npz(filename)
+    dataset.info()
 
-    pathlib.Path(filename).unlink()
+    pathlib.Path(filename).unlink(missing_ok=True)
+
+
+def save_augmented_epochs(datadir: str, outputdir: str, batch_size: int, epochs: int):
+    """
+    Generate and save multiple epochs of augmented CIFAR-10 data.
+    """
+    pathlib.Path(outputdir).mkdir(parents=True, exist_ok=True)
+    print('Generating augmented datasets')
+
+    for epoch in range(epochs):
+        print(f'Epoch {epoch}')
+        file_path = pathlib.Path(outputdir) / f'epoch{epoch}.npz'
+
+        train_loader, test_loader = create_cifar10_augmented_dataloaders(
+            batch_size, batch_size, datadir
+        )
+
+        Xtrain, Ttrain = extract_tensors_from_dataloader(train_loader)
+        Xtest, Ttest = extract_tensors_from_dataloader(test_loader)
+
+        print(f'Saving epoch {epoch} data to {file_path}')
+        save_dict_to_npz(
+            file_path,
+            {
+                'Xtrain': Xtrain,
+                'Ttrain': Ttrain,
+                'Xtest': Xtest,
+                'Ttest': Ttest,
+            }
+        )
+
+        del Xtrain, Ttrain, Xtest, Ttest  # free memory
 
 
 def main():
-    cmdline_parser = argparse.ArgumentParser()
-    cmdline_parser.add_argument("--batch-size", help="The batch size", type=int, default=1)
-    cmdline_parser.add_argument("--epochs", help="The number of epochs", type=int, default=1)
-    cmdline_parser.add_argument('--model', type=str, default='cifar10', help='the data set (default: cifar10)')
-    cmdline_parser.add_argument("--seed", help="The initial seed of the random generator", type=int)
-    cmdline_parser.add_argument('--datadir', type=str, default='./data', help='the data directory (default: ./data)')
-    cmdline_parser.add_argument("--outputdir", type=str, help="the output directory where the results are stored")
-    cmdline_parser.add_argument("--inspect", help="if this flag is set, the output directory will be inspected", action="store_true")
-    cmdline_parser.add_argument("--check", help="check if the data is the same after saving and loading", action="store_true")
-    args = cmdline_parser.parse_args()
+    parser = argparse.ArgumentParser(description='Prepare augmented CIFAR-10 datasets in .npz format')
+    parser.add_argument('--batch-size', type=int, default=1, help='Batch size for data loaders (default: 1)')
+    parser.add_argument('--epochs', type=int, default=1, help='Number of augmented dataset epochs to generate (default: 1)')
+    parser.add_argument('--model', type=str, default='cifar10', help='Dataset/model name (default: cifar10)')
+    parser.add_argument('--seed', type=int, help='Seed for RNG')
+    parser.add_argument('--datadir', type=str, default='./data', help='Path to the dataset directory (default: ./data)')
+    parser.add_argument('--outputdir', type=str, required=False, help='Output directory for storing .npz files')
+    parser.add_argument('--inspect', action='store_true', help='Inspect existing output directory contents')
+    parser.add_argument('--check', action='store_true', help='Check save/load integrity of CIFAR-10 data')
+    args = parser.parse_args()
 
-    if args.seed:
+    if args.seed is not None:
         torch.manual_seed(args.seed)
 
     if args.check:
-        check(args.datadir)
+        check_data_integrity(args.datadir)
         sys.exit(0)
 
     if args.inspect:
-        inspect_data(args.outputdir, args.epochs)
+        if not args.outputdir:
+            print('Error: --inspect requires --outputdir to be specified')
+            sys.exit(1)
+        inspect_output_dir(args.outputdir, args.epochs)
         sys.exit(0)
 
-    pathlib.Path(args.outputdir).mkdir(parents=True, exist_ok=True)
+    if not args.outputdir:
+        print('Error: --outputdir must be specified to save augmented datasets')
+        sys.exit(1)
 
-    print(f'Generating augmented datasets')
-    for epoch in range(args.epochs):
-        print(f'epoch {epoch}')
-        filename = f'{args.outputdir}/epoch{epoch}.npz'
-        train_loader, test_loader = create_cifar10_augmented_dataloaders(args.batch_size, args.batch_size, args.datadir)
-        Xtrain, Ttrain = extract_tensors_from_dataloader(train_loader)
-        Xtest, Ttest = extract_tensors_from_dataloader(test_loader)
-        print(f'Saving epoch {epoch} data to {filename}')
-        save_dict_to_npz(filename, {'Xtrain': Xtrain, 'Ttrain': Ttrain, 'Xtest': Xtest, 'Ttest': Ttest})
-        del Xtrain, Ttrain, Xtest, Ttest
+    save_augmented_epochs(args.datadir, args.outputdir, args.batch_size, args.epochs)
 
 
 if __name__ == '__main__':
     main()
+

@@ -22,5 +22,5 @@ This will:
 *   Flatten and normalize the image data,
 *   Save the result in a compressed .npz file: `mnist-flattened.npz` or `cifar10-flattened.npz`.
 
-The generated .npz files can be used as input for the `mlp` command line tool.
+If the required .npz files already exist, the script will detect this and skip reprocessing. The generated .npz files can be used as input for the `mlp` command line tool.
 
