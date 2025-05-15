@@ -28,7 +28,7 @@
 
 Detailed documentation is available for both the C++ and Python interfaces:
 
-- [C++ Manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html) – build instructions, tools, and API.
+- [C++ Manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-rowwise.html) – build instructions, tools, and API.
 - [Python Manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) – usage of the `nerva` Python module.
 - [Mathematical Specifications (PDF)](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf)
 
@@ -43,7 +43,7 @@ Relevant papers:
 
 ### C++ users
 
-Install using `CMake` or `B2`. See the [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html#_installation) for details.
+Install using `CMake` or `B2`. See the [C++ manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-rowwise.html#_installation) for details.
 
 ### Python users
 
@@ -51,7 +51,7 @@ Install the Python bindings via `pip`. See the [Python manual](https://wiegerw.g
 
 ---
 
-## Example: Training with `mlp`
+## Example: Training with the command line tool mlp
 
 ```sh
 ../install/bin/mlp \
@@ -69,7 +69,7 @@ Install the Python bindings via `pip`. See the [Python manual](https://wiegerw.g
     --seed=123
 ```
 
-For full CLI documentation, see the [manual section on `mlp`](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html#_the_tool_mlp).
+For full CLI documentation, see the [manual section on `mlp`](https://wiegerw.github.io/nerva-rowwise/doc/nerva-rowwise.html#mlp_tool).
 
 ---
 
@@ -79,7 +79,7 @@ The library is built for:
 
 - Research in sparse training (e.g., pruning/growth algorithms)
 - Transparency: backpropagation is implemented explicitly (no autograd)
-- Modularity: the core operations rely on a small set of primitive [matrix operations](https://wiegerw.github.io/nerva-rowwise/doc/nerva-cpp.html#_matrix_operations)
+- Modularity: the core operations rely on a small set of primitive [matrix operations](https://wiegerw.github.io/nerva-rowwise/doc/nerva-rowwise.html#_matrix_operations)
 
 ---
 
@@ -115,4 +115,3 @@ Questions or contributions welcome!
 Contact: **Wieger Wesselink** (j.w.wesselink@tue.nl)
 
 ---
-

@@ -1,3 +1,4 @@
+[[installation]]
 == Installation
 The following build systems are supported for building the {library}:
 

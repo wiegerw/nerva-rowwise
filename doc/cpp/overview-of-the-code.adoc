@@ -65,7 +65,7 @@ This will create an MLP with three linear layers that have weight matrices `W1, 
 include::../../tests/gradient_test.cpp[tag=construct_mlp]
 ----
 Note that the random number generator argument is used for the generation of the weights. See
-<<mlp_tool, mlp command line options>> for an overview of the supported string arguments.
+<<mlp_tool_options, mlp command line options>> for an overview of the supported string arguments.
 
 ==== Class neural_network_layer
 The class `neural_network_layer` is the base class of all neural network layers. It has attributes for the input matrix `X` and the corresponding gradient `DX`. Usually a layer has some additional parameters that can be learned by training the neural network. The most important member functions of `neural_network_layer` are given below.

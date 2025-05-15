@@ -16,6 +16,7 @@ The following command line tools are available. They can be found in the `tools`
 |A tool for inspecting the contents of a file in NumPy NPZ format.
 |===
 
+[[mlp_tool]]
 === The tool mlp
 The tool `mlp` can be used for training multilayer perceptrons. An example invocation of the `mlp` tool is
 

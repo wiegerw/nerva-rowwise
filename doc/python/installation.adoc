@@ -1,6 +1,7 @@
+[[installation]]
 == Installation
 
-The {library} Python bindings provide access to the high-performance C++ backend of the Nerva neural network library. These bindings are built using `pybind11` and compiled with C++20. Installation is supported via `pip`, but requires several system-level dependencies to be available.
+The {library} Python bindings provide access to the high-performance {cpp} backend of the Nerva neural network library. These bindings are built using `pybind11` and compiled with {cpp}17 or higher. Installation is supported via `pip`, but requires several system-level dependencies to be available.
 
 The installation process uses a https://github.com/wiegerw/nerva-rowwise/blob/main/python/setup.py[`setup.py`] script located in the `python` directory of the repository. This script requires certain environment variables to be set in order to locate the necessary libraries and headers.
 
@@ -51,13 +52,13 @@ This tells `setup.py` to look for the headers in:
 - `CMAKE_DEPS_DIR/fmt-src/include`
 - `CMAKE_DEPS_DIR/pybind11-src/include`
 
-Refer to the link:nerva-cpp.html#cmake-build[CMake install] section in the C++ documentation for details.
+Refer to the link:nerva-rowwise.html#cmake-build[CMake install] section in the C++ documentation for details.
 
 === Compiler Requirements
 
 A C++17-compatible compiler is required. The installation has been tested with
 
-- **Linux/macOS:** GCC 13+ or Clang 14+
+- **Linux/macOS:** GCC 11+ or Clang 14+
 - **Windows:** Visual Studio 2022 or later
 
 The setup script uses OpenMP and links against MKL; make sure these are available on your platform.

@@ -27,7 +27,7 @@ jobs:
       - name: Compile Asciidoc
         run: |
           mkdir -p output_directory
-          asciidoctor -r asciidoctor-bibtex -a source-highlighter=rouge -D ./output_directory ./doc/cpp/nerva-cpp.adoc
+          asciidoctor -r asciidoctor-bibtex -a source-highlighter=rouge -D ./output_directory ./doc/cpp/nerva-rowwise.adoc
           asciidoctor -r asciidoctor-bibtex -a source-highlighter=rouge -D ./output_directory ./doc/python/nerva-python.adoc
 
       - name: Deploy to GitHub Pages

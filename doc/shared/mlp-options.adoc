@@ -1,4 +1,4 @@
-[[mlp_tool]]
+[[mlp_tool_options]]
 ==== Command line options of {mlptool}
 This section gives an overview of the command line interface of the `{mlptool}` tool.
 
