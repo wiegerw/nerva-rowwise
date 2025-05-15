@@ -13,17 +13,6 @@ To support mini-batches, the {library} defines all equations that play a role in
 === Matrix products
 The performance of training a neural network largely depends on the calculation of matrix products during the backpropagation step of linear layers. In order to do this efficiently, the https://en.wikipedia.org/wiki/Math_Kernel_Library[Intel Math Kernel library (MKL)] is used. Currently, this dependency is hard coded, but there are plans to make this optional. To experiment with other implementations, like SYCL or BLAS, a global setting is used that is discussed in the next section.
 
-=== Nerva computation mode
-In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The {library} uses a global setting `NervaComputation` to experiment with other implementations. For example, the function `softmax_layer::feedforward` contains this:
-[.small-code]
-[source,cpp]
-----
-include::../../include/nerva/neural_networks/layers.h[tag=nerva_computation]
-----
-In this case, the default version `computation::eigen` turned out to have very poor performance. A direct call to an MKL routine is used to solve this problem. The `NervaComputation` setting is also used to experiment with BLAS implementations and SYCL implementations. See the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/optimizers.h[optimizers.h] for some examples of that.
-
-TIP: The command line tool `mlp` has an option `--computation` to set the computation mode.
-
 === Subnormal numbers
 Experiments with sparse neural networks have shown that the performance can be negatively influenced by https://en.wikipedia.org/wiki/Subnormal_number[subnormal numbers]. The example program `link:https://github.com/wiegerw/nerva-rowwise/blob/main/examples/subnormal_numbers.cpp[subnormal_numbers.cpp]` illustrates the problem. The table below is the result of the following experiment.
 The dot product of two large vectors of floating-point numbers is computed. One vector is filled with random values between 0 and 1, and the other with powers of 10, ranging from `1` to `1e−45`. For values larger than `1e−35`, the time needed for this calculation is about `0.044` seconds. For smaller values we end up in the range of subnormal numbers. This causes the runtime to increase more than eight-fold to `0.37` seconds. In our experiments we observed that when layers with high sparsity are used, it may happen that subnormal values appear in weight matrices, and their amount increases every epoch.

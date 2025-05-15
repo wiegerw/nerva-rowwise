@@ -1,3 +1,5 @@
+include::settings.adoc[]
+
 == Command line tools
 The following command line tools are available. They can be found in the `tools` directory.
 
@@ -47,47 +49,7 @@ epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test acc
 epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s
 ----
 
-include::command-line-tools.adoc[tags=mlptool-options]
-
-include::command-line-tools.adoc[tags=general-options]
-
-* `--verbose`, `-v`
-Show verbose output.
-
-include::command-line-tools.adoc[tags=random-generator-options]
-
-include::command-line-tools.adoc[tags=layer-configuration-options]
-
-include::command-line-tools.adoc[tags=training-configuration-options]
-
-include::command-line-tools.adoc[tags=dataset-options]
-
-* `--generate-data <name>`
-Specify a synthetic dataset that is generated on the fly. The following datasets are supported:
-|===
-|Specification |Description |Features |Classes
-
-|`checkerboard`
-|A checkerboard pattern, see also link:https://kaifishr.github.io/2021/01/14/micro-mlp.html#checkerboard[checkerboard].
-|2
-|2
-
-|`mini`
-|A dataset with random values.
-|3
-|2
-|===
-
-* `--dataset-size <value>`
-The size of the generated dataset (default: 1000).
-`--save-weights` for information about the format.
-`--load-weights` for information about the format.
-
-include::command-line-tools.adoc[tags=pruning-options]
-
-include::command-line-tools.adoc[tags=computation-options]
-
-include::command-line-tools.adoc[tags=miscellaneous-options]
+include::../shared/mlp-options.adoc[]
 
 === The tool mkl
 The tool `mkl` is used for benchmarking sparse and dense matrix products. An example of running the `mkl` tool is

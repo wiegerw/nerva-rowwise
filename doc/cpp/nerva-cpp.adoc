@@ -10,13 +10,8 @@
 :stem: latexmath
 :icons: font
 :description: Documentation for the nerva-rowwise repository.
-:library: pass:q[_Nerva-Rowwise C++ Library_]
 :imagesdir: images
 :bibliography: nerva.bib
-:mlptool: mlp
-:sgd_algorithm: stochastic_gradient_descent_algorithm
-:sectnums:
-:sectnumlevels: 3
 
 ifdef::env-github[]
 :note-caption: :information_source:
@@ -30,23 +25,25 @@ endif::[]
 </style>
 ++++
 
-include::include/introduction.adoc[]
+include::settings.adoc[]
 
-include::include/cpp-installation.adoc[]
+include::introduction.adoc[]
 
-include::include/cpp-command-line-tools.adoc[]
+include::installation.adoc[]
 
-include::include/cpp-overview-of-the-code.adoc[]
+include::command-line-tools.adoc[]
 
-include::include/matrix-operations.adoc[]
+include::overview-of-the-code.adoc[]
 
-include::include/io.adoc[]
+include::matrix-operations.adoc[]
 
-include::include/performance.adoc[]
+include::io.adoc[]
 
-include::include/sparse-neural-networks.adoc[]
+include::performance.adoc[]
 
-include::include/extending-the-library.adoc[]
+include::sparse-neural-networks.adoc[]
+
+include::extending-the-library.adoc[]
 
 == References
 

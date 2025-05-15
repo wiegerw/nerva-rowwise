@@ -1,5 +1,53 @@
+include::settings.adoc[]
+
 == Command line tools
-The tool `mlp.py` can be used to do training experiments with multilayer perceptrons.
+The following command line tools are available. They can be found in the `tools` directory.
+
+|===
+|Tool |Description
+
+|`mlp.py`
+|A tool for training multilayer perceptrons.
+
+|`inspect_npz.py`
+|A tool for inspecting the contents of a file in NumPy NPZ format.
+|===
+
+=== The tool mlp
+The tool `mlp` can be used for training multilayer perceptrons. An example invocation of the `mlp` tool is
+
+[.small-code]
+[source,bash]
+----
+include::../../python/examples/cifar10_sparse.sh[tag=doc]
+----
+This will train a https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] model using an MLP consisting of three sparse layers with activation functions ReLU, ReLU and no activation.
+A script `prepare_data.py` is available in the `data` directory
+that can be used to download the dataset, flatten it and store it in `.npz` format. See the section <<preparing-data>> for details.
+
+The output may look like this:
+[[mlp_output]]
+[.small-code]
+[listing]
+----
+=== Nerva c++ model ===
+Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
+Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
+Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
+loss = SoftmaxCrossEntropyLoss()
+scheduler = ConstantScheduler(lr=0.01)
+layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
+
+epoch   0 lr: 0.01000000  loss: 2.30284437  train accuracy: 0.07904000  test accuracy: 0.08060000 time: 0.00000000s
+epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test accuracy: 0.21320000 time: 2.74594253s
+epoch   2 lr: 0.01000000  loss: 1.91454245  train accuracy: 0.29976000  test accuracy: 0.29940000 time: 2.76982510s
+epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test accuracy: 0.35820000 time: 2.69554319s
+epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test accuracy: 0.40000000 time: 2.68532307s
+epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s
+----
+
+include::../shared/mlp-options.adoc[]
+
 
 === The tool mlp.py
 An example invocation of the `mlp.py` tool is
@@ -39,23 +87,3 @@ epoch   8  lr: 0.01000000  loss: 1.24606835  train accuracy: 0.55446000  test ac
 epoch   9  lr: 0.01000000  loss: 1.21105695  train accuracy: 0.56862000  test accuracy: 0.52180000  time: 14.82885451s
 epoch  10  lr: 0.01000000  loss: 1.19145860  train accuracy: 0.57378000  test accuracy: 0.52410000  time: 15.87854538s
 ----
-
-include::command-line-tools.adoc[tags=mlptool-options]
-
-include::command-line-tools.adoc[tags=general-options]
-
-include::command-line-tools.adoc[tags=random-generator-options]
-
-include::command-line-tools.adoc[tags=layer-configuration-options]
-
-include::command-line-tools.adoc[tags=training-configuration-options]
-
-include::command-line-tools.adoc[tags=dataset-options]
-
-ifdef::nerva-python[]
-include::command-line-tools.adoc[tags=pruning-options]
-
-include::command-line-tools.adoc[tags=computation-options]
-
-include::command-line-tools.adoc[tags=miscellaneous-options]
-endif::nerva-python[]

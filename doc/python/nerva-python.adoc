@@ -12,10 +12,6 @@
 :description: Documentation for the nerva-rowwise repository.
 :imagesdir: images
 :bibliography: nerva.bib
-:library: pass:q[_Nerva-Rowwise Python Library_]
-:mlptool: mlp.py
-:sgd_algorithm: StochasticGgradientDescentAlgorithm
-:cpp: C&#43;&#43;
 :nerva-python:  # This is used as an ifdef directive
 :sectnums:
 :sectnumlevels: 3
@@ -32,14 +28,20 @@ endif::[]
 </style>
 ++++
 
-include::include/introduction.adoc[]
+include::settings.adoc[]
 
-include::include/python-installation.adoc[]
+include::introduction.adoc[]
 
-include::include/python-command-line-tools.adoc[]
+include::installation.adoc[]
 
-include::include/python-overview-of-the-code.adoc[]
+include::command-line-tools.adoc[]
 
-include::include/io.adoc[]
+include::overview-of-the-code.adoc[]
 
-include::include/python-extending-the-library.adoc[]
+include::io.adoc[]
+
+include::performance.adoc[]
+
+include::sparse-neural-networks.adoc[]
+
+include::extending-the-library.adoc[]

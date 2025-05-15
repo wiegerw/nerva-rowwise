@@ -1,0 +1,50 @@
+include::settings.adoc[]
+
+include::../shared/sparse-neural-networks.adoc[]
+
+=== Classes for pruning and growing
+In the {library}, the classes `prune_function` and `grow_function` are used to represent generic pruning and growing strategies:
+[.small-code]
+[source,cpp]
+----
+include::../../include/nerva/neural_networks/prune.h[tag=doc]
+----
+
+[.small-code]
+[source,cpp]
+----
+include::../../include/nerva/neural_networks/grow.h[tag=doc]
+----
+
+In the command line tool `mlp` the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute `regrow_function` that applies pruning and growing to the sparse layers of an MLP. See also the <<on_start_epoch>> event.
+
+=== Experiments with sparse training
+In cite:[wesselink2024nervatrulysparseimplementation] we report on some of our experiments with sparse neural networks.
+
+An example of a dynamic sparse training experiment is
+[.small-code]
+[source,bash]
+----
+include::../../examples/cifar10_pruning.sh[tag=doc]
+----
+At the start of every epoch 20% of the weights is pruned, and the same number of weights is added back at different locations.
+The output may look like this:
+[.small-code]
+[listing]
+----
+=== Nerva c++ model ===
+Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
+Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
+Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
+loss = SoftmaxCrossEntropyLoss()
+scheduler = ConstantScheduler(lr=0.01)
+layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
+
+epoch   0 lr: 0.01000000  loss: 2.30284437  train accuracy: 0.07904000  test accuracy: 0.08060000 time: 0.00000000s
+epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test accuracy: 0.21320000 time: 5.48583113s
+pruning + growing 26665/133325 weights
+pruning + growing 13332/66662 weights
+epoch   2 lr: 0.01000000  loss: 1.91203228  train accuracy: 0.30918000  test accuracy: 0.30900000 time: 5.00460376s
+pruning + growing 26665/133325 weights
+pruning + growing 13332/66662 weights
+----

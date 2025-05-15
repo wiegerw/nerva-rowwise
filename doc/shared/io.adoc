@@ -11,7 +11,7 @@ The default storage format used in the Nerva libraries is the NumPy NPZ format, 
 
 The {mlptool} tool requires training and testing data to be stored in `.npz` format. To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including **MNIST** and **CIFAR-10**.
 
-The script is located at link:../../data/prepare_data.py[] and can be run from the command line.
+The script is located at link:{root}/data/prepare_data.py[] and can be run from the command line.
 
 ==== MNIST
 
@@ -19,13 +19,13 @@ To download and prepare the MNIST dataset, run:
 
 [source,bash]
 ----
-python data/prepare_data.py --dataset=mnist --download
+python prepare_data.py --dataset=mnist --download
 ----
 
 This will:
 
 - Download `mnist.npz` from the official source if not already present.
-- Create a flattened and normalized version of the dataset as `data/mnist-flattened.npz`.
+- Create a flattened and normalized version of the dataset as `mnist-flattened.npz`.
 
 The output file contains:
 
@@ -38,7 +38,7 @@ To download and prepare the CIFAR-10 dataset, run:
 
 [source,bash]
 ----
-python data/prepare_data.py --dataset=cifar10 --download
+python prepare_data.py --dataset=cifar10 --download
 ----
 
 This will:
@@ -46,7 +46,7 @@ This will:
 - Download the CIFAR-10 binary dataset from https://www.cs.toronto.edu/~kriz/cifar.html
 - Extract the archive
 - Flatten and normalize the RGB images into shape `[N, 3072]`
-- Save the result as `data/cifar10-flattened.npz`
+- Save the result as `cifar10-flattened.npz`
 
 As with MNIST, the `.npz` file will contain:
 

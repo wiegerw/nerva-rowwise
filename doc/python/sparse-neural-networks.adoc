@@ -1,0 +1,64 @@
+include::settings.adoc[]
+
+include::../shared/sparse-neural-networks.adoc[]
+
+=== Classes for pruning and growing
+In the {library}, the classes `prune_function` and `grow_function` are used to represent generic pruning and growing strategies:
+[.small-code]
+[source,cpp]
+----
+include::../../include/nerva/neural_networks/prune.h[tag=doc]
+----
+
+[.small-code]
+[source,cpp]
+----
+include::../../include/nerva/neural_networks/grow.h[tag=doc]
+----
+
+In the command line tool `mlp` the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute `regrow_function` that applies pruning and growing to the sparse layers of an MLP. See also the <<on_start_epoch>> event.
+
+=== Experiments with sparse training
+In cite:[wesselink2024nervatrulysparseimplementation] we report on some of our experiments with sparse neural networks.
+
+An example of a dynamic sparse training experiment is
+[.small-code]
+[source,bash]
+----
+include::../../python/examples/cifar10_pruning.sh[tag=doc]
+----
+At the start of every epoch 20% of the weights is pruned, and the same number of weights is added back at different locations.
+The output may look like this:
+[.small-code]
+[listing]
+----
+Loading dataset from file ../../data/cifar10-flattened.npz
+=== Nerva python model ===
+MultilayerPerceptron(
+  Sparse(output_size=1024, density=0.042382812500000006, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Sparse(output_size=1024, density=0.06357421875000001, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Dense(output_size=10, activation=NoActivation(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0)
+)
+loss = SoftmaxCrossEntropyLoss()
+scheduler = 0.01
+layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
+
+
+=== Training Nerva model ===
+epoch   0  lr: 0.01000000  loss: 2.30248605  train accuracy: 0.10576000  test accuracy: 0.10570000  time: 0.00000000s
+epoch   1  lr: 0.01000000  loss: 2.24581714  train accuracy: 0.17630000  test accuracy: 0.18050000  time: 3.86765830s
+regrowing 26665/133325 weights
+regrowing 13332/66662 weights
+epoch   2  lr: 0.01000000  loss: 2.02945376  train accuracy: 0.25362000  test accuracy: 0.25470000  time: 3.72007074s
+regrowing 26665/133325 weights
+regrowing 13332/66662 weights
+epoch   3  lr: 0.01000000  loss: 1.92740701  train accuracy: 0.29394000  test accuracy: 0.29380000  time: 4.29503079s
+regrowing 26665/133325 weights
+regrowing 13332/66661 weights
+epoch   4  lr: 0.01000000  loss: 1.86549039  train accuracy: 0.32460000  test accuracy: 0.32540000  time: 4.57273872s
+regrowing 26665/133324 weights
+regrowing 13332/66661 weights
+epoch   5  lr: 0.01000000  loss: 1.80027306  train accuracy: 0.35640000  test accuracy: 0.35430000  time: 4.47374441s
+regrowing 26665/133323 weights
+regrowing 13332/66660 weights
+----
