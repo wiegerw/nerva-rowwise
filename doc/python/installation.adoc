@@ -67,6 +67,7 @@ The setup script uses OpenMP and links against MKL; make sure these are availabl
 
 The bindings are compatible with Python 3.12 and newer. Make sure your `pip` corresponds to a supported version of Python.
 
+[[pip-install]]
 === Installing the Python Module
 
 To install the Python bindings, navigate to the `python` subdirectory of the repository and run:
