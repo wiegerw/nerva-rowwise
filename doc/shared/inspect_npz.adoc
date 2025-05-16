@@ -37,3 +37,14 @@ Xtest    (10000x3072  )  inf-norm = 1.00000000
 Ttest    (10000       )  inf-norm = 9.00000000
 [3 8 8 ... 5 1 7]
 ----
+
+With the command line option `--shapes-only` a summary can be obtained:
+
+[.small-code]
+[listing]
+----
+Xtrain   (50000x3072  )  inf-norm = 1.00000000
+Ttrain   (50000       )  inf-norm = 9.00000000
+Xtest    (10000x3072  )  inf-norm = 1.00000000
+Ttest    (10000       )  inf-norm = 9.00000000
+----
