@@ -849,20 +849,30 @@ that can be used to download the dataset, flatten it and store it in <code>.npz<
 </div>
 <div id="mlp_output" class="listingblock small-code">
 <div class="content">
-<pre>=== Nerva c++ model ===
-Sparse(input_size=3072, output_size=1024, density=0.042382877, optimizer=Nesterov(0.90000), activation=ReLU())
-Sparse(input_size=1024, output_size=1024, density=0.06357384, optimizer=Nesterov(0.90000), activation=ReLU())
-Dense(input_size=1024, output_size=10, optimizer=Nesterov(0.90000), activation=NoActivation())
+<pre>Loading dataset from file ../../data/cifar10-flattened.npz
+=== Nerva python model ===
+MultilayerPerceptron(
+  Sparse(output_size=1024, density=0.042382812500000006, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Sparse(output_size=1024, density=0.06357421875000001, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier),
+  Dense(output_size=10, activation=NoActivation(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0)
+)
 loss = SoftmaxCrossEntropyLoss()
-scheduler = ConstantScheduler(lr=0.01)
+scheduler = 0.01
 layer densities: 133325/3145728 (4.238%), 66662/1048576 (6.357%), 10240/10240 (100%)
 
-epoch   0 lr: 0.01000000  loss: 2.30284437  train accuracy: 0.07904000  test accuracy: 0.08060000 time: 0.00000000s
-epoch   1 lr: 0.01000000  loss: 2.14723837  train accuracy: 0.21136000  test accuracy: 0.21320000 time: 2.74594253s
-epoch   2 lr: 0.01000000  loss: 1.91454245  train accuracy: 0.29976000  test accuracy: 0.29940000 time: 2.76982510s
-epoch   3 lr: 0.01000000  loss: 1.78019225  train accuracy: 0.35416000  test accuracy: 0.35820000 time: 2.69554319s
-epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test accuracy: 0.40000000 time: 2.68532307s
-epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s</pre>
+
+=== Training Nerva model ===
+epoch   0  lr: 0.01000000  loss: 2.30248605  train accuracy: 0.10576000  test accuracy: 0.10570000  time: 0.00000000s
+epoch   1  lr: 0.01000000  loss: 2.24581714  train accuracy: 0.17630000  test accuracy: 0.18050000  time: 3.80288282s
+epoch   2  lr: 0.01000000  loss: 2.03262505  train accuracy: 0.24958000  test accuracy: 0.24750000  time: 3.53668000s
+epoch   3  lr: 0.01000000  loss: 1.92843132  train accuracy: 0.29416000  test accuracy: 0.29450000  time: 4.51532699s
+epoch   4  lr: 0.01000000  loss: 1.86818965  train accuracy: 0.32428000  test accuracy: 0.32560000  time: 4.43234620s
+epoch   5  lr: 0.01000000  loss: 1.81106027  train accuracy: 0.35034000  test accuracy: 0.34890000  time: 4.40411531s
+epoch   6  lr: 0.01000000  loss: 1.75482929  train accuracy: 0.37082000  test accuracy: 0.36880000  time: 4.30115332s
+epoch   7  lr: 0.01000000  loss: 1.70783696  train accuracy: 0.38672000  test accuracy: 0.38330000  time: 4.36580419s
+epoch   8  lr: 0.01000000  loss: 1.66517540  train accuracy: 0.40234000  test accuracy: 0.40010000  time: 4.72230031s
+epoch   9  lr: 0.01000000  loss: 1.62592003  train accuracy: 0.41828000  test accuracy: 0.41820000  time: 4.38559597s
+epoch  10  lr: 0.01000000  loss: 1.58918872  train accuracy: 0.43308000  test accuracy: 0.43240000  time: 4.33621435s</pre>
 </div>
 </div>
 <div class="sect3">
@@ -1401,7 +1411,7 @@ The edgeitems used for printing matrices. This sets the number of border rows an
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">Unresolved directive <span class="k">in</span> ../shared/inspect_npz.adoc - include::../../python/examples/inspect_cifar10.sh[tag<span class="o">=</span>doc]</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">python ../tools/inspect_npz.py ../../data/cifar10-flattened.npz</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1432,6 +1442,17 @@ Xtest    (10000x3072  )  inf-norm = 1.00000000
 
 Ttest    (10000       )  inf-norm = 9.00000000
 [3 8 8 ... 5 1 7]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the command line option <code>--shapes-only</code> a summary can be obtained:</p>
+</div>
+<div class="listingblock small-code">
+<div class="content">
+<pre>Xtrain   (50000x3072  )  inf-norm = 1.00000000
+Ttrain   (50000       )  inf-norm = 9.00000000
+Xtest    (10000x3072  )  inf-norm = 1.00000000
+Ttest    (10000       )  inf-norm = 9.00000000</pre>
 </div>
 </div>
 </div>
@@ -2473,7 +2494,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-16 07:52:10 UTC
+Last updated 2025-05-16 08:04:40 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
