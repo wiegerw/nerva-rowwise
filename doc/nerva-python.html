@@ -574,13 +574,13 @@ pre.rouge .gs {
 <li><a href="#_alternative_cmake_dependency_resolution">2.3. Alternative: CMake Dependency Resolution</a></li>
 <li><a href="#_compiler_requirements">2.4. Compiler Requirements</a></li>
 <li><a href="#_python_compatibility">2.5. Python Compatibility</a></li>
-<li><a href="#_installing_the_python_module">2.6. Installing the Python Module</a></li>
+<li><a href="#pip-install">2.6. Installing the Python Module</a></li>
 </ul>
 </li>
 <li><a href="#_command_line_tools">3. Command line tools</a>
 <ul class="sectlevel2">
-<li><a href="#_the_tool_mlp">3.1. The tool mlp</a></li>
-<li><a href="#_the_tool_mlp_py">3.2. The tool mlp.py</a></li>
+<li><a href="#_the_tool_mlp_py">3.1. The tool mlp.py</a></li>
+<li><a href="#_the_tool_inspect_npz_py">3.2. The tool inspect_npz.py</a></li>
 </ul>
 </li>
 <li><a href="#_overview_of_the_code">4. Overview of the code</a>
@@ -774,7 +774,7 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 </div>
 </div>
 <div class="sect2">
-<h3 id="_installing_the_python_module">2.6. Installing the Python Module</h3>
+<h3 id="pip-install">2.6. Installing the Python Module</h3>
 <div class="paragraph">
 <p>To install the Python bindings, navigate to the <code>python</code> subdirectory of the repository and run:</p>
 </div>
@@ -818,9 +818,9 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_the_tool_mlp">3.1. The tool mlp</h3>
+<h3 id="_the_tool_mlp_py">3.1. The tool mlp.py</h3>
 <div class="paragraph">
-<p>The tool <code>mlp</code> can be used for training multilayer perceptrons. An example invocation of the <code>mlp</code> tool is</p>
+<p>The tool <code>mlp.py</code> can be used for training multilayer perceptrons. An example invocation of the <code>mlp.py</code> tool is</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
@@ -1392,58 +1392,46 @@ The edgeitems used for printing matrices. This sets the number of border rows an
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_tool_mlp_py">3.2. The tool mlp.py</h3>
+<h3 id="_the_tool_inspect_npz_py">3.2. The tool inspect_npz.py</h3>
 <div class="paragraph">
-<p>An example invocation of the <code>mlp.py</code> tool is</p>
+<p>The tool <code>inspect_npz.py</code> can be used to inspect the contents of a dataset stored in <code>.npz</code> format.</p>
 </div>
-<div class="listingblock">
+<div class="paragraph">
+<p>An example invocation of the <code>inspect_npz.py</code> tool is</p>
+</div>
+<div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code>python ../tools/mlp.py \
-    --layers="ReLU;ReLU;Linear" \
-    --layer-sizes="3072;1024;1024;10" \
-    --layer-weights=Xavier \
-    --optimizers="Nesterov(0.9)" \
-    --loss=SoftmaxCrossEntropy \
-    --learning-rate=0.01 \
-    --epochs=100 \
-    --batch-size=100 \
-    --threads=12 \
-    --dataset=$dataset \
-    --seed=123</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">Unresolved directive <span class="k">in</span> ../shared/inspect_npz.adoc - include::../../python/examples/inspect_cifar10.sh[tag<span class="o">=</span>doc]</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>This will train a CIFAR-10 model using an MLP consisting of three layers with activation functions ReLU, ReLU and no activation. Note that it automatically downloads the CIFAR-10 dataset in the folder <code>../data</code> if it doesn&#8217;t yet exist.</p>
 </div>
 <div class="paragraph">
 <p>The output may look like this:</p>
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code>Loading dataset from file ../../data/cifar10-flattened.npz
-=== Nerva python model ===
-MultilayerPerceptron(
-  Dense(output_size=1024, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0),
-  Dense(output_size=1024, activation=ReLU(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0),
-  Dense(output_size=10, activation=NoActivation(), optimizer=Nesterov(0.9), weight_initializer=Xavier, dropout=0.0)
-)
-loss = SoftmaxCrossEntropyLoss()
-scheduler = 0.01
-layer densities: 3145728/3145728 (100%), 1048576/1048576 (100%), 10240/10240 (100%)
+<pre>Xtrain   (50000x3072  )  inf-norm = 1.00000000
+[[0.23137255 0.16862745 0.19607843 ... 0.54901961 0.32941176 0.28235294]
+ [0.60392157 0.49411765 0.41176471 ... 0.54509804 0.55686275 0.56470588]
+ [1.         0.99215686 0.99215686 ... 0.3254902  0.3254902  0.32941176]
+ ...
+ [0.1372549  0.15686275 0.16470588 ... 0.30196078 0.25882353 0.19607843]
+ [0.74117647 0.72941176 0.7254902  ... 0.6627451  0.67058824 0.67058824]
+ [0.89803922 0.9254902  0.91764706 ... 0.67843137 0.63529412 0.63137255]]
 
+Ttrain   (50000       )  inf-norm = 9.00000000
+[6 9 9 ... 9 1 1]
 
-=== Training Nerva model ===
-epoch   0  lr: 0.01000000  loss: 2.30489253  train accuracy: 0.09768000  test accuracy: 0.09770000  time: 0.00000000s
-epoch   1  lr: 0.01000000  loss: 1.67161558  train accuracy: 0.40710000  test accuracy: 0.40870000  time: 14.79412249s
-epoch   2  lr: 0.01000000  loss: 1.57473959  train accuracy: 0.44548000  test accuracy: 0.44260000  time: 14.33901316s
-epoch   3  lr: 0.01000000  loss: 1.48164101  train accuracy: 0.47662000  test accuracy: 0.46680000  time: 14.62393199s
-epoch   4  lr: 0.01000000  loss: 1.40226001  train accuracy: 0.50328000  test accuracy: 0.48750000  time: 15.14273496s
-epoch   5  lr: 0.01000000  loss: 1.35031182  train accuracy: 0.52174000  test accuracy: 0.49900000  time: 15.16651454s
-epoch   6  lr: 0.01000000  loss: 1.31527882  train accuracy: 0.53150000  test accuracy: 0.50410000  time: 15.02228177s
-epoch   7  lr: 0.01000000  loss: 1.27560615  train accuracy: 0.54598000  test accuracy: 0.51150000  time: 14.99119695s
-epoch   8  lr: 0.01000000  loss: 1.24606835  train accuracy: 0.55446000  test accuracy: 0.51660000  time: 14.84064179s
-epoch   9  lr: 0.01000000  loss: 1.21105695  train accuracy: 0.56862000  test accuracy: 0.52180000  time: 14.82885451s
-epoch  10  lr: 0.01000000  loss: 1.19145860  train accuracy: 0.57378000  test accuracy: 0.52410000  time: 15.87854538s</code></pre>
+Xtest    (10000x3072  )  inf-norm = 1.00000000
+[[0.61960784 0.62352941 0.64705882 ... 0.48627451 0.50588235 0.43137255]
+ [0.92156863 0.90588235 0.90980392 ... 0.69803922 0.74901961 0.78039216]
+ [0.61960784 0.61960784 0.54509804 ... 0.03137255 0.01176471 0.02745098]
+ ...
+ [0.07843137 0.0745098  0.05882353 ... 0.19607843 0.20784314 0.18431373]
+ [0.09803922 0.05882353 0.09019608 ... 0.31372549 0.31764706 0.31372549]
+ [0.28627451 0.38431373 0.38823529 ... 0.36862745 0.22745098 0.10196078]]
+
+Ttest    (10000       )  inf-norm = 9.00000000
+[3 8 8 ... 5 1 7]</pre>
 </div>
 </div>
 </div>
@@ -2475,7 +2463,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 <div class="ulist">
 <ul>
 <li>
-<p>The last step is to reinstall the <code>nerva</code> Python module via <code>pip</code>, see <a href="#pip-install">[pip-install]</a>.</p>
+<p>The last step is to reinstall the <code>nerva</code> Python module via <code>pip</code>, see <a href="#pip-install">Installing the Python Module</a>.</p>
 </li>
 </ul>
 </div>
@@ -2485,7 +2473,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-15 16:23:32 UTC
+Last updated 2025-05-16 07:52:10 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
