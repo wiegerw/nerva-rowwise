@@ -1540,30 +1540,30 @@ Ttest    (10000       )  inf-norm = 9.00000000</pre>
 </div>
 <div id="construct_mlp1" class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp1</span><span class="p">(</span><span class="n">sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
+<pre class="rouge highlight"><code data-lang="python"><span class="k">def</span> <span class="nf">construct_mlp1</span><span class="p">(</span><span class="n">sizes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 
-    <span class="n">layer1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">layer1</span> <span class="o">=</span> <span class="nc">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                    <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                   <span class="n">activation</span><span class="o">=</span><span class="n">ReLU</span><span class="p">(),</span>
-                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
+                   <span class="n">activation</span><span class="o">=</span><span class="nc">ReLU</span><span class="p">(),</span>
+                   <span class="n">optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">())</span>
 
-    <span class="n">layer2</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">layer2</span> <span class="o">=</span> <span class="nc">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                    <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                   <span class="n">activation</span><span class="o">=</span><span class="n">ReLU</span><span class="p">(),</span>
-                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
+                   <span class="n">activation</span><span class="o">=</span><span class="nc">ReLU</span><span class="p">(),</span>
+                   <span class="n">optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">())</span>
 
-    <span class="n">layer3</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">layer3</span> <span class="o">=</span> <span class="nc">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
                    <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
-                   <span class="n">activation</span><span class="o">=</span><span class="n">NoActivation</span><span class="p">(),</span>
-                   <span class="n">optimizer</span><span class="o">=</span><span class="n">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="n">Xavier</span><span class="p">())</span>
+                   <span class="n">activation</span><span class="o">=</span><span class="nc">NoActivation</span><span class="p">(),</span>
+                   <span class="n">optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">())</span>
 
-    <span class="n">M</span> <span class="o">=</span> <span class="n">MultilayerPerceptron</span><span class="p">()</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="nc">MultilayerPerceptron</span><span class="p">()</span>
     <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer1</span><span class="p">,</span> <span class="n">layer2</span><span class="p">,</span> <span class="n">layer3</span><span class="p">]</span>
-    <span class="n">M</span><span class="p">.</span><span class="n">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="err">#</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">C</span><span class="o">++</span> <span class="n">data</span> <span class="n">structures</span>
-
+    <span class="n">M</span><span class="p">.</span><span class="nf">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="c1"># Initialize the C++ data structures
+</span>
     <span class="k">return</span> <span class="n">M</span></code></pre>
 </div>
 </div>
@@ -1575,23 +1575,23 @@ Ttest    (10000       )  inf-norm = 9.00000000</pre>
 </div>
 <div id="construct_mlp2" class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="n">def</span> <span class="n">construct_mlp2</span><span class="p">(</span><span class="n">linear_layer_sizes</span><span class="o">:</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
+<pre class="rouge highlight"><code data-lang="python"><span class="k">def</span> <span class="nf">construct_mlp2</span><span class="p">(</span><span class="n">linear_layer_sizes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 
-    <span class="n">layer_specifications</span> <span class="o">=</span> <span class="p">[</span><span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"ReLU"</span><span class="p">,</span> <span class="s">"Linear"</span><span class="p">]</span>
+    <span class="n">layer_specifications</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">ReLU</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ReLU</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Linear</span><span class="sh">"</span><span class="p">]</span>
     <span class="n">linear_layer_densities</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
     <span class="n">linear_layer_dropouts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
-    <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">]</span>
-    <span class="n">layer_optimizers</span> <span class="o">=</span> <span class="p">[</span><span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">]</span>
-    <span class="n">layers</span> <span class="o">=</span> <span class="n">make_layers</span><span class="p">(</span><span class="n">layer_specifications</span><span class="p">,</span>
+    <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">Xavier</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Xavier</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Xavier</span><span class="sh">"</span><span class="p">]</span>
+    <span class="n">layer_optimizers</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">GradientDescent</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GradientDescent</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GradientDescent</span><span class="sh">"</span><span class="p">]</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="nf">make_layers</span><span class="p">(</span><span class="n">layer_specifications</span><span class="p">,</span>
                          <span class="n">linear_layer_sizes</span><span class="p">,</span>
                          <span class="n">linear_layer_densities</span><span class="p">,</span>
                          <span class="n">linear_layer_dropouts</span><span class="p">,</span>
                          <span class="n">linear_layer_weights</span><span class="p">,</span>
                          <span class="n">layer_optimizers</span><span class="p">)</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="n">MultilayerPerceptron</span><span class="p">()</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="nc">MultilayerPerceptron</span><span class="p">()</span>
     <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span>
-    <span class="n">M</span><span class="p">.</span><span class="n">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="err">#</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">C</span><span class="o">++</span> <span class="n">data</span> <span class="n">structures</span>
-
+    <span class="n">M</span><span class="p">.</span><span class="nf">compile</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>  <span class="c1"># Initialize the C++ data structures
+</span>
     <span class="k">return</span> <span class="n">M</span></code></pre>
 </div>
 </div>
@@ -2494,7 +2494,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-16 08:04:40 UTC
+Last updated 2025-05-27 12:32:11 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
