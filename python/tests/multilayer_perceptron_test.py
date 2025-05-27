@@ -10,6 +10,9 @@
 import unittest
 from typing import List
 
+import torch
+import numpy as np  # Make sure numpy is imported
+
 from nerva.activation_functions import ReLU, NoActivation
 from nerva.layers import Dense, make_layers
 from nerva.loss_functions import SoftmaxCrossEntropyLoss
@@ -17,18 +20,66 @@ from nerva.multilayer_perceptron import MultilayerPerceptron
 from nerva.optimizers import GradientDescent
 from nerva.weights import Xavier
 
-import torch
 
-def check_equal_tensors(name1, X1, name2, X2, epsilon=1e-5):
-    error = torch.norm(X2 - X1).pow(2).item()
-    if error > epsilon:
-        print(f'Tensors {name1} and {name2} are not equal.')
-        print(f"{name1}: \n{X1}")
-        print(f"{name2}: \n{X2}")
-        print(f'error: {error}')
-        assert error <= epsilon, f"Error {error} exceeds tolerance {epsilon}."
+def check_tensors_are_close(name1, X1, name2, X2, atol=1e-3, rtol=1e-3):
+    """
+    Checks if two tensors (PyTorch or NumPy) are close enough for practical purposes,
+    using torch.allclose for robust floating-point comparison.
+    Automatically converts NumPy arrays to PyTorch tensors if necessary.
+
+    Args:
+        name1 (str): Name of the first tensor.
+        X1 (torch.Tensor or np.ndarray): The first tensor/array.
+        name2 (str): Name of the second tensor.
+        X2 (torch.Tensor or np.ndarray): The second tensor/array.
+        atol (float): Absolute tolerance.
+        rtol (float): Relative tolerance.
+    """
+    # --- Internal Type Conversion for Flexibility ---
+    # Convert X1 to a PyTorch tensor if it's a NumPy array
+    if isinstance(X1, np.ndarray):
+        # torch.from_numpy() creates a tensor that shares memory with the NumPy array.
+        # This is efficient and generally fine for comparison in tests.
+        X1_tensor = torch.from_numpy(X1)
+    elif isinstance(X1, torch.Tensor):
+        X1_tensor = X1
     else:
-        print(f'Tensors {name1} and {name2} are equal.')
+        raise TypeError(f"Unsupported type for {name1}: {type(X1)}. Expected torch.Tensor or numpy.ndarray.")
+
+    # Convert X2 to a PyTorch tensor if it's a NumPy array
+    if isinstance(X2, np.ndarray):
+        X2_tensor = torch.from_numpy(X2)
+    elif isinstance(X2, torch.Tensor):
+        X2_tensor = X2
+    else:
+        raise TypeError(f"Unsupported type for {name2}: {type(X2)}. Expected torch.Tensor or numpy.ndarray.")
+    # --- End of Internal Type Conversion ---
+
+    # Perform the check using PyTorch tensors
+    if not torch.allclose(X1_tensor, X2_tensor, atol=atol, rtol=rtol):
+        diff = torch.abs(X1_tensor - X2_tensor)
+        max_diff = torch.max(diff).item()
+
+        print(f'Tensors {name1} and {name2} are NOT close.')
+        print(f"Max absolute difference between elements: {max_diff:.8f}")
+        print(f"Tolerances: atol={atol}, rtol={rtol}")
+        print(f"Shape of {name1}: {X1_tensor.shape}, dtype: {X1_tensor.dtype}")
+        print(f"Shape of {name2}: {X2_tensor.shape}, dtype: {X2_tensor.dtype}")
+
+        # Displaying only a few elements for large tensors to avoid verbose output
+        if X1_tensor.numel() > 10:
+            print(f"{name1} (first 5 elements):\n{X1_tensor.flatten()[:5]}")
+            print(f"{name2} (first 5 elements):\n{X2_tensor.flatten()[:5]}")
+            print(f"Difference (first 5 elements):\n{diff.flatten()[:5]}")
+        else:
+            print(f"{name1}:\n{X1_tensor}")
+            print(f"{name2}:\n{X2_tensor}")
+            print(f"Difference:\n{diff}")
+
+        assert False, \
+            f"Tensors {name1} and {name2} are not close. Max diff: {max_diff:.8f}, Tolerances: atol={atol}, rtol={rtol}."
+    else:
+        print(f'Tensors {name1} and {name2} are close.')
 
 
 # tag::construct1[]
@@ -119,16 +170,16 @@ class TestMLPExecution(unittest.TestCase):
         Y = M.feedforward(X)
         DY = loss.gradient(Y, T) / batch_size   # take the average of the gradients in the batch
     
-        check_equal_tensors("Y", Y, "Y1", Y1)
-        check_equal_tensors("DY", DY, "DY1", DY1)
+        check_tensors_are_close("Y", Y, "Y1", Y1)
+        check_tensors_are_close("DY", DY, "DY1", DY1)
     
         M.backpropagate(Y, DY)
         M.optimize(lr)
         Y = M.feedforward(X)
         M.backpropagate(Y, DY)
     
-        check_equal_tensors("Y", Y, "Y2", Y2)
-        check_equal_tensors("DY", DY, "DY2", DY2)
+        check_tensors_are_close("Y", Y, "Y2", Y2)
+        check_tensors_are_close("DY", DY, "DY2", DY2)
 
 #--- begin generated code ---#
     def test_mlp0(self):

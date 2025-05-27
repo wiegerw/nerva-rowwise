@@ -8,7 +8,6 @@ import nervalibrowwise
 import torch
 
 from nerva.datasets import DataLoader
-from nerva.learning_rate_schedulers import LearningRateScheduler
 from nerva.loss_functions import LossFunction
 from nerva.multilayer_perceptron import MultilayerPerceptron, print_model_info
 from nerva.utilities import MapTimer, pp

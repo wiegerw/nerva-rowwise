@@ -16,7 +16,7 @@ from nerva.datasets import create_cifar10_augmented_dataloaders, create_cifar10_
     create_mnist_dataloaders, create_npz_dataloaders, extract_tensors_from_dataloader
 from nerva.grow import GrowFunction, parse_grow_function
 from nerva.layers import Dense, Sparse, make_layers
-from nerva.learning_rate_schedulers import LearningRateScheduler, parse_learning_rate_scheduler
+from nerva.learning_rate import LearningRateScheduler, parse_learning_rate_scheduler
 from nerva.loss_functions import LossFunction, parse_loss_function
 from nerva.multilayer_perceptron import print_model_info, MultilayerPerceptron
 from nerva.prune import PruneFunction, parse_prune_function

@@ -48,7 +48,7 @@ The most important files in the `nerva` module are given in the table below.
 A multilayer perceptron (MLP) is modeled using the class `MultilayerPerceptron`. It contains a list of layers, and has member functions `feedforward`, `backpropagate` and `optimize` that can be used for training the neural network. Constructing an MLP can be done as follows:
 [[construct_mlp1]]
 [.small-code]
-[source,cpp]
+[source,python]
 ----
 include::../../python/tests/multilayer_perceptron_test.py[tag=construct1]
 ----
@@ -57,7 +57,7 @@ This creates an MLP with three linear layers. The parameter `sizes` contains the
 Another way to construct MLPs is provided by the function `make_layers`, that offers a string based interface. An example is given in the code below:
 [[construct_mlp2]]
 [.small-code]
-[source,cpp]
+[source,python]
 ----
 include::../../python/tests/multilayer_perceptron_test.py[tag=construct2]
 ----

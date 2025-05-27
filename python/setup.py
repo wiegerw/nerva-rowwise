@@ -10,7 +10,7 @@ from pybind11.setup_helpers import Pybind11Extension
 import os
 import sys
 
-__version__ = "0.3"
+__version__ = "0.31"
 
 define_macros = [('VERSION_INFO', __version__)]
 include_dirs = ['../include']
