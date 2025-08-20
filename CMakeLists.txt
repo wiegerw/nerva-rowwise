@@ -31,7 +31,7 @@ include_directories(${fmt_SOURCE_DIR}/include)
 FetchContent_Declare(
     lyra
     GIT_REPOSITORY https://github.com/bfgroup/Lyra.git
-    GIT_TAG 1.6.1
+    GIT_TAG 1.7.0
 )
 FetchContent_MakeAvailable(lyra)
 include_directories(${lyra_SOURCE_DIR}/include)
@@ -40,7 +40,7 @@ include_directories(${lyra_SOURCE_DIR}/include)
 FetchContent_Declare(
     pybind11
     GIT_REPOSITORY https://github.com/pybind/pybind11.git
-    GIT_TAG v2.13.5
+    GIT_TAG v3.0.0
 )
 FetchContent_MakeAvailable(pybind11)
 
@@ -48,7 +48,7 @@ FetchContent_MakeAvailable(pybind11)
 FetchContent_Declare(
     doctest
     GIT_REPOSITORY https://github.com/doctest/doctest.git
-    GIT_TAG v2.4.11
+    GIT_TAG v2.4.12
 )
 FetchContent_MakeAvailable(doctest)
 
