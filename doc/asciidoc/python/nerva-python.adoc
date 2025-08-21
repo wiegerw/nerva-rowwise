@@ -11,7 +11,7 @@
 :icons: font
 :description: Documentation for the nerva-rowwise repository.
 :imagesdir: images
-:bibliography: ../../nerva.bib
+:bibliography: ../../latex/nerva.bib
 :nerva-python:  # This is used as an ifdef directive
 :sectnums:
 :sectnumlevels: 3

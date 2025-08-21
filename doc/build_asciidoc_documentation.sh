@@ -13,7 +13,7 @@ mkdir -p "${OUTPUT_DIRECTORY}"
 rm -f "${OUTPUT_DIRECTORY}/nerva-python.html" "${OUTPUT_DIRECTORY}/nerva-rowwise.html"
 
 # Common Asciidoctor options
-BIBTEX_FILE="${SCRIPT_DIR}/nerva.bib"
+BIBTEX_FILE="${SCRIPT_DIR}/latex/nerva.bib"
 COMMON_OPTS=(-r asciidoctor-bibtex -a "source-highlighter=rouge" -D "${OUTPUT_DIRECTORY}")
 
 # Build Python manual
