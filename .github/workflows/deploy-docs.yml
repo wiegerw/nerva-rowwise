@@ -26,9 +26,7 @@ jobs:
 
       - name: Compile Asciidoc
         run: |
-          mkdir -p output_directory
-          asciidoctor -r asciidoctor-bibtex -a bibtex-file=doc/nerva.bib -a source-highlighter=rouge -D ./output_directory ./doc/asciidoc/cpp/nerva-rowwise.adoc
-          asciidoctor -r asciidoctor-bibtex -a bibtex-file=doc/nerva.bib -a source-highlighter=rouge -D ./output_directory ./doc/asciidoc/python/nerva-python.adoc
+          bash doc/build_asciidoc_documentation.sh
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

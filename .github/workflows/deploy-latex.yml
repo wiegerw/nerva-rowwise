@@ -24,13 +24,7 @@ jobs:
 
       - name: Compile LaTeX
         run: |
-          mkdir -p output_directory
-          cd doc
-          pdflatex nerva-library-specifications.tex
-          bibtex nerva-library-specifications
-          pdflatex nerva-library-specifications.tex
-          pdflatex nerva-library-specifications.tex
-          cp nerva-library-specifications.pdf ../output_directory
+          bash doc/build_latex_documentation.sh
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
