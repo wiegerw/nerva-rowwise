@@ -6,7 +6,7 @@ An example invocation of the `inspect_npz.py` tool is
 [.small-code]
 [source,bash]
 ----
-include::../../python/examples/inspect_cifar10.sh[tag=doc]
+include::../../../python/examples/inspect_cifar10.sh[tag=doc]
 ----
 
 The output may look like this:

@@ -14,7 +14,7 @@ As an example, we will explain how the loss function `SoftmaxCrossEntropyLoss` i
 [.small-code]
 [source,c++]
 ----
-include::../../src/python-bindings.cpp[tag=softmax_cross_entropy_loss]
+include::../../../src/python-bindings.cpp[tag=softmax_cross_entropy_loss]
 ----
 
 * The third step is to define a Python class `SoftmaxCrossEntropyLoss` in the file `link:https://github.com/wiegerw/nerva-rowwise/blob/main/python/nerva/loss-functions.py[loss-functions.py]`:
@@ -22,7 +22,7 @@ include::../../src/python-bindings.cpp[tag=softmax_cross_entropy_loss]
 [.small-code]
 [source,python]
 ----
-include::../../python/nerva/loss_functions.py[tag=softmax_cross_entropy_loss]
+include::../../../python/nerva/loss_functions.py[tag=softmax_cross_entropy_loss]
 ----
 Note that the Python class derives from the C++ class. In the same file, an entry to the function `parse_loss_function` should be added.
 

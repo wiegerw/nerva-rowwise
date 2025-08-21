@@ -19,7 +19,7 @@ The tool `{mlptool}` can be used for training multilayer perceptrons. An example
 [.small-code]
 [source,bash]
 ----
-include::../../python/examples/cifar10_sparse.sh[tag=doc]
+include::../../../python/examples/cifar10_sparse.sh[tag=doc]
 ----
 This will train a https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] model using an MLP consisting of three sparse layers with activation functions ReLU, ReLU and no activation.
 A script `prepare_data.py` is available in the `data` directory

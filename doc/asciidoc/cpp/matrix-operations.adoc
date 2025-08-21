@@ -6,7 +6,7 @@ Using this table leads to concise and uniform code. For example, the backpropaga
 [.small-code]
 [source,cpp]
 ----
-include::../../include/nerva/neural_networks/layers.h[tag=matrix_operations]
+include::../../../include/nerva/neural_networks/layers.h[tag=matrix_operations]
 ----
 See the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] for an overview of how these matrix operations are used.
 
