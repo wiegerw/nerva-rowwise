@@ -1411,7 +1411,7 @@ The edgeitems used for printing matrices. This sets the number of border rows an
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">python ../tools/inspect_npz.py ../../data/cifar10-flattened.npz</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">python inspect_npz.py data/cifar10-flattened.npz</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1980,7 +1980,7 @@ This format is used for portability between C++ and Python implementations. Ther
 <p>The mlp.py tool requires training and testing data to be stored in <code>.npz</code> format. To help with this, a script is provided to download and preprocess datasets commonly used in experiments, including <strong>MNIST</strong> and <strong>CIFAR-10</strong>.</p>
 </div>
 <div class="paragraph">
-<p>The script is located at <a href="../../python/data/prepare_data.py" class="bare">../../python/data/prepare_data.py</a> and can be run from the command line.</p>
+<p>The script is located at <a href="../../../python/data/prepare_data.py" class="bare">../../../python/data/prepare_data.py</a> and can be run from the command line.</p>
 </div>
 <div class="sect3">
 <h4 id="_mnist">5.2.1. MNIST</h4>
@@ -2340,30 +2340,26 @@ In the tool <code>mlp.py</code> the option <code>--overall-density</code> is use
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="k">struct</span> <span class="nc">prune_function</span>
-<span class="p">{</span>
-  <span class="c1">/// Removes elements from the support of a sparse matrix</span>
-  <span class="c1">/// @param W A sparse matrix</span>
-  <span class="c1">/// @return The number of elements removed from the support</span>
-  <span class="k">virtual</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="k">operator</span><span class="p">()(</span><span class="n">mkl</span><span class="o">::</span><span class="n">sparse_matrix_csr</span><span class="o">&lt;</span><span class="n">scalar</span><span class="o">&gt;&amp;</span> <span class="n">W</span><span class="p">)</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-  <span class="k">virtual</span> <span class="o">~</span><span class="n">prune_function</span><span class="p">()</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
-<span class="p">};</span></code></pre>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="k">class</span> <span class="nc">PruneFunction</span><span class="p">(</span><span class="n">object</span><span class="p">)</span><span class="o">:</span>
+    <span class="s">"""</span><span class="err">
+</span><span class="s">    Interface for pruning the weights of a sparse layer</span><span class="err">
+</span><span class="s">    """</span>
+    <span class="n">def</span> <span class="n">__call__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">layer</span><span class="o">:</span> <span class="n">Sparse</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">raise</span> <span class="n">NotImplementedError</span></code></pre>
 </div>
 </div>
 <div class="listingblock small-code">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="k">struct</span> <span class="nc">grow_function</span>
-<span class="p">{</span>
-  <span class="c1">/// Adds `count` elements to the support of matrix `W`</span>
-  <span class="k">virtual</span> <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">mkl</span><span class="o">::</span><span class="n">sparse_matrix_csr</span><span class="o">&lt;</span><span class="n">scalar</span><span class="o">&gt;&amp;</span> <span class="n">W</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">count</span><span class="p">)</span> <span class="k">const</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-  <span class="k">virtual</span> <span class="o">~</span><span class="n">grow_function</span><span class="p">()</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
-<span class="p">};</span></code></pre>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="k">class</span> <span class="nc">GrowFunction</span><span class="p">(</span><span class="n">object</span><span class="p">)</span><span class="o">:</span>
+    <span class="s">"""</span><span class="err">
+</span><span class="s">    Interface for growing weights of a sparse layer</span><span class="err">
+</span><span class="s">    """</span>
+    <span class="n">def</span> <span class="n">__call__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">layer</span><span class="o">:</span> <span class="n">Sparse</span><span class="p">,</span> <span class="n">count</span><span class="o">:</span> <span class="kt">int</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">raise</span> <span class="n">NotImplementedError</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In the command line tool <code>mlp</code> the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute <code>regrow_function</code> that applies pruning and growing to the sparse layers of an MLP. See also the <a href="#on_start_epoch">[on_start_epoch]</a> event.</p>
+<p>In the command line tool <code>mlp.py</code> the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute <code>regrow_function</code> that applies pruning and growing to the sparse layers of an MLP. See also the <a href="#on_start_epoch">[on_start_epoch]</a> event.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2494,7 +2490,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-08-21 13:06:08 UTC
+Last updated 2025-08-21 15:45:12 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
