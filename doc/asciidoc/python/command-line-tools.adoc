@@ -56,6 +56,6 @@ epoch   9  lr: 0.01000000  loss: 1.62592003  train accuracy: 0.41828000  test ac
 epoch  10  lr: 0.01000000  loss: 1.58918872  train accuracy: 0.43308000  test accuracy: 0.43240000  time: 4.33621435s
 ----
 
-include::../shared/mlp-options.adoc[]
+include::../include/mlp-options.adoc[]
 
-include::../shared/inspect_npz.adoc[]
+include::../include/inspect_npz.adoc[]

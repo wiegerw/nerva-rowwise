@@ -1,3 +1,3 @@
 include::settings.adoc[]
 
-include::../shared/performance.adoc[]
+include::../include/performance.adoc[]

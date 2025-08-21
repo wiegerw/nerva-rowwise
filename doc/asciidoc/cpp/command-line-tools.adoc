@@ -50,7 +50,7 @@ epoch   4 lr: 0.01000000  loss: 1.68071066  train accuracy: 0.39838000  test acc
 epoch   5 lr: 0.01000000  loss: 1.59761505  train accuracy: 0.42820000  test accuracy: 0.43060000 time: 3.02131606s
 ----
 
-include::../shared/mlp-options.adoc[]
+include::../include/mlp-options.adoc[]
 
 === The tool mkl
 The tool `mkl` is used for benchmarking sparse and dense matrix products. An example of running the `mkl` tool is

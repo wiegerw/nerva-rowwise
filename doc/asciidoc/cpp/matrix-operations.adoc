@@ -1,6 +1,6 @@
 include::settings.adoc[]
 
-include::../shared/matrix-operations.adoc[]
+include::../include/matrix-operations.adoc[]
 
 Using this table leads to concise and uniform code. For example, the backpropagation implementation of a softmax layer looks like this:
 [.small-code]
