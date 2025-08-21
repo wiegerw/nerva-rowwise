@@ -7,13 +7,13 @@ In the {library}, the classes `prune_function` and `grow_function` are used to r
 [.small-code]
 [source,cpp]
 ----
-include::../../../include/nerva/neural_networks/prune.h[tag=doc]
+include::{root}/include/nerva/neural_networks/prune.h[tag=doc]
 ----
 
 [.small-code]
 [source,cpp]
 ----
-include::../../../include/nerva/neural_networks/grow.h[tag=doc]
+include::{root}/include/nerva/neural_networks/grow.h[tag=doc]
 ----
 
 In the command line tool `mlp` the user can select specific implementations of these prune and grow functions. They are called at the start of each epoch of training via an attribute `regrow_function` that applies pruning and growing to the sparse layers of an MLP. See also the <<on_start_epoch>> event.
@@ -25,7 +25,7 @@ An example of a dynamic sparse training experiment is
 [.small-code]
 [source,bash]
 ----
-include::../../../examples/cifar10_pruning.sh[tag=doc]
+include::{root}/examples/cifar10_pruning.sh[tag=doc]
 ----
 At the start of every epoch 20% of the weights is pruned, and the same number of weights is added back at different locations.
 The output may look like this:

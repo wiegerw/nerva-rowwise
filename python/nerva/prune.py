@@ -30,12 +30,14 @@ class RegrowFunction(object):
         raise NotImplementedError
 
 
+# tag::doc[]
 class PruneFunction(object):
     """
     Interface for pruning the weights of a sparse layer
     """
     def __call__(self, layer: Sparse):
         raise NotImplementedError
+# end::doc[]
 
 
 class PruneMagnitude(PruneFunction):

@@ -8,9 +8,14 @@ from nerva.layers import Sparse
 from nerva.weights import WeightInitializer
 
 
+# tag::doc[]
 class GrowFunction(object):
+    """
+    Interface for growing weights of a sparse layer
+    """
     def __call__(self, layer: Sparse, count: int):
         raise NotImplementedError
+# end::doc[]
 
 
 class GrowRandom(GrowFunction):

@@ -23,7 +23,7 @@ The tool `mlp` can be used for training multilayer perceptrons. An example invoc
 [.small-code]
 [source,bash]
 ----
-include::../../../examples/cifar10_sparse.sh[tag=doc]
+include::{examplesdir}/cifar10_sparse.sh[tag=doc]
 ----
 This will train a https://www.cs.toronto.edu/~kriz/cifar.html[CIFAR-10] model using an MLP consisting of three sparse layers with activation functions ReLU, ReLU and no activation.
 A script `prepare_data.py` is available in the `data` directory
@@ -57,7 +57,7 @@ The tool `mkl` is used for benchmarking sparse and dense matrix products. An exa
 [.small-code]
 [source,bash]
 ----
-include::../../../examples/mkl_benchmark.sh[tag=doc]
+include::{examplesdir}/mkl_benchmark.sh[tag=doc]
 ----
 This will use various algorithms to calculate the product `A = B * C` with `A` a sparse matrix and `B` and `C` dense matrices.
 

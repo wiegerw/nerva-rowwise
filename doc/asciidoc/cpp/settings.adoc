@@ -4,5 +4,6 @@ ifndef::library[:library: pass:q[_Nerva-Rowwise C++ Library_]]
 ifndef::mlptool[:mlptool: mlp]
 ifndef::sgd_algorithm[:sgd_algorithm: stochastic_gradient_descent_algorithm]
 ifndef::mlp-cpp-options[:mlp-cpp-options:]
-ifndef::root[:root: ../..]
 ifndef::cpp[:cpp: C&#43;&#43;]
+ifndef::root[:root: ../../..]
+:examplesdir: ../../../examples
