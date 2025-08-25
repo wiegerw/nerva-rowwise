@@ -1,6 +1,6 @@
 include::settings.adoc[]
 
-include::../include/sparse-neural-networks.adoc[]
+include::../include/nerva-cpp-sparse-neural-networks.adoc[]
 
 === Classes for pruning and growing
 In the {library}, the classes `prune_function` and `grow_function` are used to represent generic pruning and growing strategies:

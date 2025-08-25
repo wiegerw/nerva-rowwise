@@ -1,6 +1,6 @@
 include::settings.adoc[]
 
-include::../include/performance.adoc[]
+include::../include/nerva-cpp-performance.adoc[]
 
 === Nerva computation mode
 In general, the performance of Eigen is very good. But occasionally, the generated code for a matrix expression can be quite poor. Especially in case of backpropagation calculations this can have a huge impact on the performance. The {library} uses a global setting `NervaComputation` to experiment with other implementations. For example, the function `softmax_layer::feedforward` contains this:
