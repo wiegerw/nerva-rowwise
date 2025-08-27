@@ -78,7 +78,7 @@ void print_dimensions(const std::string& name, const Matrix& x)
 }
 
 template <typename Matrix>
-void print_numpy_row_full(const Matrix& x, long i)
+void print_numpy_row_full(const Matrix& x, long i, int precision)
 {
   long n = x.cols();
   std::cout << "   [";
@@ -88,25 +88,25 @@ void print_numpy_row_full(const Matrix& x, long i)
     {
       std::cout << ", ";
     }
-    std::cout << fmt::format("{:11.8f}", x(i, j));
+    std::cout << fmt::format("{:.{}f}", x(i, j), precision);
   }
   std::cout << "]\n";
 }
 
 template <typename Row>
-void print_numpy_row(const Row& x, long edgeitems=3)
+void print_numpy_row(const Row& x, long edgeitems, int precision)
 {
   using Scalar = typename Row::Scalar;
 
-  auto print = [](auto x)
+  auto print = [&](auto v)
   {
     if constexpr (std::is_integral<Scalar>::value)
     {
-      std::cout << fmt::format("{:3d}", x);
+      std::cout << fmt::format("{:3d}", v);
     }
     else
     {
-      std::cout << fmt::format("{:11.8f}", x);
+      std::cout << fmt::format("{:.{}f}", v, precision);
     }
   };
 
@@ -149,11 +149,11 @@ void print_numpy_row(const Row& x, long edgeitems=3)
 }
 
 template <typename Vector>
-void print_numpy_vector(const std::string& name, const Vector& x, long edgeitems=3)
+void print_numpy_vector(const std::string& name, const Vector& x, long edgeitems = 3, int precision = 8)
 {
   std::cout << name << "= (" << x.size() << ")\n";
   // std::cout << std::setw(7);
-  print_numpy_row(x, edgeitems);
+  print_numpy_row(x, edgeitems, precision);
 }
 
 template <typename Matrix>
@@ -187,7 +187,7 @@ struct matrix_row
  * @param edgeitems The number of items to print at the edges of the matrix.
  */
 template <typename Matrix>
-void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems=3)
+void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems = 3, int precision = 8)
 {
   std::cout << fmt::format("{} ({}x{}) norm = {:.8f} {}\n", name, x.rows(), x.cols(), infinity_norm(x), (has_nan(x) ? " contains NaN " : ""));
 
@@ -202,7 +202,7 @@ void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems
 
   for (long i = 0; i < top; i++)
   {
-    print_numpy_row(matrix_row(x, i), edgeitems);
+    print_numpy_row(matrix_row(x, i), edgeitems, precision);
   }
 
   if (m > 2*edgeitems)
@@ -213,7 +213,7 @@ void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems
 
   for (long i = bottom; i < m; i++)
   {
-    print_numpy_row(matrix_row(x, i), edgeitems);
+    print_numpy_row(matrix_row(x, i), edgeitems, precision);
   }
 }
 

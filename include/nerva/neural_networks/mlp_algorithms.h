@@ -27,7 +27,7 @@
 namespace nerva {
 
 inline
-void print_model_info(const multilayer_perceptron& M, long edgeitems = 3)
+void print_model_info(const multilayer_perceptron& M, long edgeitems = 3, int precision = 8)
 {
   unsigned int index = 1;
 
@@ -40,20 +40,20 @@ void print_model_info(const multilayer_perceptron& M, long edgeitems = 3)
   {
     if (auto dlayer = dynamic_cast<dense_linear_layer*>(layer.get()))
     {
-      print_numpy_matrix(name("W"), dlayer->W, edgeitems);
-      print_numpy_matrix(name("b"), dlayer->b, edgeitems);
+      print_numpy_matrix(name("W"), dlayer->W, edgeitems, precision);
+      print_numpy_matrix(name("b"), dlayer->b, edgeitems, precision);
       index++;
     }
     else if (auto slayer = dynamic_cast<sparse_linear_layer*>(layer.get()))
     {
-      print_numpy_matrix(name("W"), mkl::to_eigen(slayer->W), edgeitems);
-      print_numpy_matrix(name("b"), slayer->b, edgeitems);
+      print_numpy_matrix(name("W"), mkl::to_eigen(slayer->W), edgeitems, precision);
+      print_numpy_matrix(name("b"), slayer->b, edgeitems, precision);
       index++;
     }
     else if (auto blayer = dynamic_cast<batch_normalization_layer*>(layer.get()))
     {
-      print_numpy_matrix(name("beta"), blayer->beta, edgeitems);
-      print_numpy_matrix(name("gamma"), blayer->gamma);
+      print_numpy_matrix(name("beta"), blayer->beta, edgeitems, precision);
+      print_numpy_matrix(name("gamma"), blayer->gamma, edgeitems, precision);
       index++;
     }
   }

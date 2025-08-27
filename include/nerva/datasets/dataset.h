@@ -38,10 +38,10 @@ using long_vector = Eigen::Matrix<long, Eigen::Dynamic, 1>;
 template <typename Matrix>
 void dataset_info(const Matrix& Xtrain, const Matrix& Ttrain, const Matrix& Xtest, const Matrix& Ttest)
 {
-  print_numpy_matrix("Xtrain", Xtrain);
-  print_numpy_matrix("Ttrain", Ttrain);
-  print_numpy_matrix("Xtest", Xtest);
-  print_numpy_matrix("Ttest", Ttest);
+  print_numpy_matrix("Xtrain", Xtrain, 3, 8);
+  print_numpy_matrix("Ttrain", Ttrain, 3, 8);
+  print_numpy_matrix("Xtest", Xtest, 3, 8);
+  print_numpy_matrix("Ttest", Ttest, 3, 8);
 }
 
 // Precondition: the python interpreter must be running.

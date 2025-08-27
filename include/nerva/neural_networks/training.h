@@ -235,21 +235,21 @@ class stochastic_gradient_descent_algorithm
           if (options.debug)
           {
             std::cout << "epoch: " << epoch << " batch: " << batch_index << '\n';
-            print_model_info(M, options.edgeitems);
-            print_numpy_matrix("X", X, options.edgeitems);
-            print_numpy_matrix("Y", Y, options.edgeitems);
-            print_numpy_matrix("DY", DY, options.edgeitems);
+            print_model_info(M, options.edgeitems, options.precision);
+            print_numpy_matrix("X", X, options.edgeitems, options.precision);
+            print_numpy_matrix("Y", Y, options.edgeitems, options.precision);
+            print_numpy_matrix("DY", DY, options.edgeitems, options.precision);
           }
 
           if (has_nan(Y))
           {
-            print_numpy_matrix("Y", Y, options.edgeitems);
+            print_numpy_matrix("Y", Y, options.edgeitems, options.precision);
             throw std::runtime_error("the output Y contains NaN values");
           }
 
           if (has_nan(DY))
           {
-            print_numpy_matrix("DY", DY, options.edgeitems);
+            print_numpy_matrix("DY", DY, options.edgeitems, options.precision);
             throw std::runtime_error("the gradient DY contains NaN values");
           }
 

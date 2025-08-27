@@ -18,10 +18,10 @@
 namespace nerva::mkl {
 
 template <typename Derived>
-void print_numpy_matrix(const std::string& name, const Eigen::MatrixBase<Derived>& A, long edgeitems=3)
+void print_numpy_matrix(const std::string& name, const Eigen::MatrixBase<Derived>& A, long edgeitems, int precision=8)
 {
   auto A_view = mkl::make_dense_matrix_view(A);
-  nerva::print_numpy_matrix(name, A_view, edgeitems);
+  nerva::print_numpy_matrix(name, A_view, edgeitems, 8);
 }
 
 template <typename Scalar, int MatrixLayout>
@@ -77,9 +77,9 @@ Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, MatrixLayout> to_eigen(con
 }
 
 template <typename Scalar>
-void print_numpy_matrix(const std::string& name, const sparse_matrix_csr<Scalar>& A, long edgeitems=3)
+void print_numpy_matrix(const std::string& name, const sparse_matrix_csr<Scalar>& A, long edgeitems = 3, int precision = 8)
 {
-  nerva::print_numpy_matrix(name, to_eigen(A), edgeitems);
+  nerva::print_numpy_matrix(name, to_eigen(A), edgeitems, precision);
 }
 
 // returns a boolean matrix with the non-zero entries of A
