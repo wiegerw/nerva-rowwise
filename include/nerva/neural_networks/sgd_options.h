@@ -29,6 +29,7 @@ struct sgd_options
   bool debug = false;
   scalar gradient_step = 0;  // if gradient_step > 0 then gradient checks will be done
   scalar clip = 0; // threshold for values that are clipped to 0
+  long edgeitems = 3; // number of items to print at the edges for matrix/array printing
 
   void info() const;
 };
@@ -47,6 +48,7 @@ std::ostream& operator<<(std::ostream& out, const sgd_options& options)
   }
   out << "statistics = " << std::boolalpha << options.statistics << std::endl;
   out << "debug = " << std::boolalpha << options.debug << std::endl;
+  out << "edgeitems = " << options.edgeitems << std::endl;
   return out;
 }
 

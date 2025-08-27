@@ -307,6 +307,7 @@ struct mlp_options: public sgd_options
     out << "densities = " << print_list(options.densities) << std::endl;
     out << "seed = " << options.seed << std::endl;
     out << "precision = " << options.precision << std::endl;
+    out << "edgeitems = " << options.edgeitems << std::endl;
     out << "threads = " << options.threads << std::endl;
     return out;
   }
@@ -386,6 +387,7 @@ class mlp_tool: public command_line_tool
 
       // print options
       cli |= lyra::opt(options.precision, "value")["--precision"]("The precision that is used for printing.");
+      cli |= lyra::opt(options.edgeitems, "value")["--edgeitems"]("The edgeitems used for printing matrices");
       cli |= lyra::opt(info)["--info"]("print some info about the multilayer_perceptron's");
       cli |= lyra::opt(timer, "-t")["--timer"].choices("disabled", "brief", "full");
 
