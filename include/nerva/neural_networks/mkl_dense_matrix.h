@@ -9,14 +9,13 @@
 
 #pragma once
 
-#include "nerva/neural_networks/mkl_dense_vector.h"
-#include "nerva/neural_networks/print_matrix.h"
-#include "Eigen/Dense"
-#include <mkl.h>
 #include <algorithm>
 #include <cassert>
-#include <stdexcept>
+#include <mkl.h>
 #include <vector>
+#include "Eigen/Dense"
+#include "nerva/neural_networks/mkl_dense_vector.h"
+#include "nerva/neural_networks/print_matrix.h"
 
 namespace nerva::mkl {
 
@@ -583,7 +582,7 @@ template <typename Scalar, int MatrixLayout>
 Scalar cblas_nrm2(dense_matrix_view<Scalar, MatrixLayout>& x)
 {
   auto x_view = make_dense_vector_view(x);
-  cblas_nrm2(x_view);
+  return cblas_nrm2(x_view);
 };
 
 // x := a*x

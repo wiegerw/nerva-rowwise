@@ -10,11 +10,12 @@
 #pragma once
 
 #include <algorithm>
-#include "fmt/format.h"
-#include <iostream>
 #include <string>
 #include <type_traits>
+#include <vector>
 #include <Eigen/Dense>
+#include "fmt/format.h"
+#include "fmt/ranges.h"
 
 namespace nerva {
 
@@ -74,23 +75,19 @@ void print_matrix(const std::string& name, const Matrix& x)
 template <typename Matrix>
 void print_dimensions(const std::string& name, const Matrix& x)
 {
-  std::cout << name << " = " << x.rows() << " x " << x.cols() << std::endl;
+  fmt::print("{} = {} x {}\n", name, x.rows(), x.cols());
 }
 
 template <typename Matrix>
 void print_numpy_row_full(const Matrix& x, long i, int precision)
 {
-  long n = x.cols();
-  std::cout << "   [";
-  for (long j = 0; j < n; j++)
+  std::vector<std::string> s;
+  s.reserve(static_cast<std::size_t>(x.cols()));
+  for (long j = 0; j < x.cols(); ++j)
   {
-    if (j > 0)
-    {
-      std::cout << ", ";
-    }
-    std::cout << fmt::format("{:.{}f}", x(i, j), precision);
+    s.push_back(fmt::format("{:.{}f}", static_cast<double>(x(i, j)), precision));
   }
-  std::cout << "]\n";
+  fmt::print("   [{}]\n", fmt::join(s, ", "));
 }
 
 template <typename Row>
@@ -98,61 +95,38 @@ void print_numpy_row(const Row& x, long edgeitems, int precision)
 {
   using Scalar = typename Row::Scalar;
 
-  auto print = [&](auto v)
+  // Pre-format all elements with desired precision or integer format
+  std::vector<std::string> s;
+  s.reserve(static_cast<std::size_t>(x.size()));
+  for (long j = 0; j < x.size(); ++j)
   {
-    if constexpr (std::is_integral<Scalar>::value)
+    if constexpr (std::is_integral_v<Scalar>)
     {
-      std::cout << fmt::format("{:3d}", v);
+      s.push_back(fmt::format("{}", x(j)));
     }
     else
     {
-      std::cout << fmt::format("{:.{}f}", v, precision);
+      s.push_back(fmt::format("{:.{}f}", static_cast<double>(x(j)), precision));
     }
-  };
-
-  long n = x.size();
-  long left = n;
-  long right = n;
-
-  std::cout << "   [";
-
-  if (n > 2*edgeitems)
-  {
-    left = std::min(n, edgeitems);
   }
 
-  for (long j = 0; j < left; j++)
+  const long n = static_cast<long>(s.size());
+  if (n <= 2 * edgeitems)
   {
-    if (j > 0)
-    {
-      std::cout << ", ";
-    }
-    print(x(j));
+    fmt::print("   [{}]\n", fmt::join(s, ", "));
+    return;
   }
 
-  if (n > 2*edgeitems)
-  {
-    std::cout << ",  ..., ";
-    right = std::max(long(0), n - edgeitems);
-  }
-
-  for (long j = right; j < n; j++)
-  {
-    if (j > n - 3)
-    {
-      std::cout << ", ";
-    }
-    print(x(j));
-  }
-
-  std::cout << "]\n";
+  const long left = edgeitems;
+  const long right = n - edgeitems;
+  fmt::print("   [{},  ..., {}]\n",
+             fmt::join(s.begin(), s.begin() + left, ", "),
+             fmt::join(s.begin() + right, s.end(), ", "));
 }
-
 template <typename Vector>
 void print_numpy_vector(const std::string& name, const Vector& x, long edgeitems = 3, int precision = 8)
 {
-  std::cout << name << "= (" << x.size() << ")\n";
-  // std::cout << std::setw(7);
+  fmt::print("{}= ({})\n", name, x.size());
   print_numpy_row(x, edgeitems, precision);
 }
 
@@ -189,7 +163,7 @@ struct matrix_row
 template <typename Matrix>
 void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems = 3, int precision = 8)
 {
-  std::cout << fmt::format("{} ({}x{}) norm = {:.{}f} {}\n", name, x.rows(), x.cols(), infinity_norm(x), precision, (has_nan(x) ? " contains NaN " : ""));
+  fmt::print("{} ({}x{}) norm = {:.{}f} {}\n", name, x.rows(), x.cols(), infinity_norm(x), precision, (has_nan(x) ? " contains NaN " : ""));
 
   long m = x.rows();
   long top = m;
@@ -207,7 +181,7 @@ void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems
 
   if (m > 2*edgeitems)
   {
-    std::cout << "   ...,\n";
+    fmt::print("   ...,\n");
     bottom = std::max(long(0), m - edgeitems);
   }
 
@@ -220,22 +194,20 @@ void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems
 template <typename Matrix>
 void print_cpp_matrix(const std::string& name, const Matrix& x)
 {
-  std::cout << name << " = " << x.rows() << "x" << x.cols() << "\n";
-  std::cout << "{\n";
-  for (long i = 0; i < x.rows(); i++)
+  fmt::print("{} = {}x{}\n", name, x.rows(), x.cols());
+  fmt::print("{{\n");
+  for (long i = 0; i < x.rows(); ++i)
   {
-    std::cout << "  {";
-    for (long j = 0; j < x.cols(); j++)
+    std::vector<std::string> row;
+    row.reserve(static_cast<std::size_t>(x.cols()));
+    for (long j = 0; j < x.cols(); ++j)
     {
-      if (j != 0)
-      {
-        std::cout << ", ";
-      }
-      std::cout << x(i, j);
+      row.push_back(fmt::format("{}", x(i, j)));
     }
-    std::cout << (i < x.rows() - 1 ? "},\n" : "}\n");
+    const char* suffix = (i < x.rows() - 1) ? "," : "";
+    fmt::print("  {{ {} }}{}\n", fmt::join(row, ", "), suffix);
   }
-  std::cout << "}\n";
+  fmt::print("}}\n");
 }
 
 } // namespace nerva
