@@ -272,7 +272,6 @@ struct mlp_options: public sgd_options
   scalar overall_density = 1;
   std::vector<double> densities;
   std::size_t seed = std::random_device{}();
-  int precision = 8;
   int threads = 1;
 
   void info() const

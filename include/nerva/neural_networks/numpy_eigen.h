@@ -84,11 +84,11 @@ void print_dict(const py::dict& data)
     }
     else if (key[0] == 'b')
     {
-      print_numpy_vector(key, eigen::extract_column_vector<scalar>(data, key));
+      print_numpy_vector(key, eigen::extract_column_vector<scalar>(data, key), 3, 8);
     }
     else if (key == "Ttrain" || key == "Ttest")
     {
-      print_numpy_vector(key, eigen::extract_column_vector<long>(data, key));
+      print_numpy_vector(key, eigen::extract_column_vector<long>(data, key), 3, 8);
     }
   }
 }

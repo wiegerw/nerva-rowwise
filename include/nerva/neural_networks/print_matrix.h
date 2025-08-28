@@ -189,7 +189,7 @@ struct matrix_row
 template <typename Matrix>
 void print_numpy_matrix(const std::string& name, const Matrix& x, long edgeitems = 3, int precision = 8)
 {
-  std::cout << fmt::format("{} ({}x{}) norm = {:.8f} {}\n", name, x.rows(), x.cols(), infinity_norm(x), (has_nan(x) ? " contains NaN " : ""));
+  std::cout << fmt::format("{} ({}x{}) norm = {:.{}f} {}\n", name, x.rows(), x.cols(), infinity_norm(x), precision, (has_nan(x) ? " contains NaN " : ""));
 
   long m = x.rows();
   long top = m;
