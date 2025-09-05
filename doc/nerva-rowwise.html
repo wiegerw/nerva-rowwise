@@ -1023,7 +1023,7 @@ b2 gcc-14 link=static release -j8</code></pre>
 <pre class="rouge highlight"><code data-lang="bash">../install/bin/mlp <span class="se">\</span>
     <span class="nt">--layers</span><span class="o">=</span><span class="s2">"ReLU;ReLU;Linear"</span> <span class="se">\</span>
     <span class="nt">--layer-sizes</span><span class="o">=</span><span class="s2">"3072;1024;1024;10"</span> <span class="se">\</span>
-    <span class="nt">--layer-weights</span><span class="o">=</span>Xavier <span class="se">\</span>
+    <span class="nt">--layer-weights</span><span class="o">=</span>XavierNormal <span class="se">\</span>
     <span class="nt">--optimizers</span><span class="o">=</span><span class="s2">"Nesterov(0.9)"</span> <span class="se">\</span>
     <span class="nt">--loss</span><span class="o">=</span>SoftmaxCrossEntropy <span class="se">\</span>
     <span class="nt">--learning-rate</span><span class="o">=</span>0.01 <span class="se">\</span>
@@ -1211,24 +1211,32 @@ The generator that is used for initializing the weights of the linear layers. Th
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Xavier</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierNormal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier Glorot weights (normal distribution)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierNormalized</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Normalized Xavier weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierUniform</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier Glorot weights (uniform distribution)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>He</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HeNormal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights (normal distribution)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HeUniform</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights (uniform distribution)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Normal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Normal distribution</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Uniform</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Uniform weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Uniform distribution</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Zero</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">All weights are zero (N.B. This usually doesn&#8217;t work)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">All weights are zero (N.B. This is not recommended for training)</p></td>
 </tr>
 </tbody>
 </table>
@@ -1882,7 +1890,7 @@ b3= (10)
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="o">&gt;</span> <span class="n">linear_layer_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">linear_layer_densities</span> <span class="o">=</span> <span class="p">{</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">};</span>
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">linear_layer_dropouts</span> <span class="o">=</span> <span class="p">{</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">};</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">{</span><span class="s">"XavierNormalized"</span><span class="p">,</span> <span class="s">"Xavier"</span><span class="p">,</span> <span class="s">"He"</span><span class="p">};</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">{</span><span class="s">"XavierNormal"</span><span class="p">,</span> <span class="s">"XavierUniform"</span><span class="p">,</span> <span class="s">"HeNormal"</span><span class="p">};</span>
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">optimizers</span> <span class="o">=</span> <span class="p">{</span><span class="s">"Nesterov(0.9)"</span><span class="p">,</span> <span class="s">"Momentum(0.9)"</span><span class="p">,</span> <span class="s">"GradientDescent"</span><span class="p">};</span>
   <span class="kt">long</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
   <span class="n">std</span><span class="o">::</span><span class="n">mt19937</span> <span class="n">rng</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">random_device</span><span class="p">{}()};</span>
@@ -2998,7 +3006,7 @@ In the tool <code>mlp</code> the option <code>--overall-density</code> is used f
 <pre class="rouge highlight"><code data-lang="bash">../install/bin/mlp <span class="se">\</span>
     <span class="nt">--layers</span><span class="o">=</span><span class="s2">"ReLU;ReLU;Linear"</span> <span class="se">\</span>
     <span class="nt">--layer-sizes</span><span class="o">=</span><span class="s2">"3072;1024;1024;10"</span> <span class="se">\</span>
-    <span class="nt">--layer-weights</span><span class="o">=</span>Xavier <span class="se">\</span>
+    <span class="nt">--layer-weights</span><span class="o">=</span>XavierNormal <span class="se">\</span>
     <span class="nt">--optimizers</span><span class="o">=</span><span class="s2">"Nesterov(0.9)"</span> <span class="se">\</span>
     <span class="nt">--loss</span><span class="o">=</span>SoftmaxCrossEntropy <span class="se">\</span>
     <span class="nt">--learning-rate</span><span class="o">=</span>0.01 <span class="se">\</span>
@@ -3129,7 +3137,7 @@ The <a href="https://github.com/wiegerw/nerva-sympy">nerva-sympy</a> repository 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-08-28 08:37:29 UTC
+Last updated 2025-09-05 06:41:29 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

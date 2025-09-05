@@ -827,7 +827,7 @@ Note that the matrix type used internally in the <code>nerva</code> module is <c
 <pre class="rouge highlight"><code data-lang="bash">python ../tools/mlp.py <span class="se">\</span>
     <span class="nt">--layers</span><span class="o">=</span><span class="s2">"ReLU;ReLU;Linear"</span> <span class="se">\</span>
     <span class="nt">--layer-sizes</span><span class="o">=</span><span class="s2">"3072;1024;1024;10"</span> <span class="se">\</span>
-    <span class="nt">--layer-weights</span><span class="o">=</span>Xavier <span class="se">\</span>
+    <span class="nt">--layer-weights</span><span class="o">=</span>XavierNormal <span class="se">\</span>
     <span class="nt">--optimizers</span><span class="o">=</span><span class="s2">"Nesterov(0.9)"</span> <span class="se">\</span>
     <span class="nt">--loss</span><span class="o">=</span>SoftmaxCrossEntropy <span class="se">\</span>
     <span class="nt">--learning-rate</span><span class="o">=</span>0.01 <span class="se">\</span>
@@ -1017,24 +1017,32 @@ The generator that is used for initializing the weights of the linear layers. Th
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Xavier</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierNormal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier Glorot weights (normal distribution)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierNormalized</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Normalized Xavier weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>XavierUniform</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Xavier Glorot weights (uniform distribution)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>He</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HeNormal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights (normal distribution)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HeUniform</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kaiming He weights (uniform distribution)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Normal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Normal distribution</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Uniform</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Uniform weights</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Uniform distribution</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Zero</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">All weights are zero (N.B. This usually doesn&#8217;t work)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">All weights are zero (N.B. This is not recommended for training)</p></td>
 </tr>
 </tbody>
 </table>
@@ -1546,19 +1554,19 @@ Ttest    (10000       )  inf-norm = 9.00000000</pre>
                    <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                    <span class="n">activation</span><span class="o">=</span><span class="nc">ReLU</span><span class="p">(),</span>
                    <span class="n">optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">())</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">XavierNormal</span><span class="p">())</span>
 
     <span class="n">layer2</span> <span class="o">=</span> <span class="nc">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                    <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
                    <span class="n">activation</span><span class="o">=</span><span class="nc">ReLU</span><span class="p">(),</span>
                    <span class="n">optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">())</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">XavierNormal</span><span class="p">())</span>
 
     <span class="n">layer3</span> <span class="o">=</span> <span class="nc">Dense</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
                    <span class="n">output_size</span><span class="o">=</span><span class="n">sizes</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
                    <span class="n">activation</span><span class="o">=</span><span class="nc">NoActivation</span><span class="p">(),</span>
                    <span class="n">optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
-                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">())</span>
+                   <span class="n">weight_initializer</span><span class="o">=</span><span class="nc">XavierNormal</span><span class="p">())</span>
 
     <span class="n">M</span> <span class="o">=</span> <span class="nc">MultilayerPerceptron</span><span class="p">()</span>
     <span class="n">M</span><span class="p">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer1</span><span class="p">,</span> <span class="n">layer2</span><span class="p">,</span> <span class="n">layer3</span><span class="p">]</span>
@@ -1580,7 +1588,7 @@ Ttest    (10000       )  inf-norm = 9.00000000</pre>
     <span class="n">layer_specifications</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">ReLU</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ReLU</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Linear</span><span class="sh">"</span><span class="p">]</span>
     <span class="n">linear_layer_densities</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
     <span class="n">linear_layer_dropouts</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
-    <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">Xavier</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Xavier</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Xavier</span><span class="sh">"</span><span class="p">]</span>
+    <span class="n">linear_layer_weights</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">XavierNormal</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">XavierNormal</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">XavierNormal</span><span class="sh">"</span><span class="p">]</span>
     <span class="n">layer_optimizers</span> <span class="o">=</span> <span class="p">[</span><span class="sh">"</span><span class="s">GradientDescent</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GradientDescent</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">GradientDescent</span><span class="sh">"</span><span class="p">]</span>
     <span class="n">layers</span> <span class="o">=</span> <span class="nf">make_layers</span><span class="p">(</span><span class="n">layer_specifications</span><span class="p">,</span>
                          <span class="n">linear_layer_sizes</span><span class="p">,</span>
@@ -1652,7 +1660,7 @@ A <code>MultilayerPerceptron</code> needs to be compiled before it can be used. 
                  <span class="n">output_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">activation</span><span class="p">:</span> <span class="n">Activation</span><span class="o">=</span><span class="nc">NoActivation</span><span class="p">(),</span>
                  <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="o">=</span><span class="nc">GradientDescent</span><span class="p">(),</span>
-                 <span class="n">weight_initializer</span><span class="p">:</span> <span class="n">WeightInitializer</span><span class="o">=</span><span class="nc">Xavier</span><span class="p">(),</span>
+                 <span class="n">weight_initializer</span><span class="p">:</span> <span class="n">WeightInitializer</span><span class="o">=</span><span class="nc">XavierNormal</span><span class="p">(),</span>
                  <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mi">0</span>
                 <span class="p">):</span></code></pre>
 </div>
@@ -2375,7 +2383,7 @@ In the tool <code>mlp.py</code> the option <code>--overall-density</code> is use
 <pre class="rouge highlight"><code data-lang="bash">python ../tools/mlp.py <span class="se">\</span>
     <span class="nt">--layers</span><span class="o">=</span><span class="s2">"ReLU;ReLU;Linear"</span> <span class="se">\</span>
     <span class="nt">--layer-sizes</span><span class="o">=</span><span class="s2">"3072;1024;1024;10"</span> <span class="se">\</span>
-    <span class="nt">--layer-weights</span><span class="o">=</span>Xavier <span class="se">\</span>
+    <span class="nt">--layer-weights</span><span class="o">=</span>XavierNormal <span class="se">\</span>
     <span class="nt">--optimizers</span><span class="o">=</span><span class="s2">"Nesterov(0.9)"</span> <span class="se">\</span>
     <span class="nt">--loss</span><span class="o">=</span>SoftmaxCrossEntropy <span class="se">\</span>
     <span class="nt">--learning-rate</span><span class="o">=</span>0.01 <span class="se">\</span>
@@ -2490,7 +2498,7 @@ After adding these components to C&#43;&#43;, they can be integrated in the <cod
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-08-28 08:37:29 UTC
+Last updated 2025-09-05 06:41:29 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
