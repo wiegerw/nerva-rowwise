@@ -12,7 +12,7 @@ fi
 ../install/bin/mlp \
     --layers="ReLU;ReLU;Linear" \
     --layer-sizes="784;1024;512;10" \
-    --layer-weights=Xavier \
+    --layer-weights=XavierNormal \
     --optimizers="Momentum(0.9);Momentum(0.9);Momentum(0.9)" \
     --loss=SoftmaxCrossEntropy \
     --learning-rate=0.01 \

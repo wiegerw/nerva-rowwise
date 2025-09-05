@@ -425,13 +425,13 @@ PYBIND11_MODULE(nervalibrowwise, m)
   /////////////////////////////////////////////////////////////////////////
 
   py::enum_<weight_initialization>(m, "Weights")
-    .value("He", weight_initialization::he, "He")
-    .value("Xavier", weight_initialization::xavier, "Xavier")
-    .value("XavierNormalized", weight_initialization::xavier_normalized, "XavierNormalized")
+    .value("HeNormal", weight_initialization::he_normal, "HeNormal")
+    .value("HeUniform", weight_initialization::he_uniform, "HeUniform")
+    .value("XavierNormal", weight_initialization::xavier_normal, "XavierNormal")
+    .value("XavierUniform", weight_initialization::xavier_uniform, "XavierUniform")
+    .value("Normal", weight_initialization::normal, "Normal")
     .value("Uniform", weight_initialization::uniform, "Uniform")
-    .value("PyTorch", weight_initialization::pytorch, "PyTorch")
     .value("Zero", weight_initialization::zero, "Zero")
-    .value("None_", weight_initialization::none, "None")
     ;
 
   m.def("initialize_weights", initialize_weights<eigen::matrix>);

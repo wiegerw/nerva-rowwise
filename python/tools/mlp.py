@@ -152,7 +152,7 @@ def make_argument_parser():
     # pruning + growing (experimental!)
     cmdline_parser.add_argument("--prune", help="The pruning strategy: Magnitude(<rate>), SET(<rate>) or Threshold(<value>)", type=str)
     cmdline_parser.add_argument("--grow", help="The growing strategy: (default: Random)", type=str)
-    cmdline_parser.add_argument('--grow-weights', type=str, help='The function used for growing weigths: Xavier, XavierNormalized, He, PyTorch, Zero', default='Xavier')
+    cmdline_parser.add_argument('--grow-weights', type=str, help='The function used for growing weigths: XavierNormal, XavierUniform, HeNormal, ...', default='XavierNormal')
 
     # multi-threading
     cmdline_parser.add_argument("--threads", help="The number of threads being used", type=int)

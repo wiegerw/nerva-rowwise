@@ -290,7 +290,7 @@ TEST_CASE("test_mlp0")
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.0, 0.0, 0.0},
-                {"XavierNormalized", "XavierNormalized", "XavierNormalized"},
+                {"XavierNormal", "XavierNormal", "XavierNormal"},
                 {"GradientDescent", "GradientDescent", "GradientDescent"},
                 batch_size
                 );
@@ -316,7 +316,7 @@ TEST_CASE("test_mlp1")
   std::vector<std::size_t> linear_layer_sizes = {2, 2, 2, 2};
   std::vector<double> linear_layer_densities = {0.6, 0.4, 1.0};
   std::vector<double> linear_layer_dropouts = {0.0, 0.0, 0.0};
-  std::vector<std::string> linear_layer_weights = {"XavierNormalized", "Xavier", "He"};
+  std::vector<std::string> linear_layer_weights = {"XavierNormal", "XavierUniform", "HeNormal"};
   std::vector<std::string> optimizers = {"Nesterov(0.9)", "Momentum(0.9)", "GradientDescent"};
   long batch_size = 5;
   std::mt19937 rng{std::random_device{}()};
@@ -363,7 +363,7 @@ TEST_CASE("test_dropout_relu")
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.5, 0.0, 0.0},
-                {"XavierNormalized", "XavierNormalized", "XavierNormalized"},
+                {"XavierNormal", "XavierNormal", "XavierNormal"},
                 {"GradientDescent", "GradientDescent", "GradientDescent"},
                 batch_size
   );
@@ -397,7 +397,7 @@ TEST_CASE("test_dropout_linear")
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.0, 0.0, p},
-                {"Xavier", "Xavier", "Xavier"},
+                {"XavierNormal", "XavierNormal", "XavierNormal"},
                 {"GradientDescent", "GradientDescent", "GradientDescent"},
                 batch_size
   );
@@ -431,7 +431,7 @@ TEST_CASE("test_dropout_sigmoid")
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {p, 0.0, 0.0},
-                {"Xavier", "Xavier", "Xavier"},
+                {"XavierNormal", "XavierNormal", "XavierNormal"},
                 {"GradientDescent", "GradientDescent", "GradientDescent"},
                 batch_size
   );
@@ -464,7 +464,7 @@ TEST_CASE("test_batch_normalization1")
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.0, 0.0, 0.0},
-                {"Xavier", "Xavier", "Xavier"},
+                {"XavierNormal", "XavierNormal", "XavierNormal"},
                 {"GradientDescent", "GradientDescent", "GradientDescent", "GradientDescent"},
                 batch_size
   );
@@ -497,7 +497,7 @@ TEST_CASE("test_batch_normalization2")
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.0, 0.0, 0.0},
-                {"Xavier", "Xavier", "Xavier"},
+                {"XavierNormal", "XavierNormal", "XavierNormal"},
                 {"GradientDescent", "GradientDescent", "GradientDescent", "GradientDescent"},
                 batch_size
   );
@@ -529,7 +529,7 @@ TEST_CASE("test_checkerboard")
                 linear_layer_sizes,
                 {1.0, 1.0, 1.0},
                 {0.0, 0.0, 0.0},
-                {"Xavier", "Xavier", "Xavier"},
+                {"XavierNormal", "XavierNormal", "XavierNormal"},
                 {"GradientDescent", "GradientDescent", "GradientDescent"},
                 batch_size
   );

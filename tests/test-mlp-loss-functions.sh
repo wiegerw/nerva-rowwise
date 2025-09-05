@@ -8,7 +8,7 @@ do
     ../install/bin/mlp \
     --layers="ReLU;ReLU;Softmax" \
     --layer-sizes="3072;128;128;10" \
-    --layer-weights="Xavier" \
+    --layer-weights="XavierNormal" \
     --densities="1" \
     --optimizers="GradientDescent" \
     --loss=$loss \

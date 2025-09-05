@@ -3,7 +3,7 @@
 seed=12345
 layers="ReLU;ReLU;Linear"
 layer_sizes="3072,1024,1024,10"
-layer_weights=XavierNormalized
+layer_weights=XavierNormal
 learning_rate="Constant(0.01)"
 optimizers="Nesterov(0.9)"
 loss="SoftmaxCrossEntropy"

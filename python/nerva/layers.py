@@ -8,7 +8,7 @@ import nervalibrowwise
 
 from nerva.activation_functions import Activation, NoActivation, parse_activation
 from nerva.optimizers import Optimizer, GradientDescent, parse_optimizer
-from nerva.weights import WeightInitializer, Xavier, parse_weight_initializer
+from nerva.weights import WeightInitializer, XavierNormal, parse_weight_initializer
 
 
 class Layer(object):
@@ -28,7 +28,7 @@ class Dense(Layer):
                  output_size: int,
                  activation: Activation=NoActivation(),
                  optimizer: Optimizer=GradientDescent(),
-                 weight_initializer: WeightInitializer=Xavier(),
+                 weight_initializer: WeightInitializer=XavierNormal(),
                  dropout_rate: float=0
                 ):
      # end::dense_constructor[]
@@ -84,7 +84,7 @@ class Sparse(Layer):
                  density: float,
                  activation: Activation=NoActivation(),
                  optimizer: Optimizer=GradientDescent(),
-                 weight_initializer: WeightInitializer=Xavier()):
+                 weight_initializer: WeightInitializer=XavierNormal()):
         """
         A sparse layer.
 
@@ -150,7 +150,7 @@ class Sparse(Layer):
     def prune_threshold(self, threshold: float) -> int:
         return self._layer.prune_threshold(threshold)
 
-    def grow_random(self, count: int, weight_initializer=Xavier()) -> None:
+    def grow_random(self, count: int, weight_initializer=XavierNormal()) -> None:
         self._layer.grow_random(str(weight_initializer), count)
 
 

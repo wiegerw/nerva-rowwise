@@ -18,7 +18,7 @@ from nerva.layers import Dense, make_layers
 from nerva.loss_functions import SoftmaxCrossEntropyLoss
 from nerva.multilayer_perceptron import MultilayerPerceptron
 from nerva.optimizers import GradientDescent
-from nerva.weights import Xavier
+from nerva.weights import XavierNormal
 
 
 def check_tensors_are_close(name1, X1, name2, X2, atol=1e-3, rtol=1e-3):
@@ -89,19 +89,19 @@ def construct_mlp1(sizes: List[int], batch_size: int):
                    output_size=sizes[1],
                    activation=ReLU(),
                    optimizer=GradientDescent(),
-                   weight_initializer=Xavier())
+                   weight_initializer=XavierNormal())
 
     layer2 = Dense(input_size=sizes[1],
                    output_size=sizes[2],
                    activation=ReLU(),
                    optimizer=GradientDescent(),
-                   weight_initializer=Xavier())
+                   weight_initializer=XavierNormal())
 
     layer3 = Dense(input_size=sizes[2],
                    output_size=sizes[3],
                    activation=NoActivation(),
                    optimizer=GradientDescent(),
-                   weight_initializer=Xavier())
+                   weight_initializer=XavierNormal())
 
     M = MultilayerPerceptron()
     M.layers = [layer1, layer2, layer3]
@@ -117,7 +117,7 @@ def construct_mlp2(linear_layer_sizes: List[int], batch_size: int):
     layer_specifications = ["ReLU", "ReLU", "Linear"]
     linear_layer_densities = [1.0, 1.0, 1.0]
     linear_layer_dropouts = [0.0, 0.0, 0.0]
-    linear_layer_weights = ["Xavier", "Xavier", "Xavier"]
+    linear_layer_weights = ["XavierNormal", "XavierNormal", "XavierNormal"]
     layer_optimizers = ["GradientDescent", "GradientDescent", "GradientDescent"]
     layers = make_layers(layer_specifications,
                          linear_layer_sizes,

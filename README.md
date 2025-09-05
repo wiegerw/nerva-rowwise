@@ -57,7 +57,7 @@ Install the Python bindings via `pip`. See the [Python manual](https://wiegerw.g
 ../install/bin/mlp \
     --layers="ReLU;ReLU;Linear" \
     --layer-sizes="3072;1024;1024;10" \
-    --layer-weights=Xavier \
+    --layer-weights=XavierNormal \
     --optimizers="Nesterov(0.9)" \
     --loss=SoftmaxCrossEntropy \
     --learning-rate=0.01 \

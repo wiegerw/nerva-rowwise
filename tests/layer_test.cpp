@@ -109,7 +109,7 @@ TEST_CASE("test_linear_layer2")
 
   sparse_linear_layer layer(D, K, N);
   set_support_random(layer, density, rng);
-  initialize_weights(weight_initialization::xavier, layer.W, layer.b, rng);
+  initialize_weights(weight_initialization::xavier_normal, layer.W, layer.b, rng);
 
   std::cout << "layer.W =\n" << layer.W.to_string() << std::endl;
   std::cout << "layer.W.values = " << print_list(layer.W.values()) << std::endl;

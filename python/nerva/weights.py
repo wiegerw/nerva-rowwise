@@ -6,19 +6,29 @@ class WeightInitializer(object):
     pass
 
 
-class Xavier(WeightInitializer):
+class HeNormal(WeightInitializer):
     def __str__(self):
-        return 'Xavier'
+        return 'HeNormal'
 
 
-class XavierNormalized(WeightInitializer):
+class HeUniform(WeightInitializer):
     def __str__(self):
-        return 'XavierNormalized'
+        return 'HeUniform'
 
 
-class He(WeightInitializer):
+class XavierNormal(WeightInitializer):
     def __str__(self):
-        return 'He'
+        return 'XavierNormal'
+
+
+class XavierUniform(WeightInitializer):
+    def __str__(self):
+        return 'XavierUniform'
+
+
+class Normal(WeightInitializer):
+    def __str__(self):
+        return 'Normal'
 
 
 class Uniform(WeightInitializer):
@@ -26,34 +36,24 @@ class Uniform(WeightInitializer):
         return 'Uniform'
 
 
-class PyTorch(WeightInitializer):
-    def __str__(self):
-        return 'PyTorch'
-
-
 class Zero(WeightInitializer):
     def __str__(self):
         return 'Zero'
 
 
-class None_(WeightInitializer):
-    def __str__(self):
-        return 'None'
-
-
 def parse_weight_initializer(text: str):
-    if text == 'Xavier':
-        return Xavier()
-    elif text == 'XavierNormalized':
-        return XavierNormalized()
-    elif text == 'He':
-        return He()
+    if text == 'HeNormal':
+       return HeNormal()
+    elif text == 'HeUniform':
+        return HeUniform()
+    elif text == 'XavierNormal':
+        return XavierNormal()
+    elif text == 'XavierUniform':
+        return XavierUniform()
+    elif text == 'Normal':
+        return Normal()
     elif text == 'Uniform':
         return Uniform()
     elif text == 'Zero':
         return Zero()
-    elif text == 'PyTorch':
-        return PyTorch()
-    elif text == 'None':
-        return None_()
     raise RuntimeError(f"unknown weight initializer '{text}'")

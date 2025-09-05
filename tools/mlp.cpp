@@ -336,7 +336,7 @@ class mlp_tool: public command_line_tool
     // pruning + growing
     std::string prune_strategy;
     std::string grow_strategy = "Random";
-    std::string grow_weights = "Xavier";
+    std::string grow_weights = "XavierNormal";
 
     void add_options(lyra::cli& cli) override
     {
@@ -369,9 +369,9 @@ class mlp_tool: public command_line_tool
       cli |= lyra::opt(options.loss_function, "value")["--loss"]("The loss function (squared-error, cross-entropy, logistic-cross-entropy)");
 
       // weights
-      cli |= lyra::opt(layer_weights_text, "value")["--layer-weights"]("The weight initialization of the layers (default, he, uniform, xavier, normalized_xavier, uniform)");
-      cli |= lyra::opt(load_weights_file, "value")["--load-weights"]("Loads the weights and bias from a file in .npz format");
-      cli |= lyra::opt(save_weights_file, "value")["--save-weights"]("Saves the weights and bias to a file in .npz format");
+      cli |= lyra::opt(layer_weights_text, "value")["--layer-weights"]("Weight initialization method for new layers (e.g. \"XavierNormal\").");
+      cli |= lyra::opt(load_weights_file, "value")["--load-weights"]("Load model weights and biases from a .npz file.");
+      cli |= lyra::opt(save_weights_file, "value")["--save-weights"]("Save model weights and biases to a .npz file.");
 
       // dataset
       cli |= lyra::opt(options.cifar10, "value")["--cifar10"]("The directory of the CIFAR-10 dataset");
@@ -393,7 +393,7 @@ class mlp_tool: public command_line_tool
       // pruning + growing
       cli |= lyra::opt(prune_strategy, "strategy")["--prune"]("The pruning strategy: Magnitude(<drop_fraction>), SET(<drop_fraction>) or Threshold(<value>)");
       cli |= lyra::opt(grow_strategy, "strategy")["--grow"]("The growing strategy: (default: Random)");
-      cli |= lyra::opt(grow_weights, "value")["--grow-weights"]("The weight function used for growing x=Xavier, X=XavierNormalized, ...");
+      cli |= lyra::opt(grow_weights, "value")["--grow-weights"]("The weight function used for growing x=XavierNormal, X=XavierUniform, ...");
 
       // miscellaneous
       cli |= lyra::opt(computation, "value")["--computation"]("The computation mode (eigen, mkl, blas)");

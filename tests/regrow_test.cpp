@@ -151,7 +151,7 @@ TEST_CASE("test_regrow")
   print_numpy_matrix("A", A);
 
   std::mt19937 rng{std::random_device{}()};
-  auto init = std::make_shared<ten_weight_initializer>(rng);
+  auto init = std::make_shared<weight_initializer_ten>(rng);
 
   long k = 4; // consider the 5 smallest nonzero elements
   scalar threshold;
@@ -259,7 +259,7 @@ TEST_CASE("test2")
       // dense matrices
       std::cout << "--- dense ---" << std::endl;
       auto B = A;
-      auto init = std::make_shared<ten_weight_initializer>(rng);
+      auto init = std::make_shared<weight_initializer_ten>(rng);
       regrow_interval(B, init, negative_count, positive_count, rng);
       print_numpy_matrix("B", B);
       CHECK_EQ((B.array() == 10).count(), negative_count + positive_count);
