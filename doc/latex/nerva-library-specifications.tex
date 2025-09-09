@@ -1287,37 +1287,95 @@ Using property \eqref{eq:matrix-property7} we can generalize equation \eqref{eq:
 where we used the well known fact that in the univariate case $\frac{d}{dt} \log(\sigma(t)) = 1 - \log(\sigma(t))$.
 
 \section{Weight initialization} \label{section:weight-initialization}
+
 The initial values of the weights in linear layers must be carefully chosen, as they may have a large impact on the performance of a neural network \cite{DBLP_journals_air_NarkhedeBS22}.
-Typically, these values are randomly generated on the basis of specific probability distributions. In this section, we give a few commonly used distributions.
+Typically, these values are randomly generated according to specific probability distributions. 
+In this section, we summarize a few commonly used weight initialization strategies.
 
 \[
 \begin{array}{@{} *{3}{L} @{}}
-  \textsc{name} & \textsc{distribution}
-  \\
+  \textsc{Name} & \textsc{Distribution} & \textsc{Notes} \\
   \addlinespace[1ex]
 
-  \text{Uniform} & U(a,b)
-  \\
+  \text{Uniform} & U(a,b) & \text{Simple uniform initialization} \\
   \addlinespace[1ex]
 
-  \text{Xavier \cite{pmlr-v9-glorot10a}} & U(- \frac{1}{\sqrt{\const{D}}}, \frac{1}{\sqrt{\const{D}}}) \\
+  \text{XavierUniform \cite{pmlr-v9-glorot10a}} & 
+    U\Big(- \frac{\sqrt{6}}{\sqrt{D+K}}, \frac{\sqrt{6}}{\sqrt{D+K}}\Big) & 
+    \text{Classic Glorot uniform, $D$ = fan-in, $K$ = fan-out} \\
   \addlinespace[1ex]
 
-  \text{Normalized Xavier \cite{pmlr-v9-glorot10a}} & U(- \frac{\sqrt{6}}{\sqrt{\const{D}+\const{K}}}, \frac{\sqrt{6}}{\sqrt{\const{D}+\const{K}}}), \\
+  \text{XavierNormal \cite{pmlr-v9-glorot10a}} & 
+    \mathcal{N}\Big(0, \sqrt{\frac{2}{D+K}}\Big) & 
+    \text{Gaussian variant, ReLU-friendly} \\
   \addlinespace[1ex]
 
-  \text{He \cite{he2015delving}} & \mathcal{N}(0, \sqrt{\frac{2}{\const{D}}}),
+  \text{HeNormal \cite{he2015delving}} & 
+    \mathcal{N}\Big(0, \sqrt{\frac{2}{D}}\Big) & 
+    \text{ReLU initialization, fan-in = $D$} \\
+  \addlinespace[1ex]
 
+  \text{HeUniform \cite{he2015delving}} & 
+    U\Big(- \sqrt{\frac{6}{D}}, \sqrt{\frac{6}{D}}\Big) & 
+    \text{Uniform variant of He, less common} \\
 \end{array}
 \]
-where $\const{D}$ is the number of inputs and $\const{K}$ the number of outputs of the layer to which the weight matrix belongs. Furthermore, $U(a,b)$ is the uniform distribution in a given interval $[a, b]$, and $\mathcal{N}(\mu,\sigma)$ is the normal distribution with mean $\mu$ and standard deviation $\sigma$.
 
+Here, $D$ is the number of inputs (fan-in) and $K$ is the number of outputs (fan-out) of the layer to which the weight matrix belongs.
+Furthermore, $U(a,b)$ denotes a uniform distribution over the interval $[a, b]$, and $\mathcal{N}(\mu,\sigma)$ denotes a normal distribution with mean $\mu$ and standard deviation $\sigma$.
+Unlike weights, the initial values of bias vectors are typically set to zero or a small constant rather than drawn from a probability distribution.
 
-Unlike weights, the initial values of bias vectors are typically set to a small constant or zero rather than drawn from probability distributions. However, the Xavier weight distribution can also be used.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Weight initialization} \label{section:weight-initialization}
+The initial values of the weights in linear layers must be carefully chosen, as they may have a large impact on the performance of a neural network \cite{DBLP_journals_air_NarkhedeBS22}. Typically, these values are randomly generated according to specific probability distributions. 
+In this section, we summarize a few commonly used weight initialization strategies.
 
+\[
+\begin{array}{@{} *{3}{L} @{}}
+  \textsc{Name} & \textsc{Distribution} & \textsc{Notes} \\
+  \addlinespace[1ex]
+  \text{Uniform} & U(a,b) & \text{Simple uniform initialization in } [a,b) \\
+  \addlinespace[1ex]
+  \text{Zero Initialization} & \delta_0 & \text{All weights set to zero (not recommended for weights)} \\
+  \addlinespace[1ex]
+  \text{XavierUniform \cite{pmlr-v9-glorot10a}} & 
+    U\Big(- \frac{\sqrt{6}}{\sqrt{D+K}}, \frac{\sqrt{6}}{\sqrt{D+K}}\Big) & 
+    \text{Classic Glorot uniform, $D$ = fan-in, $K$ = fan-out} \\
+  \addlinespace[1ex]
+  \text{XavierNormal \cite{pmlr-v9-glorot10a}} & 
+    \mathcal{N}\Big(0, \sqrt{\frac{2}{D+K}}\Big) & 
+    \text{Glorot normal for tanh/sigmoid, preserves variance} \\
+  \addlinespace[1ex]
+  \text{HeNormal \cite{he2015delving}} & 
+    \mathcal{N}\Big(0, \sqrt{\frac{2}{D}}\Big) & 
+    \text{For ReLU activations, fan-in = $D$} \\
+  \addlinespace[1ex]
+  \text{HeUniform \cite{he2015delving}} & 
+    U\Big(- \sqrt{\frac{6}{D}}, \sqrt{\frac{6}{D}}\Big) & 
+    \text{Uniform variant of He initialization, less common} \\
+\end{array}
+\]
 
+Here, $D$ is the number of inputs (fan-in) and $K$ is the number of outputs (fan-out) of the layer to which the weight matrix belongs. 
+Furthermore, $U(a,b)$ denotes a uniform distribution over the interval $[a, b]$, $\mathcal{N}(\mu,\sigma)$ denotes a normal distribution with mean $\mu$ and standard deviation $\sigma$, and $\delta_0$ denotes a point mass at zero. Unlike weights, the initial values of bias vectors are typically set to zero or a small constant rather than drawn from a probability distribution.
 
+\bigskip
 
+% \textbf{Implementation notes:} 
+
+% \begin{itemize}
+% \item \texttt{set\_weights\_uniform(W, a, b)} initializes weights with random values uniformly distributed in $[a,b)$.
+% \item \texttt{set\_weights\_normal(W, mean, std)} initializes weights with random values from Gaussian distribution $\mathcal{N}(\text{mean}, \text{std})$.
+% \item \texttt{set\_weights\_xavier\_uniform(W)} implements Glorot uniform initialization optimized for tanh/sigmoid activations, using limits ±$\sqrt{\frac{6}{D+K}}$.
+% \item \texttt{set\_weights\_xavier\_normal(W)} implements Glorot normal initialization (also for tanh/sigmoid), with standard deviation $\sqrt{\frac{2}{D+K}}$.
+% \item \texttt{set\_weights\_he\_normal(W)} implements Kaiming normal initialization tailored for ReLU activations, with standard deviation $\sqrt{\frac{2}{D}}$.
+% \item \texttt{set\_weights\_he\_uniform(W)} implements Kaiming uniform initialization (less commonly used), with limits ±$\sqrt{\frac{6}{D}}$.
+% \item \texttt{set\_weights\_zero(W)} initializes all weights to zero, but this is generally discouraged for weights, as it prevents symmetry breaking in learning.
+% \end{itemize}
+
+\noindent 
+These initializations help keep signal variances stable across layers or avoid vanishing/exploding gradients, contributing to effective training of neural networks.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 
 \section{Optimization} \label{section:optimization}
 In the optimization step, the parameters $\theta$ of a layer are updated based on the value of their gradient $\Gradient \theta$ with respect to a given loss function. The goal of this step is to decrease the value of the loss. In this section, we give three common choices for optimization methods: gradient descent, momentum, and Nesterov. All take a learning rate parameter $\eta$ as input, which is used to control the size of the optimization step. Our equations are equivalent to the ones in Keras \cite{chollet2015keras}, but presented in matrix form. 
