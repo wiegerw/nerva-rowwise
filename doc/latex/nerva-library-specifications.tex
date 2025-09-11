@@ -610,29 +610,29 @@ DX = hadamard(row_repeat(inv_sqrt_Sigma / N, N),
 \textsc{feedforward equations} & \textsc{backpropagation equations} \\
 \addlinespace[1ex]
 \begin{aligned}[t]
-Y &= X (W^\top \odot R) + 1_\const{N} \cdot b
+Y &= X (W \odot R)^\top + 1_\const{N} \cdot b
 \end{aligned}
 &
 \begin{aligned}[t]
-\Gradient W &= (\Gradient Y^\top \cdot X) \odot R^\top
+\Gradient W &= (\Gradient Y^\top \cdot X) \odot R
 \\
 \Gradient b &= 1_\const{N}^\top \cdot \Gradient Y
 \\
-\Gradient X &= \Gradient Y (W \odot R^\top)
+\Gradient X &= \Gradient Y (W \odot R)
 \end{aligned}
 \\
 \addlinespace[2ex]
 \begin{minipage}[t]{0.5\textwidth}
 \small\begin{verbatim}
-Y = X * hadamard(W.T, R) + row_repeat(b, N)
+Y = X * hadamard(W, R).T + row_repeat(b, N)
 \end{verbatim}
 \end{minipage}
 &
 \begin{minipage}[t]{0.5\textwidth}
 \small\begin{verbatim}
-DW = hadamard(DY.T * X, R.T)
+DW = hadamard(DY.T * X, R)
 Db = columns_sum(DY)
-DX = DY * hadamard(W, R.T)
+DX = DY * hadamard(W, R)
 \end{verbatim}
 \end{minipage} \\
 \end{array}
@@ -646,7 +646,7 @@ DX = DY * hadamard(W, R.T)
 \textsc{feedforward equations} & \textsc{backpropagation equations} \\
 \addlinespace[1ex]
 \begin{aligned}[t]
-Z &= X (W^\top \odot R) + 1_\const{N} \cdot b
+Z &= X (W \odot R)^\top + 1_\const{N} \cdot b
 \\
 Y &= \func{act}(Z)
 \end{aligned}
@@ -654,17 +654,17 @@ Y &= \func{act}(Z)
 \begin{aligned}[t]
 \Gradient Z &= \Gradient Y \odot \func{act}'(Z)
 \\
-\Gradient W &= (\Gradient Z^\top \cdot X) \odot R^\top
+\Gradient W &= (\Gradient Z^\top \cdot X) \odot R
 \\
 \Gradient b &= 1_\const{N}^\top \cdot \Gradient Z
 \\
-\Gradient X &= \Gradient Z (W \odot R^\top)
+\Gradient X &= \Gradient Z (W \odot R)
 \end{aligned}
 \\
 \addlinespace[2ex]
 \begin{minipage}[t]{0.5\textwidth}
 \small\begin{verbatim}
-Z = X * hadamard(W.T, R) + row_repeat(b, N)
+Z = X * hadamard(W, R).T + row_repeat(b, N)
 Y = act(Z)
 \end{verbatim}
 \end{minipage}
@@ -672,9 +672,9 @@ Y = act(Z)
 \begin{minipage}[t]{0.5\textwidth}
 \small\begin{verbatim}
 DZ = hadamard(DY, act.gradient(Z))
-DW = hadamard(DZ.T * X, R.T)
+DW = hadamard(DZ.T * X, R)
 Db = columns_sum(DZ)
-DX = DZ * hadamard(W, R.T)
+DX = DZ * hadamard(W, R)
 \end{verbatim}
 \end{minipage} \\
 \end{array}
