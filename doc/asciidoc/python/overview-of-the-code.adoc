@@ -119,7 +119,7 @@ The class `LossFunction` is the base class of all loss functions. There are five
 
 * `SoftmaxCrossEntropyLoss`
 
-See the https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] document for precise definitions of these loss functions.
+See the paper https://arxiv.org/abs/2511.11918[Batch Matrix-form Equations and Implementation of Multilayer Perceptrons] for precise definitions of these loss functions.
 
 ==== Activation functions
 The class `ActivationFunction` is the base class of all activation functions. The following activation functions are available:
@@ -134,7 +134,7 @@ The class `ActivationFunction` is the base class of all activation functions. Th
 * `SReLU`
 * `HyperbolicTangent`
 
-See the https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] document for precise definitions of these activation functions.
+See the paper https://arxiv.org/abs/2511.11918[Batch Matrix-form Equations and Implementation of Multilayer Perceptrons] for precise definitions of these activation functions.
 
 === Accessing C++ data structures
 To a limited extent, the C++ data structures can be accessed in Python. In the file

@@ -30,12 +30,18 @@ Detailed documentation is available for both the C++ and Python interfaces:
 
 - [C++ Manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-rowwise.html) – build instructions, tools, and API.
 - [Python Manual](https://wiegerw.github.io/nerva-rowwise/doc/nerva-python.html) – usage of the `nerva` Python module.
-- [Mathematical Specifications (PDF)](https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf)
 
 Relevant papers:
 
-1. [**Nerva: a Truly Sparse Implementation of Neural Networks**](https://arxiv.org/abs/2407.17437)
-2. _Batch Matrix-form Equations and Implementation of Multilayer Perceptrons_ (🔗 TODO)
+1. **Nerva: a Truly Sparse Implementation of Neural Networks**
+
+   [arXiv:2407.17437](https://arxiv.org/abs/2407.17437)
+   Introduces the library and reports sparse training experiments.
+
+2. **Batch Matrix-form Equations and Implementation of Multilayer Perceptrons**
+
+   [arXiv:2511.11918](https://arxiv.org/abs/2511.11918)
+   Includes mathematical specifications and derivations.
 
 ---
 

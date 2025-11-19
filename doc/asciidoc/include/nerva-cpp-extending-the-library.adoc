@@ -24,8 +24,7 @@ The {library} can be extended in several obvious ways, such as adding new layers
 |`grow_function`
 |===
 
-It is recommended to follow the approach advocated in the Nerva libraries. Each implementation should be based on a mathematical specification, as shown in the
-https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] document.
+It is recommended to follow the approach advocated in the Nerva libraries. Each implementation should be based on a mathematical specification, as explained in the paper https://arxiv.org/abs/2511.11918[Batch Matrix-form Equations and Implementation of Multilayer Perceptrons].
 After defining the mathematical equations, you can use the table of <<table_matrix_operations>> to convert the equations into code.
 
 Another crucial step is validation and testing. The symbolic mathematics library

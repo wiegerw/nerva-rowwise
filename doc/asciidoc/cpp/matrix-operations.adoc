@@ -8,7 +8,7 @@ Using this table leads to concise and uniform code. For example, the backpropaga
 ----
 include::{root}/include/nerva/neural_networks/layers.h[tag=matrix_operations]
 ----
-See the specification document https://wiegerw.github.io/nerva-rowwise/pdf/nerva-library-specifications.pdf[Nerva library specifications] for an overview of how these matrix operations are used.
+See the paper https://arxiv.org/abs/2511.11918[Batch Matrix-form Equations and Implementation of Multilayer Perceptrons] for an overview of how these matrix operations are used.
 
 === Eigen library
 The {library} uses the https://eigen.tuxfamily.org/[Eigen library] for representing matrices. The matrix operations in table <<table_matrix_operations>> have been implemented using Eigen, see the file https://github.com/wiegerw/nerva-rowwise/blob/main/include/nerva/neural_networks/matrix_operations.h[matrix_operations.h].
